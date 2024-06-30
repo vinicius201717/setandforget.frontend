@@ -1,0 +1,41 @@
+{
+  "extends": [
+    "@rocketseat/eslint-config/react"
+  ],
+  "rules": { "no-unused-vars": [
+      "error",
+      { "varsIgnorePattern": "^_unused$" }
+    ],
+    "no-unused-expressions": "error"
+  },
+  "plugins": [
+    "import"
+  ],
+  "settings": {
+    "import/parsers": {
+      "@typescript-eslint/parser": [
+        ".ts",
+        ".tsx"
+      ]
+    },
+    "import/resolver": {
+      "typescript": {
+        "alwaysTryTypes": true,
+        "project": [
+          "./tsconfig.json"
+        ]
+      }
+    }
+  },
+  "overrides": [
+    {
+      "files": [
+        "src/iconify-bundle/*"
+      ],
+      "rules": {
+        "@typescript-eslint/no-var-requires": "off",
+        "no-unused-expressions": ["error", { "allowShortCircuit": true, "allowTernary": true }]
+      }
+    }
+  ]
+}
