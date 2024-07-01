@@ -5,10 +5,12 @@ import { chessChallengeCancel } from 'src/pages/api/chess/chessChallengeCancel'
 export const CancelableToastContent = ({ toastId }: any) => {
   const cancelToast = () => {
     const challengeId = window.localStorage.getItem('chess-challenge-id')
-    if (challengeId) {
-      chessChallengeCancel()
+    const roomId = window.localStorage.getItem('chess-room-id')
+    if (challengeId && roomId) {
+      chessChallengeCancel(challengeId, roomId)
         .then(() => {
           window.localStorage.removeItem('chess-challenge-id')
+          window.localStorage.removeItem('chess-room-id')
           toast.dismiss(toastId)
           toast.success('Cancellation successful.', {
             position: 'bottom-right',

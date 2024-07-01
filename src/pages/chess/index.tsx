@@ -61,7 +61,6 @@ function HomePage() {
 
     const game = globalChallenge.find((game) => game.id === id)
     if (!game) return
-
     setModalInfo({
       user: {
         id: game.user.id,
@@ -69,6 +68,7 @@ function HomePage() {
         avatar: game.user.avatar,
       },
       challengeId: id,
+      roomId: game.Room.id,
       amount: game.amount,
       duration: game.duration,
     })
@@ -98,10 +98,12 @@ function HomePage() {
   const onSubmitPlay = (data: RegisterFormData) => {
     chessChallengeCreate(data)
       .then((response: any) => {
-        const challengeId = response.id
-        const userId = response.userId
+        const roomId = response.room.id
+        const challengeId = response.challenge.id
+        const userId = response.challenge.userId
 
-        connectSocket(challengeId, userId, userId, null)
+        connectSocket(roomId, userId, userId, null)
+        window.localStorage.setItem('chess-room-id', roomId)
         window.localStorage.setItem('chess-challenge-id', challengeId)
 
         setToastId(
@@ -267,6 +269,7 @@ function HomePage() {
         <ConfirmModal
           open={modalOpen}
           challengeId={modalInfo.challengeId}
+          roomId={modalInfo.roomId}
           handleClose={handleCloseModal}
           user={modalInfo.user}
           avatar={modalInfo.user.avatar}

@@ -70,6 +70,7 @@ export interface CreatorType {
 export interface GameType {
   challengeId: string
   user: CreatorType
+  roomId: string
   amount: number
   duration: number
 }
@@ -77,6 +78,7 @@ export interface GameType {
 export interface ChallengeGlobalType {
   id: string
   user: CreatorType
+  Room: { id: string }
   duration: number
   amount: number
 }

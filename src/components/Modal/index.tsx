@@ -21,6 +21,7 @@ type UserChallengeCreatorProps = {
 interface ConfirmModalProps {
   open: boolean
   challengeId: string
+  roomId: string
   handleClose: () => void
   user: UserChallengeCreatorProps
   avatar: string
@@ -30,7 +31,7 @@ interface ConfirmModalProps {
 
 function ConfirmModal({
   open,
-  challengeId,
+  roomId,
   handleClose,
   user,
   amount,
@@ -39,7 +40,7 @@ function ConfirmModal({
   const data = useAuth()
 
   const onPlay = () => {
-    connectSocket(challengeId, user.id, data?.user?.id as string, null)
+    connectSocket(roomId, user.id, data?.user?.id as string, null)
   }
 
   return (

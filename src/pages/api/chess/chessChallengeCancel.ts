@@ -1,10 +1,14 @@
 import { api } from 'src/lib/axios'
 
-export async function chessChallengeCancel(): Promise<any> {
+export async function chessChallengeCancel(
+  challengeId: string,
+  roomId: string,
+): Promise<any> {
   try {
-    const challengeId = window.localStorage.getItem('chess-challenge-id')
     if (challengeId) {
-      const response = await api.delete(`/chess-challenge/${challengeId}`)
+      const response = await api.delete(
+        `/chess-challenge/${challengeId}/${roomId}`,
+      )
 
       return response
     }

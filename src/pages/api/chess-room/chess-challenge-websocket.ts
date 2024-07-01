@@ -4,7 +4,7 @@ import { Room } from 'src/types/apps/chessTypes'
 let socket: Socket | null = null
 
 export const connectSocket = (
-  challengeId: string | null,
+  roomId: string | null,
   creatorId: string | null,
   userId: string | null,
   setChessRoom: React.Dispatch<React.SetStateAction<Room | null>> | null,
@@ -12,16 +12,17 @@ export const connectSocket = (
   if (socket) {
     socket.disconnect()
   }
-  socket = io(`http://localhost:3002/chess`, {
+
+  socket = io('http://localhost:3002/chess', {
     query: {
-      challengeId,
+      roomId,
       creatorId,
       userId,
     },
   })
 
-  socket.on('connect', () => {
-    console.log('Connected to WebSocket server')
+  socket.on('createRoom', () => {
+    if (roomId && userId) createRoom(roomId, userId)
   })
 
   socket.on('disconnect', () => {
@@ -29,8 +30,7 @@ export const connectSocket = (
   })
 
   socket.on('message', (move: string) => {
-    console.log(move)
-
+    console.log('Message received from server:', move)
     if (setChessRoom) setChessRoom(null)
   })
 
@@ -38,9 +38,21 @@ export const connectSocket = (
     console.log('Reconnected to the game:', gameData)
   })
 
-  socket.on('startGame', (data) => {
+  socket.on('roomComplete', (data) => {
     window.location.href = `/chess/play/${data.chessRoomId}`
   })
+}
+
+export const createRoom = (roomId: string, userId: string) => {
+  if (socket) {
+    socket.emit('createRoom', { roomId, userId })
+  }
+}
+
+export const joinRoom = (roomId: string, userId: string) => {
+  if (socket) {
+    socket.emit('joinRoom', { roomId, userId })
+  }
 }
 
 export const sendMove = (
@@ -54,6 +66,7 @@ export const sendMove = (
       fen,
       moveHistory,
     }
+    console.log('Sending move:', query)
     socket.emit('move', query)
   }
 }
