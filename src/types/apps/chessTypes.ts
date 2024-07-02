@@ -113,7 +113,7 @@ export interface Room {
   challenge: Challenge
   playerOne: Player
   playerTwo: Player
-  roomLogs: RoomLog[]
+  roomLog: RoomLog
 }
 
 export interface RoomLogsLive {

@@ -20,7 +20,10 @@ import {
 } from './style'
 import { chessRoomGet } from 'src/pages/api/chess-room/chess-room-get'
 import { useAuth } from 'src/hooks/useAuth'
-import { connectSocket } from 'src/pages/api/chess-room/chess-challenge-websocket'
+import {
+  connectSocket,
+  sendMove,
+} from 'src/pages/api/chess-room/chess-challenge-websocket'
 
 const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
   chessRoomId,
@@ -45,9 +48,6 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
     null,
   )
   const [orientation, setOrientation] = useState<'w' | 'b'>('w')
-
-  // const { chessRoom, liveMove, createRoom, joinRoom, reconnect, makeMove } =
-  //   useChessSocket('roomId123', 'challengeId123', 'creatorId123', 'userId123')
 
   const theme = useTheme()
   const { user, setLoading } = useAuth()
@@ -80,13 +80,16 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
   useEffect(() => {
     const initialFen =
       'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
+
     if (chessRoom) {
       if (chessRoom.playerOne.id === user?.id) {
         setOrientation('w')
       } else {
         setOrientation('b')
       }
-      const newFen = chessRoom?.roomLogs[0].fen as string
+
+      const newFen = chessRoom.roomLog.fen as string
+      const moveHistory = chessRoom?.roomLog.moveHistory as string
 
       const newGame = new Chess()
       newGame.load(newFen)
@@ -94,7 +97,6 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
       setFen(newFen)
 
       if (initialFen !== newFen) {
-        const moveHistory = chessRoom?.roomLogs[0].moveHistory as string
         if (moveHistory) {
           const lastMove: string[] = JSON.parse(moveHistory)
           setMoves(lastMove)
@@ -138,20 +140,17 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
             response.playerOne &&
             response.playerTwo
           ) {
-            setChessRoom(response)
             setLoading(false)
-
-            const challengeId = response.challenge.id
             const creatorId = response.challenge.userId
             const userId = user?.id as string
 
-            const namespace = 'chess'
-            const query = {
-              challengeId,
+            connectSocket(
+              chessRoomId,
               creatorId,
               userId,
-            }
-            connectSocket(challengeId, creatorId, userId, setChessRoom)
+              setChessRoom,
+              setLiveMove,
+            )
           }
         })
         .catch((error) => {
@@ -165,19 +164,23 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
     (move: { from: string; to: string; promotion?: string }) => {
       const moveHistory = game.history()
 
-      const roomLogId = chessRoom?.roomLogs[chessRoom.roomLogs.length - 1].id
-      const challengeId = chessRoom?.challenge.id as string
+      const roomLogId = chessRoom?.roomLog.id
       if (roomLogId) {
         const lastMove = moveHistory[moveHistory.length - 1]
-
-        const duration = JSON.stringify(timeB)
-        const newFen = game.fen()
 
         setMoves((currentMoves) => {
           const updatedMoves = [...currentMoves, lastMove]
 
           return updatedMoves
         })
+
+        sendMove(
+          chessRoomId as string,
+          chessRoom.roomLog.id,
+          move,
+          game.fen(),
+          moveHistory,
+        )
       }
     },
     [game, chessRoom, timeB],

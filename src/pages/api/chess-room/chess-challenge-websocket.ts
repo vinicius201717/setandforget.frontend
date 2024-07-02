@@ -8,6 +8,16 @@ export const connectSocket = (
   creatorId: string | null,
   userId: string | null,
   setChessRoom: React.Dispatch<React.SetStateAction<Room | null>> | null,
+  setLiveMove: React.Dispatch<
+    React.SetStateAction<
+      | {
+          from: string
+          to: string
+          promotion?: string
+        }
+      | undefined
+    >
+  > | null,
 ) => {
   if (socket) {
     socket.disconnect()
@@ -21,8 +31,8 @@ export const connectSocket = (
     },
   })
 
-  socket.on('createRoom', () => {
-    if (roomId && userId) createRoom(roomId, userId)
+  socket.on('move', (move) => {
+    if (setLiveMove) setLiveMove(move)
   })
 
   socket.on('disconnect', () => {
@@ -34,39 +44,32 @@ export const connectSocket = (
     if (setChessRoom) setChessRoom(null)
   })
 
-  socket.on('reconnected', (gameData) => {
-    console.log('Reconnected to the game:', gameData)
+  socket.on('reconnected', (game) => {
+    if (setChessRoom) setChessRoom(game)
   })
 
   socket.on('roomComplete', (data) => {
-    window.location.href = `/chess/play/${data.chessRoomId}`
+    window.localStorage.removeItem('chess-challenge-id')
+    window.localStorage.removeItem('chess-room-id')
+    window.location.href = `/chess/play/${data.roomId}`
   })
 }
 
-export const createRoom = (roomId: string, userId: string) => {
-  if (socket) {
-    socket.emit('createRoom', { roomId, userId })
-  }
-}
-
-export const joinRoom = (roomId: string, userId: string) => {
-  if (socket) {
-    socket.emit('joinRoom', { roomId, userId })
-  }
-}
-
 export const sendMove = (
+  roomId: string,
+  roomLogId: string,
   move: { from: string; to: string },
   fen: string,
-  moveHistory: string,
+  moveHistory: string[],
 ) => {
   if (socket) {
     const query = {
-      move,
+      roomId,
+      roomLogId,
+      ...move,
       fen,
       moveHistory,
     }
-    console.log('Sending move:', query)
     socket.emit('move', query)
   }
 }
