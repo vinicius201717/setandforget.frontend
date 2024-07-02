@@ -102,7 +102,7 @@ function HomePage() {
         const challengeId = response.challenge.id
         const userId = response.challenge.userId
 
-        connectSocket(roomId, userId, userId, null)
+        connectSocket(challengeId, roomId, userId, userId, null, null)
         window.localStorage.setItem('chess-room-id', roomId)
         window.localStorage.setItem('chess-challenge-id', challengeId)
 

@@ -31,6 +31,7 @@ interface ConfirmModalProps {
 
 function ConfirmModal({
   open,
+  challengeId,
   roomId,
   handleClose,
   user,
@@ -40,7 +41,14 @@ function ConfirmModal({
   const data = useAuth()
 
   const onPlay = () => {
-    connectSocket(roomId, user.id, data?.user?.id as string, null)
+    connectSocket(
+      challengeId,
+      roomId,
+      user.id,
+      data?.user?.id as string,
+      null,
+      null,
+    )
   }
 
   return (

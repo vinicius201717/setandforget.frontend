@@ -124,6 +124,9 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
         const moveHistory = game.history()
         const lastMove = moveHistory[moveHistory.length - 1]
         setMoves((currentMoves) => [...currentMoves, lastMove])
+
+        setHighlightSquareFrom(from as Square)
+        setHighlightSquareTo(to as Square)
       } else {
         console.error('Movimento inválido:', liveMove)
       }
@@ -142,9 +145,11 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
           ) {
             setLoading(false)
             const creatorId = response.challenge.userId
+            const challengeId = response.challenge.id
             const userId = user?.id as string
 
             connectSocket(
+              challengeId,
               chessRoomId,
               creatorId,
               userId,
@@ -168,6 +173,7 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
       if (roomLogId) {
         const lastMove = moveHistory[moveHistory.length - 1]
 
+        const currentMoves = [...moves, lastMove]
         setMoves((currentMoves) => {
           const updatedMoves = [...currentMoves, lastMove]
 
@@ -179,7 +185,7 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
           chessRoom.roomLog.id,
           move,
           game.fen(),
-          moveHistory,
+          currentMoves,
         )
       }
     },
@@ -260,7 +266,7 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
 
           if (
             (piece && piece.color !== game.turn()) ||
-            orientation === game.turn()
+            orientation !== game.turn()
           ) {
             setHighlightSquareFrom(null)
             setHighlightSquareTo(null)

@@ -4,6 +4,7 @@ import { Room } from 'src/types/apps/chessTypes'
 let socket: Socket | null = null
 
 export const connectSocket = (
+  challengeId: string | null,
   roomId: string | null,
   creatorId: string | null,
   userId: string | null,
@@ -25,6 +26,7 @@ export const connectSocket = (
 
   socket = io('http://localhost:3002/chess', {
     query: {
+      challengeId,
       roomId,
       creatorId,
       userId,
