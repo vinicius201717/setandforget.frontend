@@ -15,6 +15,8 @@ export const connectSocket = (
           from: string
           to: string
           promotion?: string
+          wTime: number
+          bTime: number
         }
       | undefined
     >
@@ -60,6 +62,7 @@ export const connectSocket = (
 export const sendMove = (
   roomId: string,
   roomLogId: string,
+  userId: string,
   move: { from: string; to: string },
   fen: string,
   moveHistory: string[],
@@ -68,6 +71,7 @@ export const sendMove = (
     const query = {
       roomId,
       roomLogId,
+      userId,
       ...move,
       fen,
       moveHistory,

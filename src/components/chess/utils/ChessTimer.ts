@@ -1,53 +1,59 @@
 /* eslint-disable no-unused-vars */
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 
-interface TimerProps {
-  initialTime: number
-  onTimeEnd: (player: 'w' | 'b') => void
+interface UseClockResult {
+  time: number
+  isRunning: boolean
+  start: () => void
+  pause: () => void
+  reset: (newTime: number) => void
 }
 
-interface Timer {
-  timeW: number
-  timeB: number
-  switchPlayer: () => void
-  resetTimer: (value: number) => void
-}
+const useClock = (initialTime: number): UseClockResult => {
+  const [time, setTime] = useState<number>(initialTime)
+  const [isRunning, setIsRunning] = useState<boolean>(false)
+  const intervalRef = useRef<NodeJS.Timeout | null>(null)
 
-export const useChessTimer = ({
-  initialTime,
-  onTimeEnd,
-}: TimerProps): Timer => {
-  const [timeW, setTimeW] = useState(initialTime)
-  const [timeB, setTimeB] = useState(initialTime)
-  const [activePlayer, setActivePlayer] = useState<'w' | 'b'>('w')
-
-  const decrementTime = useCallback(() => {
-    if (activePlayer === 'w') {
-      setTimeW((time) => {
-        if (time === 1) onTimeEnd('w')
-        return Math.max(time - 1, 0)
-      })
-    } else {
-      setTimeB((time) => {
-        if (time === 1) onTimeEnd('b')
-        return Math.max(time - 1, 0)
-      })
+  const start = useCallback(() => {
+    if (!isRunning) {
+      setIsRunning(true)
     }
-  }, [activePlayer, onTimeEnd])
+  }, [isRunning])
+
+  const pause = useCallback(() => {
+    if (isRunning) {
+      setIsRunning(false)
+    }
+  }, [isRunning])
+
+  const reset = useCallback((newTime: number) => {
+    setTime(newTime)
+    setIsRunning(false)
+  }, [])
 
   useEffect(() => {
-    const timerId = setInterval(decrementTime, 1000)
-    return () => clearInterval(timerId)
-  }, [decrementTime])
+    if (isRunning) {
+      intervalRef.current = setInterval(() => {
+        setTime((prevTime) => {
+          if (prevTime <= 1) {
+            clearInterval(intervalRef.current as NodeJS.Timeout)
+            setIsRunning(false)
+            return 0
+          }
+          return prevTime - 1
+        })
+      }, 1000)
+    } else if (intervalRef.current) {
+      clearInterval(intervalRef.current as NodeJS.Timeout)
+    }
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current as NodeJS.Timeout)
+      }
+    }
+  }, [isRunning])
 
-  const switchPlayer = useCallback(() => {
-    setActivePlayer((prev) => (prev === 'w' ? 'b' : 'w'))
-  }, [])
-
-  const resetTimer = useCallback((duration: number) => {
-    setTimeW(duration)
-    setTimeB(duration)
-  }, [])
-
-  return { timeW, timeB, switchPlayer, resetTimer }
+  return { time, isRunning, start, pause, reset }
 }
+
+export default useClock

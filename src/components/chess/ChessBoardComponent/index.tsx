@@ -1,9 +1,10 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-unused-vars */
 import React, { useState, useEffect, useCallback } from 'react'
 import Chessboard from 'chessboardjsx'
 import { Chess, Square } from 'chess.js'
-import { useChessTimer } from '../utils/ChessTimer'
+import useClock from '../utils/ChessTimer'
 import { formatTime } from 'src/utils/format-timer'
 import PromotionModal from '../components/PromotionModal'
 import { PieceType, PromotionProps, Room } from 'src/types/apps/chessTypes'
@@ -33,11 +34,12 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
   const [gameStatus, setGameStatus] = useState<boolean>(true)
   const [fen, setFen] = useState<string>(game.fen())
   const [moves, setMoves] = useState<string[]>([])
-  const [duration, setDuration] = useState<string>()
   const [liveMove, setLiveMove] = useState<{
     from: string
     to: string
     promotion?: string
+    wTime: number
+    bTime: number
   }>()
   const [promotion, setPromotion] = useState<PromotionProps | null>(null)
   const [selectedSquare, setSelectedSquare] = useState<Square | null>(null)
@@ -60,12 +62,8 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
     backgroundColor: lighten(theme.palette.primary.main, 0.7),
   }
 
-  const { timeW, timeB, switchPlayer, resetTimer } = useChessTimer({
-    initialTime: (chessRoom?.challenge.duration as number) || 800,
-    onTimeEnd: (player) => {
-      alert(`Tempo esgotado! ${player === 'w' ? 'Brancas' : 'Negras'} perdem.`)
-    },
-  })
+  const wClock = useClock(60)
+  const bClock = useClock(60)
 
   useEffect(() => {
     setFen(game.fen())
@@ -96,18 +94,47 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
       setGame(newGame)
       setFen(newFen)
 
-      if (initialFen !== newFen) {
-        if (moveHistory) {
-          const lastMove: string[] = JSON.parse(moveHistory)
-          setMoves(lastMove)
+      const time = chessRoom.roomLog.duration
+        ? JSON.parse(chessRoom.roomLog.duration)
+        : chessRoom.challenge.duration
+      const initialTime = chessRoom.challenge.duration
+
+      if (time && time.length > 1) {
+        if (time.length % 2 === 0) {
+          wClock.reset(parseFloat(time[time.length - 2]))
+          wClock.start()
+        } else {
+          bClock.reset(parseFloat(time[time.length - 1]))
+          bClock.start()
         }
+      } else if (time && time.length === 1) {
+        bClock.reset(initialTime)
+        wClock.reset(parseFloat(time[0]))
+        bClock.start()
+      } else {
+        bClock.reset(initialTime)
+        wClock.reset(initialTime)
+        wClock.start()
+      }
+
+      if (initialFen !== newFen && moveHistory) {
+        const lastMove: string[] = JSON.parse(moveHistory)
+        setMoves(lastMove)
+      }
+
+      if (newGame.turn() === 'w') {
+        wClock.start()
+        bClock.pause()
+      } else {
+        wClock.pause()
+        bClock.start()
       }
     }
   }, [chessRoom])
 
   useEffect(() => {
     if (liveMove) {
-      const { from, to, promotion } = liveMove
+      const { from, to, promotion, wTime, bTime } = liveMove
 
       const legalMoves = game.moves({ verbose: true })
       const isMoveLegal = legalMoves.some(
@@ -120,6 +147,17 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
       if (isMoveLegal) {
         game.move({ from, to, promotion })
         setFen(game.fen())
+
+        wClock.reset(wTime)
+        bClock.reset(bTime)
+
+        if (game.turn() === 'w') {
+          wClock.start()
+          bClock.pause()
+        } else {
+          wClock.pause()
+          bClock.start()
+        }
 
         const moveHistory = game.history()
         const lastMove = moveHistory[moveHistory.length - 1]
@@ -183,13 +221,14 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
         sendMove(
           chessRoomId as string,
           chessRoom.roomLog.id,
+          user?.id as string,
           move,
           game.fen(),
           currentMoves,
         )
       }
     },
-    [game, chessRoom, timeB],
+    [game, chessRoom],
   )
 
   const handleSquareClick = useCallback(
@@ -226,7 +265,6 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
               setFen(game.fen())
               isGameOverChess(game, setGameStatus)
               setHighlightSquareTo(square)
-              switchPlayer()
               handleMoveLive(move)
               setSelectedSquare(null)
             } else {
@@ -241,15 +279,7 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
         }
       }
     },
-    [
-      game,
-      selectedSquare,
-      orientation,
-      setFen,
-      switchPlayer,
-      handleMoveLive,
-      setGameStatus,
-    ],
+    [game, selectedSquare, orientation, setFen, handleMoveLive, setGameStatus],
   )
 
   const handleMove = useCallback(
@@ -298,7 +328,6 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
               game.move(move)
               setFen(game.fen())
               isGameOverChess(game, setGameStatus)
-              switchPlayer()
               setHighlightSquareTo(toSquare)
               handleMoveLive(move)
             }
@@ -312,7 +341,6 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
       setHighlightSquareFrom,
       setHighlightSquareTo,
       setFen,
-      switchPlayer,
       setPromotion,
       handleMoveLive,
       setGameStatus,
@@ -327,7 +355,6 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
         game.move({ from, to, promotion: pieceType })
         setFen(game.fen())
         setPromotion(null)
-        switchPlayer()
         handleMoveLive({
           from,
           to,
@@ -335,7 +362,7 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
         })
       }
     },
-    [game, promotion, handleMoveLive, switchPlayer],
+    [game, promotion, handleMoveLive],
   )
 
   return (
@@ -344,22 +371,19 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
         <Container>
           <ContainerMobile>
             <ContainerMobileChess>
-              <ContainerMobileChessDisplay>
-                <ProfileInfo
-                  name={
-                    orientation === 'b'
-                      ? chessRoom?.playerTwo.name
-                      : chessRoom.playerOne.name
-                  }
-                  rating={2220}
-                >
-                  <ClockComponent>
-                    {orientation === 'b'
-                      ? formatTime(timeB)
-                      : formatTime(timeW)}
-                  </ClockComponent>
-                </ProfileInfo>
-              </ContainerMobileChessDisplay>
+              {orientation === 'b' ? (
+                <ContainerMobileChessDisplay>
+                  <ProfileInfo name={chessRoom?.playerOne.name} rating={2220}>
+                    <ClockComponent>{formatTime(wClock.time)}</ClockComponent>
+                  </ProfileInfo>
+                </ContainerMobileChessDisplay>
+              ) : (
+                <ContainerMobileChessDisplay>
+                  <ProfileInfo name={chessRoom?.playerTwo.name} rating={2220}>
+                    <ClockComponent>{formatTime(bClock.time)}</ClockComponent>
+                  </ProfileInfo>
+                </ContainerMobileChessDisplay>
+              )}
 
               <Chessboard
                 boardStyle={{ width: '100%' }}
@@ -378,51 +402,42 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
                   }),
                 }}
               />
-              <ContainerMobileChessDisplay>
-                <ProfileInfo
-                  name={
-                    orientation === 'b'
-                      ? chessRoom?.playerOne.name
-                      : chessRoom.playerTwo.name
-                  }
-                  rating={2220}
-                >
-                  <ClockComponent>
-                    {orientation === 'b'
-                      ? formatTime(timeB)
-                      : formatTime(timeW)}
-                  </ClockComponent>
-                </ProfileInfo>
-              </ContainerMobileChessDisplay>
+              {orientation === 'w' ? (
+                <ContainerMobileChessDisplay>
+                  <ProfileInfo name={chessRoom?.playerOne.name} rating={2220}>
+                    <ClockComponent>{formatTime(wClock.time)}</ClockComponent>
+                  </ProfileInfo>
+                </ContainerMobileChessDisplay>
+              ) : (
+                <ContainerMobileChessDisplay>
+                  <ProfileInfo name={chessRoom?.playerTwo.name} rating={2220}>
+                    <ClockComponent>{formatTime(bClock.time)}</ClockComponent>
+                  </ProfileInfo>
+                </ContainerMobileChessDisplay>
+              )}
             </ContainerMobileChess>
           </ContainerMobile>
 
-          <ContainerProfile style={{ marginBottom: '10px' }}>
-            <ProfileInfo
-              name={
-                orientation === 'b'
-                  ? chessRoom?.playerOne.name
-                  : chessRoom.playerTwo.name
-              }
-              rating={2220}
-            >
-              <ClockComponent>
-                {orientation === 'b' ? formatTime(timeW) : formatTime(timeB)}
-              </ClockComponent>
-            </ProfileInfo>
-            <ProfileInfo
-              name={
-                orientation === 'w'
-                  ? chessRoom?.playerOne.name
-                  : chessRoom.playerTwo.name
-              }
-              rating={2220}
-            >
-              <ClockComponent>
-                {orientation === 'b' ? formatTime(timeB) : formatTime(timeW)}
-              </ClockComponent>
-            </ProfileInfo>
-          </ContainerProfile>
+          {orientation === 'b' ? (
+            <ContainerProfile style={{ marginBottom: '10px' }}>
+              <ProfileInfo name={chessRoom?.playerOne.name} rating={2220}>
+                <ClockComponent>{formatTime(wClock.time)}</ClockComponent>
+              </ProfileInfo>
+              <ProfileInfo name={chessRoom.playerTwo.name} rating={2220}>
+                <ClockComponent>{formatTime(bClock.time)}</ClockComponent>
+              </ProfileInfo>
+            </ContainerProfile>
+          ) : (
+            <ContainerProfile style={{ marginBottom: '10px' }}>
+              <ProfileInfo name={chessRoom?.playerOne.name} rating={2220}>
+                <ClockComponent>{formatTime(wClock.time)}</ClockComponent>
+              </ProfileInfo>
+              <ProfileInfo name={chessRoom.playerTwo.name} rating={2220}>
+                <ClockComponent>{formatTime(bClock.time)}</ClockComponent>
+              </ProfileInfo>
+            </ContainerProfile>
+          )}
+
           {promotion && promotion.show && (
             <PromotionModal
               onChoosePiece={handlePromotionChoice}
