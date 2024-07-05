@@ -15,20 +15,24 @@ const useClock = (initialTime: number): UseClockResult => {
   const intervalRef = useRef<NodeJS.Timeout | null>(null)
 
   const start = useCallback(() => {
-    if (!isRunning) {
+    if (intervalRef.current === null) {
       setIsRunning(true)
     }
-  }, [isRunning])
+  }, [])
 
   const pause = useCallback(() => {
-    if (isRunning) {
+    if (intervalRef.current !== null) {
       setIsRunning(false)
     }
-  }, [isRunning])
+  }, [])
 
   const reset = useCallback((newTime: number) => {
     setTime(newTime)
     setIsRunning(false)
+    if (intervalRef.current !== null) {
+      clearInterval(intervalRef.current)
+      intervalRef.current = null
+    }
   }, [])
 
   useEffect(() => {
@@ -37,6 +41,7 @@ const useClock = (initialTime: number): UseClockResult => {
         setTime((prevTime) => {
           if (prevTime <= 1) {
             clearInterval(intervalRef.current as NodeJS.Timeout)
+            intervalRef.current = null
             setIsRunning(false)
             return 0
           }
@@ -44,11 +49,13 @@ const useClock = (initialTime: number): UseClockResult => {
         })
       }, 1000)
     } else if (intervalRef.current) {
-      clearInterval(intervalRef.current as NodeJS.Timeout)
+      clearInterval(intervalRef.current)
+      intervalRef.current = null
     }
     return () => {
       if (intervalRef.current) {
-        clearInterval(intervalRef.current as NodeJS.Timeout)
+        clearInterval(intervalRef.current)
+        intervalRef.current = null
       }
     }
   }, [isRunning])

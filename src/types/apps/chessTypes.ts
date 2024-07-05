@@ -109,11 +109,17 @@ interface RoomLog {
   updated_at: string | null
 }
 
+interface RoomSocket {
+  wTime: number
+  bTime: number
+}
+
 export interface Room {
   challenge: Challenge
   playerOne: Player
   playerTwo: Player
   roomLog: RoomLog
+  roomSocket: RoomSocket
 }
 
 export interface RoomLogsLive {

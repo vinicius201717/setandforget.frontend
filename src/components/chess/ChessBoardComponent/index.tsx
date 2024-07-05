@@ -94,26 +94,25 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
       setGame(newGame)
       setFen(newFen)
 
-      const time = chessRoom.roomLog.duration
-        ? JSON.parse(chessRoom.roomLog.duration)
-        : chessRoom.challenge.duration
-      const initialTime = chessRoom.challenge.duration
+      // TIMES
+      const wTime = chessRoom.roomSocket.wTime
+      const bTime = chessRoom.roomSocket.bTime
 
-      if (time && time.length > 1) {
-        if (time.length % 2 === 0) {
-          wClock.reset(parseFloat(time[time.length - 2]))
+      wClock.reset(wTime)
+      bClock.reset(bTime)
+
+      if (chessRoom.roomLog.duration) {
+        const durations = JSON.parse(chessRoom.roomLog.duration)
+
+        if (durations.length % 2 === 0) {
+          bClock.pause()
           wClock.start()
         } else {
-          bClock.reset(parseFloat(time[time.length - 1]))
+          wClock.pause()
           bClock.start()
         }
-      } else if (time && time.length === 1) {
-        bClock.reset(initialTime)
-        wClock.reset(parseFloat(time[0]))
-        bClock.start()
       } else {
-        bClock.reset(initialTime)
-        wClock.reset(initialTime)
+        bClock.pause()
         wClock.start()
       }
 
@@ -121,20 +120,12 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
         const lastMove: string[] = JSON.parse(moveHistory)
         setMoves(lastMove)
       }
-
-      if (newGame.turn() === 'w') {
-        wClock.start()
-        bClock.pause()
-      } else {
-        wClock.pause()
-        bClock.start()
-      }
     }
   }, [chessRoom])
 
   useEffect(() => {
     if (liveMove) {
-      const { from, to, promotion, wTime, bTime } = liveMove
+      const { from, to, promotion } = liveMove
 
       const legalMoves = game.moves({ verbose: true })
       const isMoveLegal = legalMoves.some(
@@ -147,17 +138,6 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
       if (isMoveLegal) {
         game.move({ from, to, promotion })
         setFen(game.fen())
-
-        wClock.reset(wTime)
-        bClock.reset(bTime)
-
-        if (game.turn() === 'w') {
-          wClock.start()
-          bClock.pause()
-        } else {
-          wClock.pause()
-          bClock.start()
-        }
 
         const moveHistory = game.history()
         const lastMove = moveHistory[moveHistory.length - 1]
@@ -217,6 +197,16 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
 
           return updatedMoves
         })
+
+        if (game.turn() === 'w') {
+          wClock.reset(wClock.time)
+          wClock.start()
+          bClock.pause()
+        } else {
+          bClock.reset(bClock.time)
+          bClock.start()
+          wClock.pause()
+        }
 
         sendMove(
           chessRoomId as string,
@@ -430,10 +420,10 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
           ) : (
             <ContainerProfile style={{ marginBottom: '10px' }}>
               <ProfileInfo name={chessRoom?.playerOne.name} rating={2220}>
-                <ClockComponent>{formatTime(wClock.time)}</ClockComponent>
+                <ClockComponent>{formatTime(bClock.time)}</ClockComponent>
               </ProfileInfo>
               <ProfileInfo name={chessRoom.playerTwo.name} rating={2220}>
-                <ClockComponent>{formatTime(bClock.time)}</ClockComponent>
+                <ClockComponent>{formatTime(wClock.time)}</ClockComponent>
               </ProfileInfo>
             </ContainerProfile>
           )}
