@@ -98,22 +98,29 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
       const wTime = chessRoom.roomSocket.wTime
       const bTime = chessRoom.roomSocket.bTime
 
-      wClock.reset(wTime)
-      bClock.reset(bTime)
-
       if (chessRoom.roomLog.duration) {
+        wClock.reset(wTime)
+        bClock.reset(bTime)
+
         const durations = JSON.parse(chessRoom.roomLog.duration)
 
         if (durations.length % 2 === 0) {
+          wClock.reset(wTime)
           bClock.pause()
           wClock.start()
         } else {
+          bClock.reset(bTime)
           wClock.pause()
           bClock.start()
         }
       } else {
-        bClock.pause()
-        wClock.start()
+        const initialTime = chessRoom.challenge.duration
+        wClock.reset(initialTime)
+        bClock.reset(initialTime)
+        setTimeout(() => {
+          bClock.pause()
+          wClock.start()
+        }, 3000)
       }
 
       if (initialFen !== newFen && moveHistory) {
@@ -125,7 +132,7 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
 
   useEffect(() => {
     if (liveMove) {
-      const { from, to, promotion } = liveMove
+      const { from, to, promotion, wTime, bTime } = liveMove
 
       const legalMoves = game.moves({ verbose: true })
       const isMoveLegal = legalMoves.some(
@@ -139,6 +146,16 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
         game.move({ from, to, promotion })
         setFen(game.fen())
 
+        if (game.turn() === 'w') {
+          wClock.reset(wTime)
+          wClock.start()
+          bClock.pause()
+        } else {
+          bClock.reset(bTime)
+          bClock.start()
+          wClock.pause()
+        }
+
         const moveHistory = game.history()
         const lastMove = moveHistory[moveHistory.length - 1]
         setMoves((currentMoves) => [...currentMoves, lastMove])
@@ -146,7 +163,15 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
         setHighlightSquareFrom(from as Square)
         setHighlightSquareTo(to as Square)
       } else {
-        console.error('Movimento inválido:', liveMove)
+        if (game.turn() === 'w') {
+          wClock.reset(wTime)
+          wClock.start()
+          bClock.pause()
+        } else {
+          bClock.reset(bTime)
+          bClock.start()
+          wClock.pause()
+        }
       }
     }
   }, [liveMove])
@@ -197,16 +222,6 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
 
           return updatedMoves
         })
-
-        if (game.turn() === 'w') {
-          wClock.reset(wClock.time)
-          wClock.start()
-          bClock.pause()
-        } else {
-          bClock.reset(bClock.time)
-          bClock.start()
-          wClock.pause()
-        }
 
         sendMove(
           chessRoomId as string,
