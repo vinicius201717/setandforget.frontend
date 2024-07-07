@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+/* eslint-disable no-unused-expressions */
 import { AbilityBuilder, Ability } from '@casl/ability'
 
 export type Subjects = string

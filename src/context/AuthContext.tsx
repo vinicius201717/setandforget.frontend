@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
 // ** React Imports
-import { createContext, useEffect, useState, ReactNode, useRef } from 'react'
+import { createContext, useEffect, useState, ReactNode } from 'react'
 
 // ** Next Import
 import { useRouter } from 'next/router'
@@ -21,6 +23,7 @@ import { login } from 'src/pages/api/auth/login'
 import toast from 'react-hot-toast'
 import { sendCode } from 'src/pages/api/auth/loginCode'
 import { chessChallengeCancel } from 'src/pages/api/chess/chessChallengeCancel'
+import { checkIfHaveActiveGame } from 'src/utils/active-game'
 
 // ** Defaults
 const defaultProvider: AuthValuesType = {
@@ -78,7 +81,7 @@ const AuthProvider = ({ children }: Props) => {
       setLoading,
       onRedirectToLogin: redirectLogin,
     })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    checkIfHaveActiveGame(router)
   }, [])
 
   const handleLogin = async (
@@ -127,7 +130,11 @@ const AuthProvider = ({ children }: Props) => {
   }
 
   const handleLogout = () => {
-    chessChallengeCancel().then(() => {
+    const challengeId = window.localStorage.getItem(
+      'chess-challenge-id',
+    ) as string
+    const roomId = window.localStorage.getItem('chess-room-id') as string
+    chessChallengeCancel(challengeId, roomId).then(() => {
       window.localStorage.removeItem('chess-challenge-id')
     })
     if (toastId) toast.dismiss(toastId)

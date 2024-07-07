@@ -8,6 +8,7 @@ export const connectSocket = (
   roomId: string | null,
   creatorId: string | null,
   userId: string | null,
+  amount: string | null,
   setChessRoom: React.Dispatch<React.SetStateAction<Room | null>> | null,
   setLiveMove: React.Dispatch<
     React.SetStateAction<
@@ -32,6 +33,7 @@ export const connectSocket = (
       roomId,
       creatorId,
       userId,
+      amount,
     },
   })
 
@@ -54,7 +56,6 @@ export const connectSocket = (
 
   socket.on('roomComplete', (data) => {
     window.localStorage.removeItem('chess-challenge-id')
-    window.localStorage.removeItem('chess-room-id')
     window.location.href = `/chess/play/${data.roomId}`
   })
 }
@@ -68,6 +69,8 @@ export const sendMove = (
   moveHistory: string[],
 ) => {
   if (socket) {
+    console.log(moveHistory)
+
     const query = {
       roomId,
       roomLogId,

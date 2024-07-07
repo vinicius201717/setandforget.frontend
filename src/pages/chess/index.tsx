@@ -55,7 +55,7 @@ function HomePage() {
     ChallengeGlobalType[] | null
   >([])
 
-  const { toastId, setToastId } = useAuth()
+  const { user, toastId, setToastId } = useAuth()
   const handleOpenModal = (id: string) => {
     if (!globalChallenge) return
 
@@ -96,29 +96,36 @@ function HomePage() {
   })
 
   const onSubmitPlay = (data: RegisterFormData) => {
-    chessChallengeCreate(data)
-      .then((response: any) => {
-        const roomId = response.room.id
-        const challengeId = response.challenge.id
-        const userId = response.challenge.userId
+    if (user?.Account.amount && user.Account.amount / 100 >= data.amount) {
+      chessChallengeCreate(data)
+        .then((response: any) => {
+          const roomId = response.room.id
+          const challengeId = response.challenge.id
+          const userId = response.challenge.userId
+          const amount = JSON.stringify(user.Account.amount)
 
-        connectSocket(challengeId, roomId, userId, userId, null, null)
-        window.localStorage.setItem('chess-room-id', roomId)
-        window.localStorage.setItem('chess-challenge-id', challengeId)
+          connectSocket(challengeId, roomId, userId, userId, amount, null, null)
+          window.localStorage.setItem('chess-room-id', roomId)
+          window.localStorage.setItem('chess-challenge-id', challengeId)
 
-        setToastId(
-          toast.loading(<CancelableToastContent toastId={toastId} />, {
-            position: 'bottom-right',
-            duration: Infinity,
-            id: 'chess-loading-toast',
-          }),
-        )
-      })
-      .catch(() => {
-        toast.error('Failed to create the challenge: ', {
-          position: 'bottom-right',
+          setToastId(
+            toast.loading(<CancelableToastContent toastId={toastId} />, {
+              position: 'bottom-right',
+              duration: Infinity,
+              id: 'chess-loading-toast',
+            }),
+          )
         })
+        .catch(() => {
+          toast.error('Failed to create the challenge: ', {
+            position: 'bottom-right',
+          })
+        })
+    } else {
+      toast.error('Insufficient funds.', {
+        position: 'bottom-right',
       })
+    }
   }
 
   const handleChange = (newScreen: 1 | 2) => {
@@ -273,7 +280,7 @@ function HomePage() {
           handleClose={handleCloseModal}
           user={modalInfo.user}
           avatar={modalInfo.user.avatar}
-          amount={modalInfo.amount}
+          amount={JSON.stringify(modalInfo.amount)}
           duration={modalInfo.duration}
         />
       ) : (

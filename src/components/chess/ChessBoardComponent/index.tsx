@@ -25,6 +25,8 @@ import {
   connectSocket,
   sendMove,
 } from 'src/pages/api/chess-room/chess-challenge-websocket'
+import { GamePlayTicketInfo } from '../components/GamePlayTickteInfo'
+import ChessMovesTable from '../components/ChessMovesTable'
 
 const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
   chessRoomId,
@@ -50,6 +52,7 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
     null,
   )
   const [orientation, setOrientation] = useState<'w' | 'b'>('w')
+  const [ticketOrMoves, setTicketOrMoves] = useState<1 | 2 | null>(1)
 
   const theme = useTheme()
   const { user, setLoading } = useAuth()
@@ -114,18 +117,15 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
           bClock.start()
         }
       } else {
-        const initialTime = chessRoom.challenge.duration
-        wClock.reset(initialTime)
-        bClock.reset(initialTime)
-        setTimeout(() => {
-          bClock.pause()
-          wClock.start()
-        }, 3000)
+        wClock.reset(wTime)
+        bClock.reset(bTime)
+        bClock.pause()
+        wClock.start()
       }
 
       if (initialFen !== newFen && moveHistory) {
-        const lastMove: string[] = JSON.parse(moveHistory)
-        setMoves(lastMove)
+        const lastMoves: string[] = JSON.parse(moveHistory)
+        setMoves(lastMoves)
       }
     }
   }, [chessRoom])
@@ -196,6 +196,7 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
               chessRoomId,
               creatorId,
               userId,
+              null,
               setChessRoom,
               setLiveMove,
             )
@@ -216,12 +217,7 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
       if (roomLogId) {
         const lastMove = moveHistory[moveHistory.length - 1]
 
-        const currentMoves = [...moves, lastMove]
-        setMoves((currentMoves) => {
-          const updatedMoves = [...currentMoves, lastMove]
-
-          return updatedMoves
-        })
+        setMoves((currentMoves) => [...currentMoves, lastMove])
 
         sendMove(
           chessRoomId as string,
@@ -229,11 +225,11 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
           user?.id as string,
           move,
           game.fen(),
-          currentMoves,
+          [...moves, lastMove],
         )
       }
     },
-    [game, chessRoom],
+    [game, chessRoom, moves, chessRoomId, user?.id],
   )
 
   const handleSquareClick = useCallback(
@@ -389,9 +385,9 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
                   </ProfileInfo>
                 </ContainerMobileChessDisplay>
               )}
-
               <Chessboard
-                boardStyle={{ width: '100%' }}
+                boardStyle={{ width: '100%', height: '100%' }}
+                calcWidth={() => 700}
                 position={fen}
                 orientation={orientation === 'w' ? 'white' : 'black'}
                 onDrop={({ sourceSquare, targetSquare }) =>
@@ -425,19 +421,59 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
 
           {orientation === 'b' ? (
             <ContainerProfile style={{ marginBottom: '10px' }}>
-              <ProfileInfo name={chessRoom?.playerOne.name} rating={2220}>
+              <ProfileInfo
+                name={chessRoom?.playerOne.name}
+                positionClock={1}
+                rating={2220}
+              >
                 <ClockComponent>{formatTime(wClock.time)}</ClockComponent>
               </ProfileInfo>
-              <ProfileInfo name={chessRoom.playerTwo.name} rating={2220}>
+              {ticketOrMoves === 1 ? (
+                <GamePlayTicketInfo
+                  ticketId={chessRoom.challenge.id}
+                  clock={chessRoom.challenge.duration / 60}
+                  value={chessRoom.challenge.amount * 2}
+                  payout={90}
+                />
+              ) : (
+                <ChessMovesTable moves={moves} />
+              )}
+              <ProfileInfo
+                name={chessRoom.playerTwo.name}
+                positionClock={2}
+                me={true}
+                rating={2220}
+                setTicketOrMoves={setTicketOrMoves}
+              >
                 <ClockComponent>{formatTime(bClock.time)}</ClockComponent>
               </ProfileInfo>
             </ContainerProfile>
           ) : (
             <ContainerProfile style={{ marginBottom: '10px' }}>
-              <ProfileInfo name={chessRoom?.playerOne.name} rating={2220}>
+              <ProfileInfo
+                name={chessRoom?.playerOne.name}
+                positionClock={1}
+                rating={2220}
+              >
                 <ClockComponent>{formatTime(bClock.time)}</ClockComponent>
-              </ProfileInfo>
-              <ProfileInfo name={chessRoom.playerTwo.name} rating={2220}>
+              </ProfileInfo>{' '}
+              {ticketOrMoves === 1 ? (
+                <GamePlayTicketInfo
+                  ticketId={chessRoom.challenge.id}
+                  clock={chessRoom.challenge.duration / 60}
+                  value={chessRoom.challenge.amount * 2}
+                  payout={90}
+                />
+              ) : (
+                <ChessMovesTable moves={moves} />
+              )}
+              <ProfileInfo
+                name={chessRoom.playerTwo.name}
+                positionClock={2}
+                me={true}
+                rating={2220}
+                setTicketOrMoves={setTicketOrMoves}
+              >
                 <ClockComponent>{formatTime(wClock.time)}</ClockComponent>
               </ProfileInfo>
             </ContainerProfile>

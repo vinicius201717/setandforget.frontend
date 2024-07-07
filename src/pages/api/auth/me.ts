@@ -2,6 +2,7 @@
 import { api } from 'src/lib/axios'
 import authConfig from 'src/configs/auth'
 import { NotificationsType, UserDataType } from 'src/context/types'
+import { checkIfHaveActiveGame } from 'src/utils/active-game'
 
 type InitAuthProps = {
   setUser: (user: UserDataType | null) => void

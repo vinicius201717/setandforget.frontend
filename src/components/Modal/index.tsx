@@ -12,6 +12,7 @@ import { InitialLetterName } from 'src/utils/initialFormatNameIcon'
 import { formatMoney } from 'src/utils/format-money'
 import { useAuth } from 'src/hooks/useAuth'
 import { connectSocket } from 'src/pages/api/chess-room/chess-challenge-websocket'
+import toast from 'react-hot-toast'
 type UserChallengeCreatorProps = {
   name: string
   id: string
@@ -25,7 +26,7 @@ interface ConfirmModalProps {
   handleClose: () => void
   user: UserChallengeCreatorProps
   avatar: string
-  amount: number
+  amount: string
   duration: number
 }
 
@@ -41,14 +42,23 @@ function ConfirmModal({
   const data = useAuth()
 
   const onPlay = () => {
-    connectSocket(
-      challengeId,
-      roomId,
-      user.id,
-      data?.user?.id as string,
-      null,
-      null,
-    )
+    if (
+      data.user?.Account.amount &&
+      data.user?.Account.amount >= parseFloat(amount) * 100
+    ) {
+      window.localStorage.setItem('chess-room-id', roomId)
+      connectSocket(
+        challengeId,
+        roomId,
+        user.id,
+        data?.user?.id as string,
+        amount,
+        null,
+        null,
+      )
+    } else {
+      toast.error('Insuficient sald', { position: 'bottom-right' })
+    }
   }
 
   return (
@@ -74,7 +84,9 @@ function ConfirmModal({
             <AvatarStyled> {InitialLetterName(user.name)}</AvatarStyled>
             <Typography variant='h6'>{user.name}</Typography>
           </AvatarContainer>
-          <Typography variant='h4'>{formatMoney(amount)}</Typography>
+          <Typography variant='h4'>
+            {formatMoney(parseFloat(amount))}
+          </Typography>
           <Typography variant='h6'>{duration / 60} minutos</Typography>
         </CardContent>
         <CardActions>

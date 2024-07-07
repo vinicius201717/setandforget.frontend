@@ -3,7 +3,6 @@ import { BoxProps } from '@mui/system'
 
 export const Container = styled(Box)<BoxProps>(({ theme }) => ({
   display: 'flex',
-
   [theme.breakpoints.down('md')]: {
     display: 'block',
   },
@@ -13,7 +12,12 @@ export const ContainerProfile = styled(Box)<BoxProps>(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'space-between',
+  marginLeft: '20px',
+  padding: '10px',
+  borderRadius: theme.shape.borderRadius,
 
+  boxShadow: theme.shadows[15],
+  flex: 1,
   [theme.breakpoints.down('md')]: {
     display: 'none',
   },

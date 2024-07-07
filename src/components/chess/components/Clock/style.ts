@@ -8,7 +8,6 @@ export const Container = styled(Box)<BoxProps>(({ theme }) => ({
   fontSize: '20px',
   fontWeight: '600',
   padding: '10px',
-  marginTop: '20px',
   marginLeft: '10px',
   color: theme.palette.primary.contrastText,
   display: 'flex',
