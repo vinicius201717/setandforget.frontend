@@ -27,6 +27,8 @@ import {
 } from 'src/pages/api/chess-room/chess-challenge-websocket'
 import { GamePlayTicketInfo } from '../components/GamePlayTickteInfo'
 import ChessMovesTable from '../components/ChessMovesTable'
+import chessLogUpdate from 'src/pages/api/chess-log/chess-log-update'
+import { getCapturedPieces } from '../utils/setCapturedPiecesToFen'
 
 const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
   chessRoomId,
@@ -53,6 +55,7 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
   )
   const [orientation, setOrientation] = useState<'w' | 'b'>('w')
   const [ticketOrMoves, setTicketOrMoves] = useState<1 | 2 | null>(1)
+  const [capturedPieces, setCapturedPieces] = useState<string[]>([])
 
   const theme = useTheme()
   const { user, setLoading } = useAuth()
@@ -96,6 +99,11 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
       newGame.load(newFen)
       setGame(newGame)
       setFen(newFen)
+      const newCapturedPieces = getCapturedPieces(newFen)
+
+      if (newCapturedPieces) {
+        setCapturedPieces(newCapturedPieces)
+      }
 
       // TIMES
       const wTime = chessRoom.roomSocket.wTime
@@ -135,7 +143,7 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
       const { from, to, promotion, wTime, bTime } = liveMove
 
       const legalMoves = game.moves({ verbose: true })
-      const isMoveLegal = legalMoves.some(
+      const isMoveLegal = legalMoves.find(
         (m) =>
           m.from === from &&
           m.to === to &&
@@ -143,9 +151,10 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
       )
 
       if (isMoveLegal) {
-        game.move({ from, to, promotion })
-        setFen(game.fen())
+        const moveToVerifyCaptured = game.move({ from, to, promotion })
 
+        setFen(game.fen())
+        updateCapturedPieces(moveToVerifyCaptured)
         if (game.turn() === 'w') {
           wClock.reset(wTime)
           wClock.start()
@@ -209,6 +218,15 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
     }
   }, [chessRoomId])
 
+  const updateCapturedPieces = (move: any) => {
+    if (move.captured) {
+      const color =
+        game.turn() === 'w' ? move.captured.toUpperCase() : move.captured
+      const newPieces = [...capturedPieces, color]
+      setCapturedPieces(newPieces)
+    }
+  }
+
   const handleMoveLive = useCallback(
     (move: { from: string; to: string; promotion?: string }) => {
       const moveHistory = game.history()
@@ -262,12 +280,27 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
             )
 
             if (isMoveLegal) {
-              game.move(move)
-              setFen(game.fen())
-              isGameOverChess(game, setGameStatus)
-              setHighlightSquareTo(square)
-              handleMoveLive(move)
-              setSelectedSquare(null)
+              const foundMove = legalMoves.find(
+                (m) =>
+                  m.from === move.from &&
+                  m.to === move.to &&
+                  m.flags.includes('p'),
+              )
+              if (foundMove) {
+                setPromotion({
+                  show: true,
+                  color: game.turn(),
+                  from: selectedSquare,
+                  to: square,
+                })
+              } else {
+                game.move(move)
+                setFen(game.fen())
+                isGameOverChess(game, setGameStatus)
+                setHighlightSquareTo(square)
+                handleMoveLive(move)
+                setSelectedSquare(null)
+              }
             } else {
               const pieceAtTarget = game.get(square)
               if (pieceAtTarget && pieceAtTarget.color === game.turn()) {
@@ -326,11 +359,12 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
             setHighlightSquareTo(toSquare)
           } else {
             if (orientation === turn) {
-              game.move(move)
+              const moveToVerifyCaptured = game.move(move)
               setFen(game.fen())
               isGameOverChess(game, setGameStatus)
               setHighlightSquareTo(toSquare)
               handleMoveLive(move)
+              updateCapturedPieces(moveToVerifyCaptured)
             }
           }
         }
@@ -347,20 +381,31 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
       setGameStatus,
     ],
   )
-
   const handlePromotionChoice = useCallback(
     (pieceType: PieceType) => {
       if (promotion) {
         const { from, to } = promotion
 
-        game.move({ from, to, promotion: pieceType })
-        setFen(game.fen())
-        setPromotion(null)
-        handleMoveLive({
-          from,
-          to,
-          promotion: pieceType,
-        })
+        const legalMoves = game.moves({ verbose: true })
+        const isMoveLegal = legalMoves.some(
+          (m) => m.from === from && m.to === to && m.promotion === pieceType,
+        )
+
+        if (isMoveLegal) {
+          const moveToVerifyCaptured = game.move({
+            from,
+            to,
+            promotion: pieceType,
+          })
+          setFen(game.fen())
+          setPromotion(null)
+          handleMoveLive({
+            from,
+            to,
+            promotion: pieceType,
+          })
+          updateCapturedPieces(moveToVerifyCaptured)
+        }
       }
     },
     [game, promotion, handleMoveLive],
@@ -374,13 +419,23 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
             <ContainerMobileChess>
               {orientation === 'b' ? (
                 <ContainerMobileChessDisplay>
-                  <ProfileInfo name={chessRoom?.playerOne.name} rating={2220}>
+                  <ProfileInfo
+                    name={chessRoom?.playerOne.name}
+                    rating={2220}
+                    capturedPieces={capturedPieces}
+                    orientation={orientation}
+                  >
                     <ClockComponent>{formatTime(wClock.time)}</ClockComponent>
                   </ProfileInfo>
                 </ContainerMobileChessDisplay>
               ) : (
                 <ContainerMobileChessDisplay>
-                  <ProfileInfo name={chessRoom?.playerTwo.name} rating={2220}>
+                  <ProfileInfo
+                    name={chessRoom?.playerTwo.name}
+                    rating={2220}
+                    capturedPieces={capturedPieces}
+                    orientation={orientation}
+                  >
                     <ClockComponent>{formatTime(bClock.time)}</ClockComponent>
                   </ProfileInfo>
                 </ContainerMobileChessDisplay>
@@ -405,13 +460,23 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
               />
               {orientation === 'w' ? (
                 <ContainerMobileChessDisplay>
-                  <ProfileInfo name={chessRoom?.playerOne.name} rating={2220}>
+                  <ProfileInfo
+                    name={chessRoom?.playerOne.name}
+                    rating={2220}
+                    capturedPieces={capturedPieces}
+                    orientation={orientation}
+                  >
                     <ClockComponent>{formatTime(wClock.time)}</ClockComponent>
                   </ProfileInfo>
                 </ContainerMobileChessDisplay>
               ) : (
                 <ContainerMobileChessDisplay>
-                  <ProfileInfo name={chessRoom?.playerTwo.name} rating={2220}>
+                  <ProfileInfo
+                    name={chessRoom?.playerTwo.name}
+                    rating={2220}
+                    capturedPieces={capturedPieces}
+                    orientation={orientation}
+                  >
                     <ClockComponent>{formatTime(bClock.time)}</ClockComponent>
                   </ProfileInfo>
                 </ContainerMobileChessDisplay>
@@ -425,6 +490,8 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
                 name={chessRoom?.playerOne.name}
                 positionClock={1}
                 rating={2220}
+                capturedPieces={capturedPieces}
+                orientation={orientation}
               >
                 <ClockComponent>{formatTime(wClock.time)}</ClockComponent>
               </ProfileInfo>
@@ -444,6 +511,8 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
                 me={true}
                 rating={2220}
                 setTicketOrMoves={setTicketOrMoves}
+                capturedPieces={capturedPieces}
+                orientation={orientation}
               >
                 <ClockComponent>{formatTime(bClock.time)}</ClockComponent>
               </ProfileInfo>
@@ -454,6 +523,8 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
                 name={chessRoom?.playerOne.name}
                 positionClock={1}
                 rating={2220}
+                capturedPieces={capturedPieces}
+                orientation={orientation}
               >
                 <ClockComponent>{formatTime(bClock.time)}</ClockComponent>
               </ProfileInfo>{' '}
@@ -473,6 +544,8 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
                 me={true}
                 rating={2220}
                 setTicketOrMoves={setTicketOrMoves}
+                capturedPieces={capturedPieces}
+                orientation={orientation}
               >
                 <ClockComponent>{formatTime(wClock.time)}</ClockComponent>
               </ProfileInfo>

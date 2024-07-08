@@ -38,6 +38,8 @@ export const connectSocket = (
   })
 
   socket.on('move', (move) => {
+    console.log(move)
+
     if (setLiveMove) setLiveMove(move)
   })
 
@@ -64,13 +66,11 @@ export const sendMove = (
   roomId: string,
   roomLogId: string,
   userId: string,
-  move: { from: string; to: string },
+  move: { from: string; to: string; promotion?: string },
   fen: string,
   moveHistory: string[],
 ) => {
   if (socket) {
-    console.log(moveHistory)
-
     const query = {
       roomId,
       roomLogId,

@@ -11,6 +11,8 @@ import {
   ProfileImg,
 } from './style'
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz'
+import { useEffect, useState } from 'react'
+import { getPieceImages } from '../../utils/formatNameToImagePieces'
 
 interface ProfileInfoProps {
   children: React.ReactNode
@@ -19,6 +21,8 @@ interface ProfileInfoProps {
   positionClock?: number | null
   me?: boolean
   setTicketOrMoves?: React.Dispatch<React.SetStateAction<1 | 2 | null>>
+  capturedPieces: string[]
+  orientation: 'w' | 'b'
 }
 
 export function ProfileInfo({
@@ -28,18 +32,43 @@ export function ProfileInfo({
   positionClock = 0,
   me,
   setTicketOrMoves,
+  capturedPieces,
+  orientation,
 }: ProfileInfoProps) {
+  const [capturedPiecesW, setCapturedPiecesW] = useState<string[]>([])
+  const [capturedPiecesB, setCapturedPiecesB] = useState<string[]>([])
   const inverte = () => {
     if (setTicketOrMoves) {
       setTicketOrMoves((current) => (current === 1 ? 2 : 1))
     }
   }
 
+  const givUp = () => {
+    window.localStorage.removeItem('chess-room-id')
+  }
+
+  useEffect(() => {
+    const whitePieces = capturedPieces.filter(
+      (piece) => piece === piece.toUpperCase(),
+    )
+    const blackPieces = capturedPieces.filter(
+      (piece) => piece === piece.toLowerCase(),
+    )
+    setCapturedPiecesW(whitePieces)
+    setCapturedPiecesB(blackPieces)
+  }, [capturedPieces])
+
   return (
     <Container>
       <ContainerClockBoxPiece>
         {positionClock === 2 && children}
-        {positionClock === 2 && <BoxPieces></BoxPieces>}
+        {positionClock === 2 && (
+          <BoxPieces>
+            {orientation === 'w'
+              ? getPieceImages(capturedPiecesW)
+              : getPieceImages(capturedPiecesB)}
+          </BoxPieces>
+        )}
       </ContainerClockBoxPiece>
       {positionClock === 2 && <br />}
       <ProfileContainer>
@@ -53,14 +82,22 @@ export function ProfileInfo({
             <ActionButton onClick={inverte}>
               <SwapHorizIcon />
             </ActionButton>
-            <ActionButton>Give up</ActionButton>
+            <ActionButton onClick={givUp}>Give up</ActionButton>
             <ActionButton>Draw</ActionButton>
           </BoxButtons>
         ) : null}
       </ProfileContainer>
       <ContainerClockBoxPiece>
         {positionClock === 1 ? children : ''}
-        {positionClock === 1 ? <BoxPieces></BoxPieces> : ''}
+        {positionClock === 1 ? (
+          <BoxPieces>
+            {orientation === 'w'
+              ? getPieceImages(capturedPiecesB)
+              : getPieceImages(capturedPiecesW)}
+          </BoxPieces>
+        ) : (
+          ''
+        )}
       </ContainerClockBoxPiece>
     </Container>
   )
