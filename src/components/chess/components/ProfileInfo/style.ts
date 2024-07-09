@@ -14,11 +14,31 @@ export const ContainerClockBoxPiece = styled(Box)<BoxProps>(() => ({
 }))
 
 export const BoxPieces = styled(Box)<BoxProps>(({ theme }) => ({
+  width: 'auto',
   flex: '1',
   height: '50px',
   borderRadius: theme.shape.borderRadius,
   marginLeft: '20px',
   backgroundColor: theme.palette.background.paper,
+  overflowX: 'auto',
+  display: 'flex',
+
+  '&::-webkit-scrollbar': {
+    height: '8px',
+  },
+  '&::-webkit-scrollbar-track': {
+    backgroundColor: theme.palette.background.default,
+    borderRadius: '4px',
+  },
+  '&::-webkit-scrollbar-thumb': {
+    backgroundColor: theme.palette.primary.main,
+    borderRadius: '4px',
+  },
+  '&::-webkit-scrollbar-thumb:hover': {
+    backgroundColor: theme.palette.primary.dark,
+  },
+  scrollbarWidth: 'thin',
+  scrollbarColor: `${theme.palette.primary.main} ${theme.palette.background.default}`,
 }))
 
 export const ProfileContainer = styled(Box)<BoxProps>(({ theme }) => ({

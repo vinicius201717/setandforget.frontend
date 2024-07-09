@@ -18,7 +18,7 @@ export const ContainerProfile = styled(Box)<BoxProps>(({ theme }) => ({
 
   boxShadow: theme.shadows[15],
   flex: 1,
-  [theme.breakpoints.down('md')]: {
+  [theme.breakpoints.down('lg')]: {
     display: 'none',
   },
 }))

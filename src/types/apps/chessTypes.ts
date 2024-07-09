@@ -118,6 +118,7 @@ export interface Room {
   challenge: Challenge
   playerOne: Player
   playerTwo: Player
+  status: boolean
   roomLog: RoomLog
   roomSocket: RoomSocket
 }

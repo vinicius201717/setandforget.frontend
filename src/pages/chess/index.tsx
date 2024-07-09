@@ -39,6 +39,8 @@ import { chessChallengeGet } from '../api/chess/chessChallengeGet'
 import { chessChallengeGetAll } from '../api/chess/chessChallengeGetAll'
 import { useAuth } from 'src/hooks/useAuth'
 import { connectSocket } from '../api/chess-room/chess-challenge-websocket'
+import { UserDataType } from 'src/context/types'
+import { updateAccountAmount } from 'src/utils/updateAccountAmount'
 
 const registerFormSchema = z.object({
   duration: z.number(),
@@ -55,7 +57,7 @@ function HomePage() {
     ChallengeGlobalType[] | null
   >([])
 
-  const { user, toastId, setToastId } = useAuth()
+  const { user, toastId, setToastId, setUser } = useAuth()
   const handleOpenModal = (id: string) => {
     if (!globalChallenge) return
 
@@ -99,12 +101,22 @@ function HomePage() {
     if (user?.Account.amount && user.Account.amount / 100 >= data.amount) {
       chessChallengeCreate(data)
         .then((response: any) => {
+          updateAccountAmount({ amount: data.amount, user, setUser })
           const roomId = response.room.id
           const challengeId = response.challenge.id
           const userId = response.challenge.userId
           const amount = JSON.stringify(user.Account.amount)
 
-          connectSocket(challengeId, roomId, userId, userId, amount, null, null)
+          connectSocket(
+            challengeId,
+            roomId,
+            userId,
+            userId,
+            amount,
+            null,
+            null,
+            null,
+          )
           window.localStorage.setItem('chess-room-id', roomId)
           window.localStorage.setItem('chess-challenge-id', challengeId)
 

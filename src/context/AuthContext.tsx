@@ -81,7 +81,7 @@ const AuthProvider = ({ children }: Props) => {
       setLoading,
       onRedirectToLogin: redirectLogin,
     })
-    checkIfHaveActiveGame(router)
+    // checkIfHaveActiveGame(router)
   }, [])
 
   const handleLogin = async (

@@ -13,6 +13,8 @@ import {
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz'
 import { useEffect, useState } from 'react'
 import { getPieceImages } from '../../utils/formatNameToImagePieces'
+import { giveUp } from 'src/pages/api/chess-room/chess-challenge-websocket'
+import { useAuth } from 'src/hooks/useAuth'
 
 interface ProfileInfoProps {
   children: React.ReactNode
@@ -23,6 +25,7 @@ interface ProfileInfoProps {
   setTicketOrMoves?: React.Dispatch<React.SetStateAction<1 | 2 | null>>
   capturedPieces: string[]
   orientation: 'w' | 'b'
+  status: boolean
 }
 
 export function ProfileInfo({
@@ -34,9 +37,12 @@ export function ProfileInfo({
   setTicketOrMoves,
   capturedPieces,
   orientation,
+  status,
 }: ProfileInfoProps) {
   const [capturedPiecesW, setCapturedPiecesW] = useState<string[]>([])
   const [capturedPiecesB, setCapturedPiecesB] = useState<string[]>([])
+
+  const { user } = useAuth()
   const inverte = () => {
     if (setTicketOrMoves) {
       setTicketOrMoves((current) => (current === 1 ? 2 : 1))
@@ -44,7 +50,12 @@ export function ProfileInfo({
   }
 
   const givUp = () => {
-    window.localStorage.removeItem('chess-room-id')
+    const roomId = window.localStorage.getItem('chess-room-id')
+    const userId = user?.id as string
+    if (roomId && userId) {
+      giveUp(roomId, userId)
+    }
+    // window.localStorage.removeItem('chess-room-id')
   }
 
   useEffect(() => {
@@ -82,8 +93,10 @@ export function ProfileInfo({
             <ActionButton onClick={inverte}>
               <SwapHorizIcon />
             </ActionButton>
-            <ActionButton onClick={givUp}>Give up</ActionButton>
-            <ActionButton>Draw</ActionButton>
+            <ActionButton disabled={!status} onClick={givUp}>
+              Give up
+            </ActionButton>
+            <ActionButton disabled={!status}>Draw</ActionButton>
           </BoxButtons>
         ) : null}
       </ProfileContainer>
