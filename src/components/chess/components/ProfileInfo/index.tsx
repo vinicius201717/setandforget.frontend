@@ -55,7 +55,7 @@ export function ProfileInfo({
     if (roomId && userId) {
       giveUp(roomId, userId)
     }
-    // window.localStorage.removeItem('chess-room-id')
+    window.localStorage.removeItem('chess-room-id')
   }
 
   useEffect(() => {

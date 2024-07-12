@@ -76,6 +76,8 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
 
   useEffect(() => {
     if (!gameStatus) {
+      bClock.pause()
+      wClock.pause()
       alert('O JOGO ACABOU')
     }
   }, [gameStatus])
@@ -258,7 +260,15 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
       if (gameStatus) {
         const turn = game.turn()
         if (orientation === turn) {
-          if (!isGameOverChess(game, setGameStatus)) {
+          if (
+            !isGameOverChess(
+              chessRoomId as string,
+              user?.id as string,
+              chessRoom?.playerTwo as unknown as string,
+              game,
+              setGameStatus,
+            )
+          ) {
             const piece = game.get(square)
             if (!selectedSquare) {
               if (
@@ -433,7 +443,9 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
                     orientation={orientation}
                     status={gameStatus}
                   >
-                    <ClockComponent>{formatTime(wClock.time)}</ClockComponent>
+                    <ClockComponent isRunning={wClock.isRunning}>
+                      {formatTime(wClock.time)}
+                    </ClockComponent>
                   </ProfileInfo>
                 </ContainerMobileChessDisplay>
               ) : (
@@ -445,7 +457,9 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
                     orientation={orientation}
                     status={gameStatus}
                   >
-                    <ClockComponent>{formatTime(bClock.time)}</ClockComponent>
+                    <ClockComponent isRunning={bClock.isRunning}>
+                      {formatTime(bClock.time)}
+                    </ClockComponent>
                   </ProfileInfo>
                 </ContainerMobileChessDisplay>
               )}
@@ -466,6 +480,7 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
                     [highlightSquareTo]: highlightStyleTo,
                   }),
                 }}
+                transitionDuration={100}
               />
               {orientation === 'w' ? (
                 <ContainerMobileChessDisplay>
@@ -476,7 +491,9 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
                     orientation={orientation}
                     status={gameStatus}
                   >
-                    <ClockComponent>{formatTime(wClock.time)}</ClockComponent>
+                    <ClockComponent isRunning={wClock.isRunning}>
+                      {formatTime(wClock.time)}
+                    </ClockComponent>
                   </ProfileInfo>
                 </ContainerMobileChessDisplay>
               ) : (
@@ -488,7 +505,9 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
                     orientation={orientation}
                     status={gameStatus}
                   >
-                    <ClockComponent>{formatTime(bClock.time)}</ClockComponent>
+                    <ClockComponent isRunning={bClock.isRunning}>
+                      {formatTime(bClock.time)}
+                    </ClockComponent>
                   </ProfileInfo>
                 </ContainerMobileChessDisplay>
               )}
@@ -505,7 +524,9 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
                 orientation={orientation}
                 status={gameStatus}
               >
-                <ClockComponent>{formatTime(wClock.time)}</ClockComponent>
+                <ClockComponent isRunning={wClock.isRunning}>
+                  {formatTime(wClock.time)}
+                </ClockComponent>
               </ProfileInfo>
               {ticketOrMoves === 1 ? (
                 <GamePlayTicketInfo
@@ -527,7 +548,9 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
                 orientation={orientation}
                 status={gameStatus}
               >
-                <ClockComponent>{formatTime(bClock.time)}</ClockComponent>
+                <ClockComponent isRunning={bClock.isRunning}>
+                  {formatTime(bClock.time)}
+                </ClockComponent>
               </ProfileInfo>
             </ContainerProfile>
           ) : (
@@ -540,7 +563,9 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
                 orientation={orientation}
                 status={gameStatus}
               >
-                <ClockComponent>{formatTime(bClock.time)}</ClockComponent>
+                <ClockComponent isRunning={bClock.isRunning}>
+                  {formatTime(bClock.time)}
+                </ClockComponent>
               </ProfileInfo>{' '}
               {ticketOrMoves === 1 ? (
                 <GamePlayTicketInfo
@@ -562,7 +587,9 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
                 orientation={orientation}
                 status={gameStatus}
               >
-                <ClockComponent>{formatTime(wClock.time)}</ClockComponent>
+                <ClockComponent isRunning={wClock.isRunning}>
+                  {formatTime(wClock.time)}
+                </ClockComponent>
               </ProfileInfo>
             </ContainerProfile>
           )}

@@ -22,7 +22,7 @@ import { initAuth } from 'src/pages/api/auth/me'
 import { login } from 'src/pages/api/auth/login'
 import toast from 'react-hot-toast'
 import { sendCode } from 'src/pages/api/auth/loginCode'
-import { chessChallengeCancel } from 'src/pages/api/chess/chessChallengeCancel'
+import { chessChallengeCancel } from 'src/pages/api/chess-challenge/chessChallengeCancel'
 import { checkIfHaveActiveGame } from 'src/utils/active-game'
 
 // ** Defaults

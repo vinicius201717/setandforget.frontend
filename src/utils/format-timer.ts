@@ -1,7 +1,8 @@
 export function formatTime(timeInSeconds: number): string {
-  const hours = Math.floor(timeInSeconds / 3600)
-  const minutes = Math.floor((timeInSeconds % 3600) / 60)
-  const seconds = Math.floor(timeInSeconds % 60)
+  const time = Math.max(0, timeInSeconds)
+  const hours = Math.floor(time / 3600)
+  const minutes = Math.floor((time % 3600) / 60)
+  const seconds = Math.floor(time % 60)
 
   const formattedHours =
     hours > 0 ? `${hours.toString().padStart(2, '0')}:` : ''

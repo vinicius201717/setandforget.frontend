@@ -1,40 +1,60 @@
+import { chessResultCreate } from 'src/pages/api/chess-result/chessResultCreate'
+
 /* eslint-disable no-unused-vars */
+interface ChessGame {
+  isCheckmate: () => boolean
+  isStalemate: () => boolean
+  isThreefoldRepetition: () => boolean
+  isInsufficientMaterial: () => boolean
+  isDraw: () => boolean
+  isGameOver: () => boolean
+}
+
+type GameStatusSetter = (status: boolean) => void
 
 export const isGameOverChess = (
-  game: any,
-  setGameStatus: (status: boolean) => void,
+  roomId: string,
+  winnerId: string,
+  loserId: string,
+  game: ChessGame,
+  setGameStatus: GameStatusSetter,
 ): boolean => {
-  if (game.isCheckmate()) {
-    console.log('Xeque-mate! O jogo acabou.')
-    setGameStatus(false)
-    return true
-  } else if (game.isStalemate()) {
-    console.log('Empate por afogamento. O jogo acabou.')
-    setGameStatus(false)
+  let gameOverCondition: string | null = null
 
-    return true
-  } else if (game.isThreefoldRepetition()) {
-    console.log('Empate por três repetições. O jogo acabou.')
-    setGameStatus(false)
-
-    return true
-  } else if (game.isInsufficientMaterial()) {
-    console.log('Empate por material insuficiente. O jogo acabou.')
-    setGameStatus(false)
-
-    return true
-  } else if (game.isDraw()) {
-    console.log(
-      'Empate por alguma outra regra (50 movimentos, etc). O jogo acabou.',
-    )
-    setGameStatus(false)
-
-    return true
+  switch (true) {
+    case game.isCheckmate():
+      gameOverCondition = 'Checkmate'
+      break
+    case game.isStalemate():
+      gameOverCondition = 'Stalemate'
+      break
+    case game.isThreefoldRepetition():
+      gameOverCondition = 'Draw by threefold repetition'
+      break
+    case game.isInsufficientMaterial():
+      gameOverCondition = 'Draw due to insufficient material'
+      break
+    case game.isDraw():
+      gameOverCondition = 'Draw by some other rule (50-move rule, etc)'
+      break
+    case game.isGameOver():
+      gameOverCondition = 'The game is over by one of the above conditions.'
+      break
+    default:
+      break
   }
-  if (game.isGameOver()) {
-    console.log('O jogo acabou por uma das condições acima.')
-    setGameStatus(false)
 
+  if (gameOverCondition) {
+    console.log(gameOverCondition)
+    chessResultCreate({
+      roomId,
+      winnerId,
+      loserId,
+      resultType: gameOverCondition,
+    }).then((response) => {
+      console.log(response)
+    })
+    setGameStatus(false)
     return true
   }
 

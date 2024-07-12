@@ -31,16 +31,18 @@ import { GlobalPlayerProfile } from 'src/components/chess/components/GlobalPlaye
 import ConfirmModal from 'src/components/Modal'
 import FilterGlobalPlayers from 'src/components/chess/components/ModalFilterGlobalPlayers'
 import { times } from './data/times'
-import { ChallengeGlobalType, GameType } from 'src/types/apps/chessTypes'
+import {
+  Challenge,
+  ChallengeGlobalType,
+  GameType,
+} from 'src/types/apps/chessTypes'
 import toast from 'react-hot-toast'
 import { CancelableToastContent } from 'src/components/chess/PersistentToast'
-import { chessChallengeCreate } from '../api/chess/chessChallengeCreate'
-import { chessChallengeGet } from '../api/chess/chessChallengeGet'
-import { chessChallengeGetAll } from '../api/chess/chessChallengeGetAll'
+import { chessChallengeCreate } from '../api/chess-challenge/chessChallengeCreate'
+import { chessChallengeGet } from '../api/chess-challenge/chessChallengeGet'
+import { chessChallengeGetAll } from '../api/chess-challenge/chessChallengeGetAll'
 import { useAuth } from 'src/hooks/useAuth'
 import { connectSocket } from '../api/chess-room/chess-challenge-websocket'
-import { UserDataType } from 'src/context/types'
-import { updateAccountAmount } from 'src/utils/updateAccountAmount'
 
 const registerFormSchema = z.object({
   duration: z.number(),
@@ -97,11 +99,37 @@ function HomePage() {
     },
   })
 
+  const updateAccountAmount = (amount: number, action: string) => {
+    if (user && user.Account) {
+      let newAmount: number
+      switch (action) {
+        case 'subtraction':
+          newAmount = (user.Account.amount / 100 - amount) * 100
+          break
+
+        case 'plus':
+          newAmount = user.Account.amount
+          break
+        default:
+          newAmount = user.Account.amount
+          break
+      }
+
+      const updatedUser = {
+        ...user,
+        Account: {
+          ...user.Account,
+          amount: newAmount,
+        },
+      }
+      setUser(updatedUser)
+    }
+  }
   const onSubmitPlay = (data: RegisterFormData) => {
     if (user?.Account.amount && user.Account.amount / 100 >= data.amount) {
       chessChallengeCreate(data)
         .then((response: any) => {
-          updateAccountAmount({ amount: data.amount, user, setUser })
+          updateAccountAmount(data.amount, 'subtraction')
           const roomId = response.room.id
           const challengeId = response.challenge.id
           const userId = response.challenge.userId
@@ -121,11 +149,18 @@ function HomePage() {
           window.localStorage.setItem('chess-challenge-id', challengeId)
 
           setToastId(
-            toast.loading(<CancelableToastContent toastId={toastId} />, {
-              position: 'bottom-right',
-              duration: Infinity,
-              id: 'chess-loading-toast',
-            }),
+            toast.loading(
+              <CancelableToastContent
+                toastId={toastId}
+                amount={data.amount}
+                updateAccountAmount={updateAccountAmount}
+              />,
+              {
+                position: 'bottom-right',
+                duration: Infinity,
+                id: 'chess-loading-toast',
+              },
+            ),
           )
         })
         .catch(() => {
@@ -152,14 +187,21 @@ function HomePage() {
     })
     const challengeId = window.localStorage.getItem('chess-challenge-id')
     if (challengeId) {
-      chessChallengeGet(challengeId).then(() => {
-        if (toastId === null) {
+      chessChallengeGet(challengeId).then((response: Challenge) => {
+        if (toastId === null && response) {
           setToastId(
-            toast.loading(<CancelableToastContent toastId={toastId} />, {
-              position: 'bottom-right',
-              duration: Infinity,
-              id: 'chess-loading-toast',
-            }),
+            toast.loading(
+              <CancelableToastContent
+                toastId={toastId}
+                amount={response.amount}
+                updateAccountAmount={updateAccountAmount}
+              />,
+              {
+                position: 'bottom-right',
+                duration: Infinity,
+                id: 'chess-loading-toast',
+              },
+            ),
           )
         }
       })
