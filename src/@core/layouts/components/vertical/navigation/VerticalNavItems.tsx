@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 // ** Type Imports
 import {
   NavLink,

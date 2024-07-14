@@ -7,7 +7,7 @@ export const StyledTableRow = styled(TableRow)(({ theme }) => ({
 }))
 
 export const ScrollableTableContainer = styled(Paper)(({ theme }) => ({
-  height: '400px',
+  height: '300px',
   maxHeight: '400px',
   overflowY: 'auto',
   '&::-webkit-scrollbar': {

@@ -2,15 +2,18 @@ import { Box, BoxProps, Button, ButtonProps, styled } from '@mui/material'
 import Image, { ImageProps } from 'next/image'
 
 export const Container = styled(Box)<BoxProps>(({ theme }) => ({
-  [theme.breakpoints.down('md')]: {
+  [theme.breakpoints.down('lg')]: {
     display: 'flex',
-    justifyContent: 'space-between',
+    flexDirection: 'column',
+    width: '100%',
+    height: '100px',
   },
 }))
 
-export const ContainerClockBoxPiece = styled(Box)<BoxProps>(() => ({
+export const ContainerClockBoxPiece = styled(Box)<BoxProps>(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
+  [theme.breakpoints.down('lg')]: {},
 }))
 
 export const BoxPieces = styled(Box)<BoxProps>(({ theme }) => ({
@@ -45,9 +48,8 @@ export const ProfileContainer = styled(Box)<BoxProps>(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
   position: 'relative',
-  [theme.breakpoints.down('md')]: {
-    width: '100%',
-    justifyContent: 'space-between',
+  [theme.breakpoints.down('lg')]: {
+    marginTop: '-10px',
   },
 }))
 
@@ -72,8 +74,7 @@ export const BoxButtons = styled(Box)<BoxProps>(({ theme }) => ({
   alignItems: 'center',
   position: 'absolute',
   right: '10px',
-  [theme.breakpoints.down('md')]: {
-    width: '100%',
+  [theme.breakpoints.down('lg')]: {
     justifyContent: 'space-between',
   },
 }))

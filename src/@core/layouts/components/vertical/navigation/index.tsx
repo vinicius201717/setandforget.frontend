@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+/* eslint-disable no-unused-vars */
 // ** React Import
 import { useRef, useState } from 'react'
 

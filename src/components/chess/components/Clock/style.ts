@@ -16,7 +16,7 @@ export const Container = styled(Box)<BoxProps & { isRunning: boolean }>(
     justifyContent: 'flex-start',
     opacity: isRunning ? 1 : 0.5,
 
-    [theme.breakpoints.down('md')]: {
+    [theme.breakpoints.down('lg')]: {
       margin: '0',
     },
   }),

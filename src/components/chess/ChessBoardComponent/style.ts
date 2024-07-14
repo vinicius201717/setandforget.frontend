@@ -1,9 +1,14 @@
 import { Box, styled } from '@mui/material'
 import { BoxProps } from '@mui/system'
 
+interface ContainerMobileChessDisplayProps extends BoxProps {
+  me?: boolean
+}
+
 export const Container = styled(Box)<BoxProps>(({ theme }) => ({
   display: 'flex',
-  [theme.breakpoints.down('md')]: {
+  [theme.breakpoints.down('lg')]: {
+    height: 'auto',
     display: 'block',
   },
 }))
@@ -23,25 +28,31 @@ export const ContainerProfile = styled(Box)<BoxProps>(({ theme }) => ({
   },
 }))
 
-export const ContainerMobileChess = styled(Box)({
-  display: 'flex',
-  flexDirection: 'column',
-})
-
 export const ContainerMobileChessDisplay = styled(Box)<BoxProps>(
   ({ theme }) => ({
     display: 'none',
-
-    [theme.breakpoints.down('md')]: {
+    [theme.breakpoints.down('lg')]: {
+      height: '70px',
+      borderRadius: theme.shape.borderRadius,
       display: 'flex',
+      margin: '10px 0 40px 0',
     },
   }),
 )
 
 export const ContainerMobile = styled(Box)<BoxProps>(({ theme }) => ({
-  [theme.breakpoints.down('md')]: {
+  [theme.breakpoints.down('lg')]: {
     width: '100%',
+    height: 'auto',
     display: 'flex',
     justifyContent: 'center',
+  },
+}))
+
+export const ContainerMobileChess = styled(Box)<BoxProps>(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  [theme.breakpoints.down('lg')]: {
+    height: 'auto',
   },
 }))
