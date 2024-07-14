@@ -28,7 +28,7 @@ import {
 } from './style'
 
 import { GlobalPlayerProfile } from 'src/components/chess/components/GlobalPlayerProfile'
-import ConfirmModal from 'src/components/Modal'
+import ConfirmModal from 'src/components/chess/Modal'
 import FilterGlobalPlayers from 'src/components/chess/components/ModalFilterGlobalPlayers'
 import { times } from './data/times'
 import {
@@ -141,6 +141,7 @@ function HomePage() {
             userId,
             userId,
             amount,
+            null,
             null,
             null,
             null,

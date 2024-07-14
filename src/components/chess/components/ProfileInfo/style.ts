@@ -53,7 +53,13 @@ export const ProfileContainer = styled(Box)<BoxProps>(({ theme }) => ({
   },
 }))
 
-export const ActionButton = styled(Button)<ButtonProps>(({ theme }) => ({
+interface ActionButtonProps extends ButtonProps {
+  isMobile?: boolean
+}
+
+export const ActionButton = styled(Button, {
+  shouldForwardProp: (prop) => prop !== 'isMobile',
+})<ActionButtonProps>(({ theme, isMobile }) => ({
   backgroundColor: theme.palette.background.paper,
   color: theme.palette.getContrastText(theme.palette.background.paper),
   padding: theme.spacing(2),
@@ -68,7 +74,12 @@ export const ActionButton = styled(Button)<ButtonProps>(({ theme }) => ({
     backgroundColor: theme.palette.action.disabledBackground,
     color: theme.palette.action.disabled,
   },
+
+  [theme.breakpoints.down('lg')]: {
+    display: isMobile ? 'none' : 'block',
+  },
 }))
+
 export const BoxButtons = styled(Box)<BoxProps>(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',

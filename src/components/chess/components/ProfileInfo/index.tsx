@@ -13,7 +13,10 @@ import {
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz'
 import { useEffect, useState } from 'react'
 import { getPieceImages } from '../../utils/formatNameToImagePieces'
-import { giveUp } from 'src/pages/api/chess-room/chess-challenge-websocket'
+import {
+  draw,
+  giveUp,
+} from 'src/pages/api/chess-room/chess-challenge-websocket'
 import { useAuth } from 'src/hooks/useAuth'
 
 interface ProfileInfoProps {
@@ -49,13 +52,22 @@ export function ProfileInfo({
     }
   }
 
-  const givUp = () => {
+  const handleGivUp = () => {
     const roomId = window.localStorage.getItem('chess-room-id')
     const userId = user?.id as string
     if (roomId && userId) {
       giveUp(roomId, userId)
     }
     window.localStorage.removeItem('chess-room-id')
+  }
+
+  const handleDraw = () => {
+    const roomId = window.localStorage.getItem('chess-room-id')
+    const userId = user?.id as string
+    const name = user?.name as string
+    if (roomId && userId) {
+      draw(roomId, userId, name)
+    }
   }
 
   useEffect(() => {
@@ -90,13 +102,15 @@ export function ProfileInfo({
         </NameRagingContainer>
         {me ? (
           <BoxButtons>
-            <ActionButton onClick={inverte}>
+            <ActionButton onClick={inverte} isMobile={true}>
               <SwapHorizIcon />
             </ActionButton>
-            <ActionButton disabled={!status} onClick={givUp}>
+            <ActionButton disabled={!status} onClick={handleGivUp}>
               Give up
             </ActionButton>
-            <ActionButton disabled={!status}>Draw</ActionButton>
+            <ActionButton disabled={!status} onClick={handleDraw}>
+              Draw
+            </ActionButton>
           </BoxButtons>
         ) : null}
       </ProfileContainer>

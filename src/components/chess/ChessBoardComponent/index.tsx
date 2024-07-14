@@ -7,7 +7,13 @@ import { Chess, Square } from 'chess.js'
 import useClock from '../utils/ChessTimer'
 import { formatTime } from 'src/utils/format-timer'
 import PromotionModal from '../components/PromotionModal'
-import { PieceType, PromotionProps, Room } from 'src/types/apps/chessTypes'
+import {
+  Draw,
+  GameStatus,
+  PieceType,
+  PromotionProps,
+  Room,
+} from 'src/types/apps/chessTypes'
 import { isGameOverChess } from '../utils/isGameOver'
 import { ProfileInfo } from '../components/ProfileInfo'
 import { ClockComponent } from '../components/Clock'
@@ -28,13 +34,25 @@ import {
 import { GamePlayTicketInfo } from '../components/GamePlayTickteInfo'
 import ChessMovesTable from '../components/ChessMovesTable'
 import { getCapturedPieces } from '../utils/setCapturedPiecesToFen'
+import toast from 'react-hot-toast'
+import { ToastDraw } from '../components/ToastDraw'
+import ModalEndGame from '../ModalEndGame'
 
 const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
   chessRoomId,
 }) => {
   const [game, setGame] = useState(new Chess())
   const [chessRoom, setChessRoom] = useState<Room | null>(null)
-  const [gameStatus, setGameStatus] = useState<boolean>(true)
+  const [gameStatus, setGameStatus] = useState<GameStatus>({
+    status: true,
+    message: '',
+  })
+  const [draw, setDraw] = useState<Draw>({
+    active: false,
+    name: '',
+    userId: '',
+  })
+  const [modalEndGameOpen, setModalEndGameOpen] = useState(false)
   const [fen, setFen] = useState<string>(game.fen())
   const [moves, setMoves] = useState<string[]>([])
   const [liveMove, setLiveMove] = useState<{
@@ -57,7 +75,7 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
   const [capturedPieces, setCapturedPieces] = useState<string[]>([])
 
   const theme = useTheme()
-  const { user, setLoading } = useAuth()
+  const { user, setLoading, toastId, setToastId } = useAuth()
 
   const highlightStyleFrom = {
     backgroundColor: lighten(theme.palette.primary.main, 0.8),
@@ -70,15 +88,17 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
   const wClock = useClock(60)
   const bClock = useClock(60)
 
+  const handleCloseModalEndGame = () => setModalEndGameOpen(false)
+
   useEffect(() => {
     setFen(game.fen())
   }, [game])
 
   useEffect(() => {
-    if (!gameStatus) {
+    if (!gameStatus.status) {
       bClock.pause()
       wClock.pause()
-      alert('O JOGO ACABOU')
+      setModalEndGameOpen(true)
     }
   }, [gameStatus])
 
@@ -100,7 +120,6 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
       newGame.load(newFen)
       setGame(newGame)
       setFen(newFen)
-      setGameStatus(chessRoom.status)
       const newCapturedPieces = getCapturedPieces(newFen)
 
       if (newCapturedPieces) {
@@ -138,10 +157,11 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
         setMoves(lastMoves)
       }
     }
+    setLoading(false)
   }, [chessRoom])
 
   useEffect(() => {
-    if (gameStatus) {
+    if (gameStatus.status) {
       if (liveMove) {
         const { from, to, promotion, wTime, bTime } = liveMove
 
@@ -155,15 +175,17 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
 
         if (isMoveLegal) {
           const moveToVerifyCaptured = game.move({ from, to, promotion })
+
           const winner =
-            user?.id === chessRoom?.playerOne
-              ? chessRoom?.playerTwo
-              : chessRoom?.playerOne
+            user?.id === chessRoom?.playerOne.id
+              ? chessRoom?.playerTwo.id
+              : chessRoom?.playerOne.id
           isGameOverChess(
             chessRoomId as string,
             winner as unknown as string,
             user?.id as string,
             game,
+            true,
             setGameStatus,
           )
           setFen(game.fen())
@@ -200,16 +222,31 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
   }, [liveMove])
 
   useEffect(() => {
+    if (draw.active) {
+      setToastId(
+        toast(
+          <ToastDraw toastId={toastId} name={draw.name} userId={draw.userId} />,
+          {
+            position: 'bottom-right',
+            duration: Infinity,
+            id: 'chess-draw-loading-toast',
+          },
+        ),
+      )
+    }
+  }, [draw])
+
+  useEffect(() => {
     if (chessRoomId) {
       chessRoomGet(chessRoomId as string)
         .then((response: Room) => {
           if (
             response &&
+            response.status &&
             response.challenge &&
             response.playerOne &&
             response.playerTwo
           ) {
-            setLoading(false)
             const creatorId = response.challenge.userId
             const challengeId = response.challenge.id
             const userId = user?.id as string
@@ -220,10 +257,50 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
               creatorId,
               userId,
               null,
+              setDraw,
               setGameStatus,
               setChessRoom,
               setLiveMove,
             )
+          } else {
+            if (response.result) {
+              const arrayDurations =
+                response.roomLog && response.roomLog.duration
+                  ? JSON.parse(response.roomLog.duration)
+                  : null
+              let wTime
+              let bTime
+
+              if (arrayDurations && arrayDurations.length % 2 === 0) {
+                bTime = arrayDurations[arrayDurations.length - 1]
+                wTime = arrayDurations[arrayDurations.length - 2]
+              } else if (arrayDurations) {
+                wTime = arrayDurations[arrayDurations.length - 1]
+                bTime = arrayDurations[arrayDurations.length - 2]
+              } else {
+                wTime = response.challenge.duration
+                bTime = response.challenge.duration
+              }
+
+              const data: Room = {
+                challenge: response.challenge,
+                playerOne: response.playerTwo,
+                playerTwo: response.playerOne,
+                result: response.result,
+                roomLog: response.roomLog,
+                roomSocket: {
+                  bTime,
+                  wTime,
+                },
+                status: response.status,
+              }
+
+              setGameStatus({
+                status: false,
+                message: response.result.resultType,
+              })
+              setChessRoom(data)
+            }
           }
         })
         .catch((error) => {
@@ -267,81 +344,72 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
 
   const handleSquareClick = useCallback(
     (square: Square) => {
-      if (gameStatus) {
+      if (gameStatus.status) {
         const turn = game.turn()
         if (orientation === turn) {
-          if (
-            !isGameOverChess(
-              chessRoomId as string,
-              user?.id as string,
-              chessRoom?.playerTwo as unknown as string,
-              game,
-              setGameStatus,
-            )
-          ) {
-            const piece = game.get(square)
-            if (!selectedSquare) {
-              if (
-                piece &&
-                piece.color === orientation &&
-                piece.color === game.turn()
-              ) {
-                setSelectedSquare(square)
-                setHighlightSquareFrom(square)
-                setHighlightSquareTo(null)
-              } else {
-                setHighlightSquareFrom(null)
-                setHighlightSquareTo(null)
-              }
+          const piece = game.get(square)
+          if (!selectedSquare) {
+            if (
+              piece &&
+              piece.color === orientation &&
+              piece.color === game.turn()
+            ) {
+              setSelectedSquare(square)
+              setHighlightSquareFrom(square)
+              setHighlightSquareTo(null)
             } else {
-              const move = { from: selectedSquare, to: square, promotion: 'q' }
-              const legalMoves = game.moves({ verbose: true })
-              const isMoveLegal = legalMoves.some(
+              setHighlightSquareFrom(null)
+              setHighlightSquareTo(null)
+            }
+          } else {
+            const move = { from: selectedSquare, to: square, promotion: 'q' }
+            const legalMoves = game.moves({ verbose: true })
+            const isMoveLegal = legalMoves.some(
+              (m) =>
+                m.from === move.from &&
+                m.to === move.to &&
+                (m.promotion === move.promotion || !m.promotion),
+            )
+
+            if (isMoveLegal) {
+              const foundMove = legalMoves.find(
                 (m) =>
                   m.from === move.from &&
                   m.to === move.to &&
-                  (m.promotion === move.promotion || !m.promotion),
+                  m.flags.includes('p'),
               )
-
-              if (isMoveLegal) {
-                const foundMove = legalMoves.find(
-                  (m) =>
-                    m.from === move.from &&
-                    m.to === move.to &&
-                    m.flags.includes('p'),
-                )
-                if (foundMove) {
-                  setPromotion({
-                    show: true,
-                    color: game.turn(),
-                    from: selectedSquare,
-                    to: square,
-                  })
-                } else {
-                  game.move(move)
-                  setFen(game.fen())
-                  const loser =
-                    user?.id === chessRoom?.playerOne
-                      ? chessRoom?.playerTwo
-                      : chessRoom?.playerOne
-                  isGameOverChess(
-                    chessRoomId as string,
-                    user?.id as string,
-                    loser as unknown as string,
-                    game,
-                    setGameStatus,
-                  )
-                  setHighlightSquareTo(square)
-                  handleMoveLive(move)
-                  setSelectedSquare(null)
-                }
+              if (foundMove) {
+                setPromotion({
+                  show: true,
+                  color: game.turn(),
+                  from: selectedSquare,
+                  to: square,
+                })
               } else {
-                const pieceAtTarget = game.get(square)
-                if (pieceAtTarget && pieceAtTarget.color === game.turn()) {
-                  setSelectedSquare(square)
-                  setHighlightSquareFrom(square)
-                  setHighlightSquareTo(null)
-                }
+                game.move(move)
+                setFen(game.fen())
+                const loseId =
+                  user?.id === chessRoom?.playerOne.id
+                    ? chessRoom?.playerTwo.id
+                    : chessRoom?.playerOne.id
+                isGameOverChess(
+                  chessRoomId as string,
+                  user?.id as string,
+                  loseId as unknown as string,
+                  game,
+                  false,
+                  setGameStatus,
+                )
+                setHighlightSquareTo(square)
+                handleMoveLive(move)
+                setSelectedSquare(null)
+              }
+            } else {
+              const pieceAtTarget = game.get(square)
+              if (pieceAtTarget && pieceAtTarget.color === game.turn()) {
+                setSelectedSquare(square)
+                setHighlightSquareFrom(square)
+                setHighlightSquareTo(null)
               }
             }
           }
@@ -353,65 +421,63 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
 
   const handleMove = useCallback(
     (from: string, to: string) => {
-      if (gameStatus) {
+      if (gameStatus.status) {
         if (game) {
           const turn = game.turn()
-          const loser =
-            user?.id === chessRoom?.playerOne
-              ? chessRoom?.playerTwo
-              : chessRoom?.playerOne
+          const fromSquare = from as Square
+          const toSquare = to as Square
+          const piece = game.get(fromSquare)
+
+          setHighlightSquareFrom(fromSquare)
+
           if (
-            !isGameOverChess(
-              chessRoomId as string,
-              user?.id as string,
-              loser as unknown as string,
-              game,
-              setGameStatus,
-            )
+            (piece && piece.color !== game.turn()) ||
+            orientation !== game.turn()
           ) {
-            const fromSquare = from as Square
-            const toSquare = to as Square
-            const piece = game.get(fromSquare)
+            setHighlightSquareFrom(null)
+            setHighlightSquareTo(null)
+            return
+          }
 
-            setHighlightSquareFrom(fromSquare)
+          const validMoves = game.moves({
+            square: fromSquare,
+            verbose: true,
+          })
+          const move = validMoves.find(
+            (m) => m.from === fromSquare && m.to === toSquare,
+          )
 
-            if (
-              (piece && piece.color !== game.turn()) ||
-              orientation !== game.turn()
-            ) {
-              setHighlightSquareFrom(null)
-              setHighlightSquareTo(null)
-              return
-            }
+          if (!move) {
+            return
+          }
 
-            const validMoves = game.moves({
-              square: fromSquare,
-              verbose: true,
+          if (move.flags.includes('p')) {
+            setPromotion({
+              show: true,
+              color: game.turn(),
+              from: fromSquare,
+              to: toSquare,
             })
-            const move = validMoves.find(
-              (m) => m.from === fromSquare && m.to === toSquare,
-            )
-
-            if (!move) {
-              return
-            }
-
-            if (move.flags.includes('p')) {
-              setPromotion({
-                show: true,
-                color: game.turn(),
-                from: fromSquare,
-                to: toSquare,
-              })
+            setHighlightSquareTo(toSquare)
+          } else {
+            if (orientation === turn) {
+              const moveToVerifyCaptured = game.move(move)
+              const loseId =
+                user?.id === chessRoom?.playerOne.id
+                  ? chessRoom?.playerTwo.id
+                  : chessRoom?.playerOne.id
+              isGameOverChess(
+                chessRoomId as string,
+                user?.id as string,
+                loseId as unknown as string,
+                game,
+                false,
+                setGameStatus,
+              )
+              setFen(game.fen())
               setHighlightSquareTo(toSquare)
-            } else {
-              if (orientation === turn) {
-                const moveToVerifyCaptured = game.move(move)
-                setFen(game.fen())
-                setHighlightSquareTo(toSquare)
-                handleMoveLive(move)
-                updateCapturedPieces(moveToVerifyCaptured)
-              }
+              handleMoveLive(move)
+              updateCapturedPieces(moveToVerifyCaptured)
             }
           }
         }
@@ -472,7 +538,7 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
                     rating={2220}
                     capturedPieces={capturedPieces}
                     orientation={orientation}
-                    status={gameStatus}
+                    status={gameStatus.status}
                   >
                     <ClockComponent isRunning={wClock.isRunning}>
                       {formatTime(wClock.time)}
@@ -487,7 +553,7 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
                     rating={2220}
                     capturedPieces={capturedPieces}
                     orientation={orientation}
-                    status={gameStatus}
+                    status={gameStatus.status}
                   >
                     <ClockComponent isRunning={bClock.isRunning}>
                       {formatTime(bClock.time)}
@@ -524,7 +590,7 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
                     setTicketOrMoves={setTicketOrMoves}
                     capturedPieces={capturedPieces}
                     orientation={orientation}
-                    status={gameStatus}
+                    status={gameStatus.status}
                   >
                     <ClockComponent isRunning={wClock.isRunning}>
                       {formatTime(wClock.time)}
@@ -541,7 +607,7 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
                     setTicketOrMoves={setTicketOrMoves}
                     capturedPieces={capturedPieces}
                     orientation={orientation}
-                    status={gameStatus}
+                    status={gameStatus.status}
                   >
                     <ClockComponent isRunning={bClock.isRunning}>
                       {formatTime(bClock.time)}
@@ -560,7 +626,7 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
                 rating={2220}
                 capturedPieces={capturedPieces}
                 orientation={orientation}
-                status={gameStatus}
+                status={gameStatus.status}
               >
                 <ClockComponent isRunning={wClock.isRunning}>
                   {formatTime(wClock.time)}
@@ -584,7 +650,7 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
                 setTicketOrMoves={setTicketOrMoves}
                 capturedPieces={capturedPieces}
                 orientation={orientation}
-                status={gameStatus}
+                status={gameStatus.status}
               >
                 <ClockComponent isRunning={bClock.isRunning}>
                   {formatTime(bClock.time)}
@@ -594,12 +660,12 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
           ) : (
             <ContainerProfile style={{ marginBottom: '10px' }}>
               <ProfileInfo
-                name={chessRoom?.playerOne.name}
+                name={chessRoom?.playerTwo.name}
                 positionClock={1}
                 rating={2220}
                 capturedPieces={capturedPieces}
                 orientation={orientation}
-                status={gameStatus}
+                status={gameStatus.status}
               >
                 <ClockComponent isRunning={bClock.isRunning}>
                   {formatTime(bClock.time)}
@@ -616,14 +682,14 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
                 <ChessMovesTable moves={moves} />
               )}
               <ProfileInfo
-                name={chessRoom.playerTwo.name}
+                name={chessRoom.playerOne.name}
                 positionClock={2}
                 me={true}
                 rating={2220}
                 setTicketOrMoves={setTicketOrMoves}
                 capturedPieces={capturedPieces}
                 orientation={orientation}
-                status={gameStatus}
+                status={gameStatus.status}
               >
                 <ClockComponent isRunning={wClock.isRunning}>
                   {formatTime(wClock.time)}
@@ -640,6 +706,22 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
           )}
         </Container>
       ) : null}
+      {chessRoom ? (
+        <ModalEndGame
+          handleClose={handleCloseModalEndGame}
+          open={modalEndGameOpen}
+          amount={chessRoom?.challenge.amount as number}
+          duration={chessRoom?.challenge.duration as number}
+          roomId={chessRoomId as string}
+          message={gameStatus.message}
+          playerOne={chessRoom.playerOne}
+          playerTwo={chessRoom.playerTwo}
+          winnerId={chessRoom.result?.winnerId as string}
+          loserId={chessRoom.result?.loserId as string}
+        />
+      ) : (
+        ''
+      )}
     </>
   )
 }

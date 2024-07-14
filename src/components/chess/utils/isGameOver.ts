@@ -10,13 +10,19 @@ interface ChessGame {
   isGameOver: () => boolean
 }
 
-type GameStatusSetter = (status: boolean) => void
+interface GameStatus {
+  status: boolean
+  message: string
+}
+
+type GameStatusSetter = (data: GameStatus) => void
 
 export const isGameOverChess = (
   roomId: string,
   winnerId: string,
   loserId: string,
   game: ChessGame,
+  isLiveMoveVerification: boolean | null | undefined,
   setGameStatus: GameStatusSetter,
 ): boolean => {
   let gameOverCondition: string | null = null
@@ -45,17 +51,20 @@ export const isGameOverChess = (
   }
 
   if (gameOverCondition) {
-    console.log(gameOverCondition)
-    chessResultCreate({
-      roomId,
-      winnerId,
-      loserId,
-      resultType: gameOverCondition,
-    }).then((response) => {
-      console.log(response)
-    })
-    setGameStatus(false)
-    return true
+    if (!isLiveMoveVerification) {
+      chessResultCreate({
+        roomId,
+        winnerId,
+        loserId,
+        resultType: gameOverCondition,
+      }).then((response) => {
+        console.log(response)
+        setGameStatus({ status: false, message: gameOverCondition })
+        return true
+      })
+      setGameStatus({ status: false, message: gameOverCondition })
+      return true
+    }
   }
 
   return false

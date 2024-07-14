@@ -93,7 +93,7 @@ export interface Challenge {
   updated_at: string
 }
 
-interface Player {
+export interface Player {
   id: string
   name: string
   avatar: string | null
@@ -104,7 +104,7 @@ interface RoomLog {
   roomId: string
   fen: string
   moveHistory: string
-  duration: string
+  duration: string | null
   created_at: string
   updated_at: string | null
 }
@@ -114,6 +114,25 @@ interface RoomSocket {
   bTime: number
 }
 
+interface RoomResult {
+  id: string
+  roomId: string
+  winnerId: string
+  loserId: string
+  resultType: string
+  created_at: string
+}
+export interface Draw {
+  active: boolean
+  name: string
+  userId: string
+}
+
+export interface GameStatus {
+  status: boolean
+  message: string
+}
+
 export interface Room {
   challenge: Challenge
   playerOne: Player
@@ -121,6 +140,7 @@ export interface Room {
   status: boolean
   roomLog: RoomLog
   roomSocket: RoomSocket
+  result: RoomResult | null
 }
 
 export interface RoomLogsLive {

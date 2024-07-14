@@ -68,6 +68,7 @@ import 'src/iconify-bundle/icons-bundle-react'
 // ** Global css styles
 import '../../styles/globals.css'
 import { queryClient } from 'src/lib/react-query'
+import { WebSocketProvider } from 'src/context/WebSocketContext'
 
 // ** Extend App Props with Emotion
 type ExtendedAppProps = AppProps & {
@@ -154,21 +155,23 @@ const App = (props: ExtendedAppProps) => {
                 {({ settings }) => {
                   return (
                     <ThemeComponent settings={settings}>
-                      <Guard authGuard={authGuard} guestGuard={guestGuard}>
-                        <AclGuard
-                          aclAbilities={aclAbilities}
-                          guestGuard={guestGuard}
-                          authGuard={authGuard}
-                        >
-                          {getLayout(<Component {...pageProps} />)}
-                        </AclGuard>
-                      </Guard>
-                      <ReactHotToast>
-                        <Toaster
-                          position={settings.toastPosition}
-                          toastOptions={{ className: 'react-hot-toast' }}
-                        />
-                      </ReactHotToast>
+                      <WebSocketProvider>
+                        <Guard authGuard={authGuard} guestGuard={guestGuard}>
+                          <AclGuard
+                            aclAbilities={aclAbilities}
+                            guestGuard={guestGuard}
+                            authGuard={authGuard}
+                          >
+                            {getLayout(<Component {...pageProps} />)}
+                          </AclGuard>
+                        </Guard>
+                        <ReactHotToast>
+                          <Toaster
+                            position={settings.toastPosition}
+                            toastOptions={{ className: 'react-hot-toast' }}
+                          />
+                        </ReactHotToast>
+                      </WebSocketProvider>
                     </ThemeComponent>
                   )
                 }}
