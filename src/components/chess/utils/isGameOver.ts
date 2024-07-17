@@ -1,4 +1,6 @@
 import { chessResultCreate } from 'src/pages/api/chess-result/chessResultCreate'
+import { endGame } from 'src/pages/api/chess-room/chess-challenge-websocket'
+import { GameStatus } from 'src/types/apps/chessTypes'
 
 /* eslint-disable no-unused-vars */
 interface ChessGame {
@@ -10,15 +12,11 @@ interface ChessGame {
   isGameOver: () => boolean
 }
 
-interface GameStatus {
-  status: boolean
-  message: string
-}
-
 type GameStatusSetter = (data: GameStatus) => void
 
 export const isGameOverChess = (
   roomId: string,
+  userId: string,
   winnerId: string,
   loserId: string,
   game: ChessGame,
@@ -58,11 +56,16 @@ export const isGameOverChess = (
         loserId,
         resultType: gameOverCondition,
       }).then((response) => {
-        console.log(response)
-        setGameStatus({ status: false, message: gameOverCondition })
+        endGame(response.id, roomId, userId, loserId, gameOverCondition)
+
+        setGameStatus({
+          status: false,
+          message: gameOverCondition,
+          loserId,
+        })
         return true
       })
-      setGameStatus({ status: false, message: gameOverCondition })
+      setGameStatus({ status: false, message: gameOverCondition, loserId })
       return true
     }
   }

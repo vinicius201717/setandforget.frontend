@@ -1,15 +1,8 @@
 import { formatMoney } from 'src/utils/format-money'
-import { InitialNameAvatar, Profile } from './style'
+import { InitialNameAvatar, Profile, StyledTableContainer } from './style'
 import { InitialLetterName } from 'src/utils/initialFormatNameIcon'
 import { formatTime } from 'src/utils/format-timer'
-import {
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableRow,
-} from '@mui/material'
+import { Table, TableBody, TableCell, TableRow } from '@mui/material'
 
 interface DataProps {
   name: string
@@ -25,7 +18,7 @@ export function GlobalPlayerProfile({
   avatar,
 }: DataProps) {
   return (
-    <TableContainer component={Paper}>
+    <StyledTableContainer>
       <Table
         sx={{ minWidth: 500, cursor: 'pointer' }}
         aria-label='custom pagination table'
@@ -51,6 +44,6 @@ export function GlobalPlayerProfile({
           </TableRow>
         </TableBody>
       </Table>
-    </TableContainer>
+    </StyledTableContainer>
   )
 }

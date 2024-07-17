@@ -133,7 +133,7 @@ function HomePage() {
           const roomId = response.room.id
           const challengeId = response.challenge.id
           const userId = response.challenge.userId
-          const amount = JSON.stringify(user.Account.amount)
+          const amount = JSON.stringify(data.amount)
 
           connectSocket(
             challengeId,

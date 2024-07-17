@@ -46,6 +46,7 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
   const [gameStatus, setGameStatus] = useState<GameStatus>({
     status: true,
     message: '',
+    loserId: '',
   })
   const [draw, setDraw] = useState<Draw>({
     active: false,
@@ -182,6 +183,7 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
               : chessRoom?.playerOne.id
           isGameOverChess(
             chessRoomId as string,
+            user?.id as string,
             winner as unknown as string,
             user?.id as string,
             game,
@@ -298,6 +300,7 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
               setGameStatus({
                 status: false,
                 message: response.result.resultType,
+                loserId: '',
               })
               setChessRoom(data)
             }
@@ -395,6 +398,7 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
                 isGameOverChess(
                   chessRoomId as string,
                   user?.id as string,
+                  user?.id as string,
                   loseId as unknown as string,
                   game,
                   false,
@@ -468,6 +472,7 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
                   : chessRoom?.playerOne.id
               isGameOverChess(
                 chessRoomId as string,
+                user?.id as string,
                 user?.id as string,
                 loseId as unknown as string,
                 game,
@@ -716,8 +721,7 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
           message={gameStatus.message}
           playerOne={chessRoom.playerOne}
           playerTwo={chessRoom.playerTwo}
-          winnerId={chessRoom.result?.winnerId as string}
-          loserId={chessRoom.result?.loserId as string}
+          loserId={chessRoom.result?.loserId || gameStatus.loserId}
         />
       ) : (
         ''

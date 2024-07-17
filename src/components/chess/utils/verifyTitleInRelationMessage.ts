@@ -1,15 +1,15 @@
 export const translateGameOverMessage = (
   gameOverCondition: string,
-  winnerId: string,
+  loserId: string,
   userId: string,
 ): string => {
   switch (gameOverCondition) {
     case 'Stalemate':
       return 'Game tied'
     case 'Give up':
-      return userId === winnerId ? 'You won' : 'You lost'
+      return userId === loserId ? 'You lost' : 'You won'
     case 'Checkmate':
-      return userId === winnerId ? 'You won' : 'You lost'
+      return userId === loserId ? 'You lost' : 'You won'
     case 'Draw by threefold repetition':
       return 'Game tied'
     case 'Draw due to insufficient material':

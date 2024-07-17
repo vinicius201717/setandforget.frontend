@@ -131,6 +131,7 @@ export interface Draw {
 export interface GameStatus {
   status: boolean
   message: string
+  loserId: string
 }
 
 export interface Room {

@@ -64,7 +64,11 @@ export const connectSocket = (
 
   socket.on('giveUp', (data: GameStatus) => {
     if (setGameStatus)
-      setGameStatus({ status: data.status, message: data.message })
+      setGameStatus({
+        status: data.status,
+        message: data.message,
+        loserId: data.loserId,
+      })
   })
 
   socket.on('draw', (name: string, userId: string) => {
@@ -79,7 +83,16 @@ export const connectSocket = (
 
   socket.on('acceptDraw', (data: GameStatus) => {
     if (setGameStatus)
-      setGameStatus({ status: data.status, message: data.message })
+      setGameStatus({ status: data.status, message: data.message, loserId: '' })
+  })
+
+  socket.on('endGame', (data) => {
+    if (setGameStatus)
+      setGameStatus({
+        status: data.status,
+        message: data.message,
+        loserId: data.loserId,
+      })
   })
 }
 
@@ -144,5 +157,24 @@ export const acceptDraw = (roomId: string, userId: string, name: string) => {
   }
   if (socket) {
     socket.emit('acceptDraw', query)
+  }
+}
+
+export const endGame = (
+  resultId: string,
+  roomId: string,
+  userId: string,
+  loserId: string,
+  resultType: string,
+) => {
+  const query = {
+    resultId,
+    roomId,
+    userId,
+    loserId,
+    resultType,
+  }
+  if (socket) {
+    socket.emit('endGame', query)
   }
 }

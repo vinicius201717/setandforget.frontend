@@ -52,7 +52,7 @@ export function ProfileInfo({
     }
   }
 
-  const handleGivUp = () => {
+  const handleGiveUp = () => {
     const roomId = window.localStorage.getItem('chess-room-id')
     const userId = user?.id as string
     if (roomId && userId) {
@@ -105,7 +105,7 @@ export function ProfileInfo({
             <ActionButton onClick={inverte} isMobile={true}>
               <SwapHorizIcon />
             </ActionButton>
-            <ActionButton disabled={!status} onClick={handleGivUp}>
+            <ActionButton disabled={!status} onClick={handleGiveUp}>
               Give up
             </ActionButton>
             <ActionButton disabled={!status} onClick={handleDraw}>

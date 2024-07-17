@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   Modal,
   Paper,
@@ -25,7 +27,6 @@ interface ConfirmModalProps {
   message: string
   playerOne: Player
   playerTwo: Player
-  winnerId: string
   loserId: string
 }
 
@@ -34,10 +35,11 @@ function ModalEndGame({
   handleClose,
   amount,
   duration,
+  roomId,
   message,
   playerOne,
   playerTwo,
-  winnerId,
+  loserId,
 }: ConfirmModalProps) {
   const { user } = useAuth()
 
@@ -57,7 +59,7 @@ function ModalEndGame({
     >
       <StyledCard>
         <Typography variant='h4'>
-          {translateGameOverMessage(message, winnerId, user?.id as string)}
+          {translateGameOverMessage(message, loserId, user?.id as string)}
         </Typography>
         <p>{message}</p>
         <CloseButton onClick={handleClose}>
@@ -73,11 +75,12 @@ function ModalEndGame({
                     <div>
                       {translateGameOverMessage(
                         message,
-                        winnerId,
+                        loserId,
                         user?.id as string,
                       ) === 'You lost' ? (
                         <GridArrowDownwardIcon
                           style={{
+                            width: '15px',
                             color: 'red',
                             verticalAlign: 'middle',
                             marginRight: '-5px',
@@ -93,7 +96,7 @@ function ModalEndGame({
                     <div>
                       {translateGameOverMessage(
                         message,
-                        winnerId,
+                        loserId,
                         user?.id as string,
                       ) === 'You won' ? (
                         <GridArrowUpwardIcon
