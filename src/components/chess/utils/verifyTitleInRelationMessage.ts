@@ -4,6 +4,8 @@ export const translateGameOverMessage = (
   userId: string,
 ): string => {
   switch (gameOverCondition) {
+    case 'Time up':
+      return userId === loserId ? 'You lost' : 'You won'
     case 'Stalemate':
       return 'Game tied'
     case 'Give up':

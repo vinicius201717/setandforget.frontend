@@ -1,10 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-unused-vars */
 import React, { useState, useEffect, useCallback } from 'react'
 import Chessboard from 'chessboardjsx'
 import { Chess, Square } from 'chess.js'
-import useClock from '../utils/ChessTimer'
 import { formatTime } from 'src/utils/format-timer'
 import PromotionModal from '../components/PromotionModal'
 import {
@@ -37,6 +37,9 @@ import { getCapturedPieces } from '../utils/setCapturedPiecesToFen'
 import toast from 'react-hot-toast'
 import { ToastDraw } from '../components/ToastDraw'
 import ModalEndGame from '../ModalEndGame'
+import { UserDataType } from 'src/context/types'
+import { returnTheWinnerIsWinnengsInCaseOfWithdrawal } from '../utils/returnTheWinnerIsWinnengsInCaseOfWithdrawal'
+import { useClock } from '../utils/ChessTimer'
 
 const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
   chessRoomId,
@@ -76,7 +79,7 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
   const [capturedPieces, setCapturedPieces] = useState<string[]>([])
 
   const theme = useTheme()
-  const { user, setLoading, toastId, setToastId } = useAuth()
+  const { user, setUser, setLoading, toastId, setToastId } = useAuth()
 
   const highlightStyleFrom = {
     backgroundColor: lighten(theme.palette.primary.main, 0.8),
@@ -86,8 +89,37 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
     backgroundColor: lighten(theme.palette.primary.main, 0.7),
   }
 
-  const wClock = useClock(60)
-  const bClock = useClock(60)
+  const handleTimeEnd = useCallback(() => {
+    const winnerId =
+      user?.id === chessRoom?.playerOne
+        ? chessRoom?.playerTwo.id
+        : chessRoom?.playerOne.id
+
+    const isLiveMoveVerificationAndWinnerPlayer: boolean = winnerId === user?.id
+
+    isGameOverChess(
+      chessRoomId as string,
+      user?.id as string,
+      winnerId as string,
+      user?.id as string,
+      game,
+      true,
+      !isLiveMoveVerificationAndWinnerPlayer,
+      user as UserDataType,
+      chessRoom?.challenge.amount as number,
+      false,
+      setGameStatus,
+      setUser,
+    )
+    setGameStatus({
+      status: false,
+      message: 'Time up',
+      loserId: user?.id as string,
+    })
+  }, [setGameStatus, setUser, game, user?.id, chessRoomId, chessRoom])
+
+  const wClock = useClock(60, handleTimeEnd)
+  const bClock = useClock(60, handleTimeEnd)
 
   const handleCloseModalEndGame = () => setModalEndGameOpen(false)
 
@@ -100,6 +132,17 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
       bClock.pause()
       wClock.pause()
       setModalEndGameOpen(true)
+      if (
+        gameStatus.message === 'Give up' &&
+        gameStatus.loserId &&
+        gameStatus.loserId !== user?.id
+      ) {
+        returnTheWinnerIsWinnengsInCaseOfWithdrawal({
+          amount: chessRoom?.challenge.amount as number,
+          setUser,
+          user: user as UserDataType,
+        })
+      }
     }
   }, [gameStatus])
 
@@ -131,7 +174,7 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
       const wTime = chessRoom.roomSocket.wTime
       const bTime = chessRoom.roomSocket.bTime
 
-      if (chessRoom.roomLog.duration && gameStatus) {
+      if (chessRoom.roomLog.duration && gameStatus.status) {
         wClock.reset(wTime)
         bClock.reset(bTime)
 
@@ -149,8 +192,10 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
       } else {
         wClock.reset(wTime)
         bClock.reset(bTime)
-        bClock.pause()
-        wClock.start()
+        if (gameStatus.status) {
+          bClock.pause()
+          wClock.start()
+        }
       }
 
       if (initialFen !== newFen && moveHistory) {
@@ -187,8 +232,13 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
             winner as unknown as string,
             user?.id as string,
             game,
+            false,
             true,
+            user as UserDataType,
+            chessRoom?.challenge.amount as number,
+            false,
             setGameStatus,
+            setUser,
           )
           setFen(game.fen())
           updateCapturedPieces(moveToVerifyCaptured)
@@ -277,8 +327,13 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
                 bTime = arrayDurations[arrayDurations.length - 1]
                 wTime = arrayDurations[arrayDurations.length - 2]
               } else if (arrayDurations) {
-                wTime = arrayDurations[arrayDurations.length - 1]
-                bTime = arrayDurations[arrayDurations.length - 2]
+                if (arrayDurations.length === 1) {
+                  wTime = arrayDurations[arrayDurations.length - 1]
+                  bTime = response.challenge.duration
+                } else {
+                  wTime = arrayDurations[arrayDurations.length - 1]
+                  bTime = arrayDurations[arrayDurations.length - 2]
+                }
               } else {
                 wTime = response.challenge.duration
                 bTime = response.challenge.duration
@@ -286,8 +341,8 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
 
               const data: Room = {
                 challenge: response.challenge,
-                playerOne: response.playerTwo,
-                playerTwo: response.playerOne,
+                playerOne: response.playerOne,
+                playerTwo: response.playerTwo,
                 result: response.result,
                 roomLog: response.roomLog,
                 roomSocket: {
@@ -296,13 +351,12 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
                 },
                 status: response.status,
               }
-
+              setChessRoom(data)
               setGameStatus({
                 status: false,
                 message: response.result.resultType,
-                loserId: '',
+                loserId: response.result.loserId,
               })
-              setChessRoom(data)
             }
           }
         })
@@ -402,7 +456,12 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
                   loseId as unknown as string,
                   game,
                   false,
+                  false,
+                  user as UserDataType,
+                  chessRoom?.challenge.amount as number,
+                  true,
                   setGameStatus,
+                  setUser,
                 )
                 setHighlightSquareTo(square)
                 handleMoveLive(move)
@@ -477,7 +536,12 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
                 loseId as unknown as string,
                 game,
                 false,
+                false,
+                user as UserDataType,
+                chessRoom?.challenge.amount as number,
+                true,
                 setGameStatus,
+                setUser,
               )
               setFen(game.fen())
               setHighlightSquareTo(toSquare)

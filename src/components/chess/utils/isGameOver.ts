@@ -1,3 +1,4 @@
+import { UserDataType } from 'src/context/types'
 import { chessResultCreate } from 'src/pages/api/chess-result/chessResultCreate'
 import { endGame } from 'src/pages/api/chess-room/chess-challenge-websocket'
 import { GameStatus } from 'src/types/apps/chessTypes'
@@ -20,8 +21,13 @@ export const isGameOverChess = (
   winnerId: string,
   loserId: string,
   game: ChessGame,
+  timeUp: boolean,
   isLiveMoveVerification: boolean | null | undefined,
+  user: UserDataType,
+  amount: number,
+  verifyIfIsLiveMove: boolean,
   setGameStatus: GameStatusSetter,
+  setUser: (value: UserDataType) => void,
 ): boolean => {
   let gameOverCondition: string | null = null
 
@@ -44,12 +50,17 @@ export const isGameOverChess = (
     case game.isGameOver():
       gameOverCondition = 'The game is over by one of the above conditions.'
       break
+    case timeUp:
+      gameOverCondition = 'Time up'
+      break
     default:
       break
   }
 
   if (gameOverCondition) {
     if (!isLiveMoveVerification) {
+      console.log(userId)
+
       chessResultCreate({
         roomId,
         winnerId,
@@ -57,7 +68,33 @@ export const isGameOverChess = (
         resultType: gameOverCondition,
       }).then((response) => {
         endGame(response.id, roomId, userId, loserId, gameOverCondition)
+        if (gameOverCondition === 'Checkmate' && verifyIfIsLiveMove) {
+          const totalBet = amount * 2
+          const winnings = totalBet * 0.9
+          const newAmount = user.Account.amount + winnings * 100
 
+          const updatedUser = {
+            ...user,
+            Account: {
+              ...user.Account,
+              amount: newAmount,
+            },
+          }
+          setUser(updatedUser)
+        } else if (gameOverCondition === 'Time up' && !verifyIfIsLiveMove) {
+          const totalBet = amount * 2
+          const winnings = totalBet * 0.9
+          const newAmount = user.Account.amount + winnings * 100
+
+          const updatedUser = {
+            ...user,
+            Account: {
+              ...user.Account,
+              amount: newAmount,
+            },
+          }
+          setUser(updatedUser)
+        }
         setGameStatus({
           status: false,
           message: gameOverCondition,
