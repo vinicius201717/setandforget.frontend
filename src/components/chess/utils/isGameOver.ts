@@ -1,7 +1,7 @@
 import { UserDataType } from 'src/context/types'
 import { chessResultCreate } from 'src/pages/api/chess-result/chessResultCreate'
 import { endGame } from 'src/pages/api/chess-room/chess-challenge-websocket'
-import { GameStatus } from 'src/types/apps/chessTypes'
+import { GameStatus, Room } from 'src/types/apps/chessTypes'
 
 /* eslint-disable no-unused-vars */
 interface ChessGame {
@@ -28,6 +28,9 @@ export const isGameOverChess = (
   verifyIfIsLiveMove: boolean,
   setGameStatus: GameStatusSetter,
   setUser: (value: UserDataType) => void,
+  setChessRoom: (
+    value: Room | ((prevRoom: Room | null) => Room | null),
+  ) => void,
 ): boolean => {
   let gameOverCondition: string | null = null
 
@@ -59,8 +62,6 @@ export const isGameOverChess = (
 
   if (gameOverCondition) {
     if (!isLiveMoveVerification) {
-      console.log(userId)
-
       chessResultCreate({
         roomId,
         winnerId,
@@ -100,9 +101,34 @@ export const isGameOverChess = (
           message: gameOverCondition,
           loserId,
         })
+
         return true
       })
-      setGameStatus({ status: false, message: gameOverCondition, loserId })
+    } else {
+      if (gameOverCondition.includes('Draw')) {
+        const newAmount = user.Account.amount + amount * 100
+
+        const updatedUser = {
+          ...user,
+          Account: {
+            ...user.Account,
+            amount: newAmount,
+          },
+        }
+        setUser(updatedUser)
+
+        setGameStatus({
+          status: false,
+          message: gameOverCondition,
+          loserId,
+        })
+        return true
+      }
+      setGameStatus({
+        status: false,
+        message: gameOverCondition,
+        loserId,
+      })
       return true
     }
   }

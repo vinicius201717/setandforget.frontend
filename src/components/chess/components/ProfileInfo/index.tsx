@@ -18,6 +18,14 @@ import {
   giveUp,
 } from 'src/pages/api/chess-room/chess-challenge-websocket'
 import { useAuth } from 'src/hooks/useAuth'
+import {
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Button,
+} from '@mui/material'
 
 interface ProfileInfoProps {
   children: React.ReactNode
@@ -44,8 +52,10 @@ export function ProfileInfo({
 }: ProfileInfoProps) {
   const [capturedPiecesW, setCapturedPiecesW] = useState<string[]>([])
   const [capturedPiecesB, setCapturedPiecesB] = useState<string[]>([])
+  const [open, setOpen] = useState(false)
 
   const { user } = useAuth()
+
   const inverte = () => {
     if (setTicketOrMoves) {
       setTicketOrMoves((current) => (current === 1 ? 2 : 1))
@@ -59,6 +69,7 @@ export function ProfileInfo({
       giveUp(roomId, userId)
     }
     window.localStorage.removeItem('chess-room-id')
+    setOpen(false)
   }
 
   const handleDraw = () => {
@@ -68,6 +79,14 @@ export function ProfileInfo({
     if (roomId && userId) {
       draw(roomId, userId, name)
     }
+  }
+
+  const handleClickOpen = () => {
+    setOpen(true)
+  }
+
+  const handleClose = () => {
+    setOpen(false)
   }
 
   useEffect(() => {
@@ -105,7 +124,7 @@ export function ProfileInfo({
             <ActionButton onClick={inverte} isMobile={true}>
               <SwapHorizIcon />
             </ActionButton>
-            <ActionButton disabled={!status} onClick={handleGiveUp}>
+            <ActionButton disabled={!status} onClick={handleClickOpen}>
               Give up
             </ActionButton>
             <ActionButton disabled={!status} onClick={handleDraw}>
@@ -126,6 +145,23 @@ export function ProfileInfo({
           ''
         )}
       </ContainerClockBoxPiece>
+
+      <Dialog open={open} onClose={handleClose}>
+        <DialogTitle>Confirm Give Up</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to give up the game?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} color='primary'>
+            Cancel
+          </Button>
+          <Button onClick={handleGiveUp} color='primary' autoFocus>
+            Confirm
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   )
 }

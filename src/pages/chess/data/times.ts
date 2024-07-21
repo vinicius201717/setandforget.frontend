@@ -1,9 +1,5 @@
 export const times = [
   {
-    value: 5,
-    label: '5 sec',
-  },
-  {
     value: 60,
     label: '1 min',
   },

@@ -1,4 +1,5 @@
 import { Box, BoxProps, Button, ButtonProps, styled } from '@mui/material'
+import Link, { LinkProps } from 'next/link'
 import React from 'react'
 
 interface ButtonIconProps extends ButtonProps {
@@ -109,4 +110,10 @@ export const HeaderGlobalOptions = styled(Box)<BoxProps>(() => ({
   display: 'flex',
   justifyContent: 'space-between',
   alignItems: 'center',
+}))
+
+export const LinkHistory = styled(Link)<LinkProps>(({ theme }) => ({
+  color: theme.palette.getContrastText(theme.palette.background.default),
+  textDecoration: 'none',
+  margin: '5px',
 }))

@@ -34,6 +34,7 @@ export const getPieceImages = (pieces: string[]): JSX.Element[] => {
       alt='chess piece'
       width={50}
       height={50}
+      style={{ marginRight: '-20px' }}
     />
   ))
 }

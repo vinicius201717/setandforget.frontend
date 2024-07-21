@@ -40,6 +40,7 @@ import ModalEndGame from '../ModalEndGame'
 import { UserDataType } from 'src/context/types'
 import { returnTheWinnerIsWinnengsInCaseOfWithdrawal } from '../utils/returnTheWinnerIsWinnengsInCaseOfWithdrawal'
 import { useClock } from '../utils/ChessTimer'
+import { returnAmountToAcceptDraw } from '../utils/returnAmountToAcceptDraw'
 
 const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
   chessRoomId,
@@ -81,6 +82,13 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
   const theme = useTheme()
   const { user, setUser, setLoading, toastId, setToastId } = useAuth()
 
+  const moveSound =
+    typeof Audio !== 'undefined' ? new Audio('/sounds/move.mp3') : null
+  const captureSound =
+    typeof Audio !== 'undefined' ? new Audio('/sounds/capiture.mp3') : null
+  const checkSound =
+    typeof Audio !== 'undefined' ? new Audio('/sounds/check.mp3') : null
+
   const highlightStyleFrom = {
     backgroundColor: lighten(theme.palette.primary.main, 0.8),
   }
@@ -110,6 +118,7 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
       false,
       setGameStatus,
       setUser,
+      setChessRoom,
     )
     setGameStatus({
       status: false,
@@ -135,9 +144,16 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
       if (
         gameStatus.message === 'Give up' &&
         gameStatus.loserId &&
-        gameStatus.loserId !== user?.id
+        gameStatus.loserId !== user?.id &&
+        chessRoom?.status
       ) {
         returnTheWinnerIsWinnengsInCaseOfWithdrawal({
+          amount: chessRoom?.challenge.amount as number,
+          setUser,
+          user: user as UserDataType,
+        })
+      } else if (gameStatus.message === 'Draw proposal' && chessRoom?.status) {
+        returnAmountToAcceptDraw({
           amount: chessRoom?.challenge.amount as number,
           setUser,
           user: user as UserDataType,
@@ -239,9 +255,25 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
             false,
             setGameStatus,
             setUser,
+            setChessRoom,
           )
           setFen(game.fen())
+
           updateCapturedPieces(moveToVerifyCaptured)
+          if (moveToVerifyCaptured.captured && captureSound) {
+            captureSound.play().catch((error) => {
+              console.error('Erro ao reproduzir som de captura:', error)
+            })
+          } else if (game.inCheck() && checkSound) {
+            checkSound.play().catch((error) => {
+              console.error('Erro ao reproduzir som de xeque:', error)
+            })
+          } else if (moveSound) {
+            moveSound.play().catch((error) => {
+              console.error('Erro ao reproduzir som de movimento:', error)
+            })
+          }
+
           if (game.turn() === 'w') {
             wClock.reset(wTime)
             wClock.start()
@@ -443,7 +475,7 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
                   to: square,
                 })
               } else {
-                game.move(move)
+                const moveToVerifyCaptured = game.move(move)
                 setFen(game.fen())
                 const loseId =
                   user?.id === chessRoom?.playerOne.id
@@ -462,10 +494,25 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
                   true,
                   setGameStatus,
                   setUser,
+                  setChessRoom,
                 )
                 setHighlightSquareTo(square)
                 handleMoveLive(move)
                 setSelectedSquare(null)
+                updateCapturedPieces(moveToVerifyCaptured)
+                if (moveToVerifyCaptured.captured && captureSound) {
+                  captureSound.play().catch((error) => {
+                    console.error('Erro ao reproduzir som de captura:', error)
+                  })
+                } else if (game.inCheck() && checkSound) {
+                  checkSound.play().catch((error) => {
+                    console.error('Erro ao reproduzir som de xeque:', error)
+                  })
+                } else if (moveSound) {
+                  moveSound.play().catch((error) => {
+                    console.error('Erro ao reproduzir som de movimento:', error)
+                  })
+                }
               }
             } else {
               const pieceAtTarget = game.get(square)
@@ -542,11 +589,25 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
                 true,
                 setGameStatus,
                 setUser,
+                setChessRoom,
               )
               setFen(game.fen())
               setHighlightSquareTo(toSquare)
               handleMoveLive(move)
               updateCapturedPieces(moveToVerifyCaptured)
+              if (moveToVerifyCaptured.captured && captureSound) {
+                captureSound.play().catch((error) => {
+                  console.error('Erro ao reproduzir som de captura:', error)
+                })
+              } else if (game.inCheck() && checkSound) {
+                checkSound.play().catch((error) => {
+                  console.error('Erro ao reproduzir som de xeque:', error)
+                })
+              } else if (moveSound) {
+                moveSound.play().catch((error) => {
+                  console.error('Erro ao reproduzir som de movimento:', error)
+                })
+              }
             }
           }
         }

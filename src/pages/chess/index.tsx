@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -25,6 +26,7 @@ import {
   OptionButtonChange,
   ButtonIcon,
   HeaderGlobalOptions,
+  LinkHistory,
 } from './style'
 
 import { GlobalPlayerProfile } from 'src/components/chess/components/GlobalPlayerProfile'
@@ -34,6 +36,7 @@ import { times } from './data/times'
 import {
   Challenge,
   ChallengeGlobalType,
+  CreateChallengeReturn,
   GameType,
 } from 'src/types/apps/chessTypes'
 import toast from 'react-hot-toast'
@@ -128,26 +131,47 @@ function HomePage() {
   const onSubmitPlay = (data: RegisterFormData) => {
     if (user?.Account.amount && user.Account.amount / 100 >= data.amount) {
       chessChallengeCreate(data)
-        .then((response: any) => {
-          updateAccountAmount(data.amount, 'subtraction')
-          const roomId = response.room.id
-          const challengeId = response.challenge.id
-          const userId = response.challenge.userId
-          const amount = JSON.stringify(data.amount)
+        .then((response: CreateChallengeReturn) => {
+          if (response.checkEqual) {
+            const roomId = response.room.id
 
-          connectSocket(
-            challengeId,
-            roomId,
-            userId,
-            userId,
-            amount,
-            null,
-            null,
-            null,
-            null,
-          )
-          window.localStorage.setItem('chess-room-id', roomId)
-          window.localStorage.setItem('chess-challenge-id', challengeId)
+            const creatorId = response.challenge.userId
+            const challengeId = response.challenge.id
+            const amount = JSON.stringify(data.amount)
+            window.localStorage.setItem('chess-room-id', roomId)
+
+            connectSocket(
+              challengeId,
+              roomId,
+              creatorId,
+              user?.id,
+              amount,
+              null,
+              null,
+              null,
+              null,
+            )
+          } else {
+            updateAccountAmount(data.amount, 'subtraction')
+            const roomId = response.room.id
+            const challengeId = response.challenge.id
+            const userId = response.challenge.userId
+            const amount = JSON.stringify(data.amount)
+
+            connectSocket(
+              challengeId,
+              roomId,
+              userId,
+              userId,
+              amount,
+              null,
+              null,
+              null,
+              null,
+            )
+            window.localStorage.setItem('chess-room-id', roomId)
+            window.localStorage.setItem('chess-challenge-id', challengeId)
+          }
 
           setToastId(
             toast.loading(
@@ -279,10 +303,16 @@ function HomePage() {
           <Button
             type='submit'
             variant='contained'
-            style={{ marginTop: '10px', marginLeft: '3px', width: '100%' }}
+            style={{
+              marginTop: '10px',
+              marginLeft: '3px',
+              marginBottom: '20px',
+              width: '100%',
+            }}
           >
             Jogar
           </Button>
+          <LinkHistory href={'chess/history'}>History game</LinkHistory>
         </FormContainer>
       </ContainerChildren>
       {globalChallenge && globalChallenge.length > 0 ? (

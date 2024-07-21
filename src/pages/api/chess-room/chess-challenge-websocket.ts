@@ -1,5 +1,7 @@
+/* eslint-disable no-unused-vars */
 import toast from 'react-hot-toast'
 import { io, Socket } from 'socket.io-client'
+import { UserDataType } from 'src/context/types'
 import { Draw, GameStatus, Room } from 'src/types/apps/chessTypes'
 
 let socket: Socket | null = null
@@ -13,6 +15,7 @@ export const connectSocket = (
   setDraw: React.Dispatch<React.SetStateAction<Draw>> | null,
   setGameStatus: React.Dispatch<React.SetStateAction<GameStatus>> | null,
   setChessRoom: React.Dispatch<React.SetStateAction<Room | null>> | null,
+
   setLiveMove: React.Dispatch<
     React.SetStateAction<
       | {
@@ -82,8 +85,9 @@ export const connectSocket = (
   })
 
   socket.on('acceptDraw', (data: GameStatus) => {
-    if (setGameStatus)
+    if (setGameStatus) {
       setGameStatus({ status: data.status, message: data.message, loserId: '' })
+    }
   })
 
   socket.on('endGame', (data) => {

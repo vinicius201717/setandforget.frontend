@@ -67,6 +67,31 @@ export interface CreatorType {
   avatar: string
 }
 
+export interface CreateChallengeReturn {
+  challenge: {
+    amount: number
+    created_at: string
+    duration: number
+    id: string
+    roomId: string | null
+    status: boolean
+    updated_at: string
+    userId: string
+  }
+  room: {
+    challengeId: string
+    created_at: string
+    duration: number
+    id: string
+    playerOneId: string | null
+    playerTwoId: string | null
+    status: boolean
+    updated_at: string
+    userId: string | null
+  }
+  checkEqual: boolean
+}
+
 export interface GameType {
   challengeId: string
   user: CreatorType
@@ -114,7 +139,7 @@ interface RoomSocket {
   bTime: number
 }
 
-interface RoomResult {
+export interface RoomResult {
   id: string
   roomId: string
   winnerId: string
@@ -122,6 +147,18 @@ interface RoomResult {
   resultType: string
   created_at: string
 }
+
+export interface RoomResultWithUserName {
+  id: string
+  roomId: string
+  winnerId: string
+  loserId: string
+  winner: { id: string; name: string }
+  loser: { id: string; name: string }
+  resultType: string
+  created_at: string
+}
+
 export interface Draw {
   active: boolean
   name: string

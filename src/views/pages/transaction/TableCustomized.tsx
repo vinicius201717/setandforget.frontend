@@ -126,7 +126,7 @@ const TableCustomized = ({ transactions }: TableCustomizedProps) => {
                       </Link>
                     </StyledTableCell>
                   ) : (
-                    ''
+                    <StyledTableCell align='right'></StyledTableCell>
                   )}
                 </StyledTableRow>
               ))
