@@ -47,8 +47,8 @@ function DefaultValuesDeposit({
               setSelectedValue(value)
               triggerValidation()
             }}
-            width='100px'
-            height='70px'
+            width='80px'
+            height='50px'
             sx={{
               backgroundColor:
                 selectedValue === value

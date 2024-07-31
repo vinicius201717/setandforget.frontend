@@ -1,5 +1,7 @@
+/* eslint-disable no-unused-vars */
 import { Chess, Square } from 'chess.js'
-import React from 'react'
+import React, { Dispatch, SetStateAction } from 'react'
+import { UserDataType } from 'src/context/types'
 
 export interface HandleSquareClickProps {
   square: Square
@@ -185,4 +187,31 @@ export interface RoomLogsLive {
   fen: string
   moveHistory: string
   duration: string
+}
+
+export interface ChessboardComponentProps {
+  chessRoomId?: string
+  selectedSquare: Square | null
+  setSelectedSquare: Dispatch<SetStateAction<Square | null>>
+  setHighlightSquareFrom: Dispatch<SetStateAction<Square | null>>
+  setHighlightSquareTo: Dispatch<SetStateAction<Square | null>>
+  setPromotion: Dispatch<SetStateAction<PromotionProps | null>>
+  setFen: Dispatch<SetStateAction<string>>
+  updateCapturedPieces: (move: any) => void
+  handleMoveLive: (move: {
+    from: string
+    to: string
+    promotion?: string
+  }) => void
+  gameStatus: GameStatus
+  setGameStatus: Dispatch<SetStateAction<GameStatus>>
+  setUser: Dispatch<SetStateAction<UserDataType | null>>
+  setChessRoom: Dispatch<SetStateAction<Room | null>>
+  game: any
+  orientation: 'w' | 'b'
+  user: UserDataType | null
+  chessRoom: Room | null
+  captureSound: HTMLAudioElement | null
+  checkSound: HTMLAudioElement | null
+  moveSound: HTMLAudioElement | null
 }

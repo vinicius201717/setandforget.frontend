@@ -1,15 +1,6 @@
 import { api } from 'src/lib/axios'
 import authConfig from 'src/configs/auth'
-
-interface BankAccountData {
-  account_holder_name: string
-  account_holder_type: 'individual' | 'company'
-  account_number: string
-  bank_name: string
-  currency: string
-  routing_number: string
-  country?: string
-}
+import { BankAccountData } from 'src/types/apps/bankAccounts'
 
 export async function createBankAccount(
   data: BankAccountData,
@@ -18,6 +9,7 @@ export async function createBankAccount(
     const storedToken = window.localStorage.getItem(
       authConfig.storageTokenKeyName,
     )
+
     if (storedToken) {
       const response = await api.post('/bank-account', data, {
         headers: {
@@ -25,7 +17,7 @@ export async function createBankAccount(
         },
       })
       if (response.status === 201) {
-        return response.data.url
+        return response.data
       } else {
         return null
       }

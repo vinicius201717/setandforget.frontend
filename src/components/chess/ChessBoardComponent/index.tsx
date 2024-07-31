@@ -624,6 +624,7 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
       setGameStatus,
     ],
   )
+
   const handlePromotionChoice = useCallback(
     (pieceType: PieceType) => {
       if (promotion) {

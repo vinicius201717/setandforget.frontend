@@ -55,7 +55,9 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Controller, useForm } from 'react-hook-form'
 import { useAuth } from 'src/hooks/useAuth'
 import { createBankAccount } from 'src/pages/api/bank-account/createBankAccount'
-import { Alert, AlertTitle } from '@mui/material'
+import { Alert, AlertTitle, CircularProgress } from '@mui/material'
+import { BankAccountData } from 'src/types/apps/bankAccounts'
+import toast from 'react-hot-toast'
 
 interface DataType {
   name: string
@@ -140,29 +142,29 @@ const dataWithdraw: DataWithdrawType[] = [
 ]
 
 const schema = z.object({
-  account_holder_name: z
+  accountHolderName: z
     .string({
       required_error: 'Account holder name is required',
     })
     .min(1, 'Account holder name is required'),
 
-  account_holder_type: z.enum(['individual', 'company'], {
+  accountHolderType: z.enum(['individual', 'company'], {
     required_error: 'Account holder type is required',
   }),
 
-  bank_name: z
+  bankName: z
     .string({
       required_error: 'Bank name is required',
     })
     .min(1, 'Bank name is required'),
 
-  routing_number: z
+  routingNumber: z
     .string({
       required_error: 'Routing number is required',
     })
     .regex(/^\d{4,9}$/, 'Routing number must be 4 or 9 digits'),
 
-  account_number: z
+  accountNumber: z
     .string({
       required_error: 'Account number is required',
     })
@@ -173,6 +175,12 @@ const schema = z.object({
       required_error: 'Currency is required',
     })
     .min(1, 'Currency is required'),
+
+  country: z
+    .string({
+      required_error: 'Country is required',
+    })
+    .min(1, 'Country is required'),
 })
 const PaymentMethodCard = () => {
   const user = useAuth()
@@ -187,25 +195,42 @@ const PaymentMethodCard = () => {
   const [selectedCard, setSelectedCard] = useState<SelectedCardType | null>(
     null,
   )
+  const [loadingWithdraw, setLoadingWithdraw] = useState<boolean>(false)
 
   const {
     control,
+    reset,
     handleSubmit,
     formState: { errors },
-  } = useForm({
+  } = useForm<BankAccountData>({
     resolver: zodResolver(schema),
     defaultValues: {
-      account_holder_name: user?.user?.name.toUpperCase() || '',
-      account_holder_type: 'individual',
-      bank_name: '',
-      routing_number: '',
-      account_number: '',
-      currency: 'BRL',
+      accountHolderName: user?.user?.name.toUpperCase() || '',
+      accountHolderType: 'individual',
+      bankName: '',
+      routingNumber: '',
+      accountNumber: '',
+      currency: '',
+      country: '',
     },
   })
 
-  const onSubmit = (data: any) => {
+  const onSubmit = (data: BankAccountData) => {
+    setLoadingWithdraw(true)
     createBankAccount(data)
+      .then((response) => {
+        setLoadingWithdraw(false)
+        if (response) {
+          toast.success('Bank account created successfully!', {
+            position: 'bottom-right',
+          })
+        }
+      })
+      .catch((err) => {
+        setLoadingWithdraw(false)
+        console.log(err)
+        toast.error('Error creating bank account', { position: 'bottom-right' })
+      })
   }
 
   const handleEditCardClickOpen = (id: number) => {
@@ -273,11 +298,15 @@ const PaymentMethodCard = () => {
     }
   }
 
-  const handleResetForm = () => {
-    setCvc('')
-    setName('')
-    setExpiry('')
-    setCardNumber('')
+  // const handleResetForm = () => {
+  //   setCvc('')
+  //   setName('')
+  //   setExpiry('')
+  //   setCardNumber('')
+  // }
+
+  const handleResetFormWithdraw = () => {
+    reset()
   }
 
   return (
@@ -394,7 +423,7 @@ const PaymentMethodCard = () => {
                       <Grid item xs={12} sm={6}>
                         <FormControl fullWidth>
                           <Controller
-                            name='account_holder_name'
+                            name='accountHolderName'
                             control={control}
                             render={({ field }) => (
                               <TextField
@@ -403,8 +432,8 @@ const PaymentMethodCard = () => {
                                 label='Account Holder Name'
                                 type='text'
                                 placeholder='VINICIUS CAETANO'
-                                error={!!errors.account_holder_name}
-                                helperText={errors.account_holder_name?.message}
+                                error={!!errors.accountHolderName}
+                                helperText={errors.accountHolderName?.message}
                               />
                             )}
                           />
@@ -413,7 +442,7 @@ const PaymentMethodCard = () => {
                       <Grid item xs={12} sm={6}>
                         <FormControl fullWidth>
                           <Controller
-                            name='account_holder_type'
+                            name='accountHolderType'
                             control={control}
                             render={({ field }) => (
                               <TextField
@@ -422,8 +451,8 @@ const PaymentMethodCard = () => {
                                 label='Account Holder Type'
                                 type='text'
                                 placeholder='individual or company'
-                                error={!!errors.account_holder_type}
-                                helperText={errors.account_holder_type?.message}
+                                error={!!errors.accountHolderType}
+                                helperText={errors.accountHolderType?.message}
                               />
                             )}
                           />
@@ -432,7 +461,7 @@ const PaymentMethodCard = () => {
                       <Grid item xs={12} sm={6}>
                         <FormControl fullWidth>
                           <Controller
-                            name='bank_name'
+                            name='bankName'
                             control={control}
                             render={({ field }) => (
                               <TextField
@@ -441,8 +470,8 @@ const PaymentMethodCard = () => {
                                 label='Bank Name'
                                 type='text'
                                 placeholder='Nubank'
-                                error={!!errors.bank_name}
-                                helperText={errors.bank_name?.message}
+                                error={!!errors.bankName}
+                                helperText={errors.bankName?.message}
                               />
                             )}
                           />
@@ -451,7 +480,7 @@ const PaymentMethodCard = () => {
                       <Grid item xs={12} sm={6}>
                         <FormControl fullWidth>
                           <Controller
-                            name='routing_number'
+                            name='routingNumber'
                             control={control}
                             render={({ field }) => (
                               <TextField
@@ -460,8 +489,8 @@ const PaymentMethodCard = () => {
                                 label='Routing Number'
                                 placeholder='00000000'
                                 type='number'
-                                error={!!errors.routing_number}
-                                helperText={errors.routing_number?.message}
+                                error={!!errors.routingNumber}
+                                helperText={errors.routingNumber?.message}
                               />
                             )}
                           />
@@ -470,7 +499,7 @@ const PaymentMethodCard = () => {
                       <Grid item xs={12} sm={6}>
                         <FormControl fullWidth>
                           <Controller
-                            name='account_number'
+                            name='accountNumber'
                             control={control}
                             render={({ field }) => (
                               <TextField
@@ -479,8 +508,27 @@ const PaymentMethodCard = () => {
                                 type='number'
                                 label='Account Number'
                                 placeholder='000123456789'
-                                error={!!errors.account_number}
-                                helperText={errors.account_number?.message}
+                                error={!!errors.accountNumber}
+                                helperText={errors.accountNumber?.message}
+                              />
+                            )}
+                          />
+                        </FormControl>
+                      </Grid>
+                      <Grid item xs={12} sm={6}>
+                        <FormControl fullWidth>
+                          <Controller
+                            name='country'
+                            control={control}
+                            render={({ field }) => (
+                              <TextField
+                                {...field}
+                                fullWidth
+                                type='text'
+                                label='Country'
+                                placeholder='Brazil'
+                                error={!!errors.country}
+                                helperText={errors.country?.message}
                               />
                             )}
                           />
@@ -522,14 +570,23 @@ const PaymentMethodCard = () => {
                       </Grid>
                     </Grid>
                     <Grid item xs={12} marginLeft={4} marginTop={10}>
-                      <Button type='submit' variant='contained' sx={{ mr: 4 }}>
-                        Save Changes
+                      <Button
+                        type='submit'
+                        variant='contained'
+                        sx={{ mr: 4 }}
+                        disabled={loadingWithdraw}
+                      >
+                        {loadingWithdraw ? (
+                          <CircularProgress size={24} />
+                        ) : (
+                          'Save Changes'
+                        )}
                       </Button>
                       <Button
                         type='reset'
                         variant='outlined'
                         color='secondary'
-                        onClick={handleResetForm}
+                        onClick={handleResetFormWithdraw}
                       >
                         Reset
                       </Button>
@@ -871,7 +928,7 @@ const PaymentMethodCard = () => {
             sx={{ mr: 2 }}
             onClick={handleEditCardClose}
           >
-            Submit
+            {loadingWithdraw ? <CircularProgress size={24} /> : 'Submit'}
           </Button>
           <Button
             variant='outlined'
