@@ -22,19 +22,19 @@ import { AddressBox, AddressDetails, AddressTitle } from './style'
 import { deleteAddress } from 'src/pages/api/address/deleteAddress'
 import toast from 'react-hot-toast'
 
-const AddressList = ({ addresses, setAddresses }: AddressListProps) => {
+const AddressList = ({ address, setAddress }: AddressListProps) => {
   const [open, setOpen] = useState(false)
   const [selectedAddress, setSelectedAddress] = useState<string | null>(null)
 
   useEffect(() => {
     getAllAddress().then(
-      (response: PostAddressResponseType[] | null | undefined) => {
+      (response: PostAddressResponseType | null | undefined) => {
         if (response) {
-          setAddresses(response)
+          setAddress(response)
         }
       },
     )
-  }, [setAddresses])
+  }, [setAddress])
 
   const handleClickOpen = (id: string) => {
     setSelectedAddress(id)
@@ -49,10 +49,7 @@ const AddressList = ({ addresses, setAddresses }: AddressListProps) => {
   const handleDelete = () => {
     if (selectedAddress !== null) {
       deleteAddress(selectedAddress).then(() => {
-        const newAddresses = addresses.filter(
-          (address) => address.id !== selectedAddress,
-        )
-        setAddresses(newAddresses)
+        setAddress(null)
         handleClose()
         toast.success('Address deleted successfully', {
           position: 'bottom-right',
@@ -60,14 +57,14 @@ const AddressList = ({ addresses, setAddresses }: AddressListProps) => {
       })
     }
   }
-  if (addresses.length > 0) {
+  if (address) {
     return (
       <Card>
         <CardHeader title='Saved Addresses' />
         <CardContent>
           <Grid container spacing={4}>
-            {addresses.map((address, index) => (
-              <Grid item xs={12} sm={6} md={4} key={index}>
+            {address && (
+              <Grid item xs={12} sm={6} md={4}>
                 <AddressBox>
                   <Box
                     display='flex'
@@ -75,7 +72,7 @@ const AddressList = ({ addresses, setAddresses }: AddressListProps) => {
                     alignItems='center'
                   >
                     <AddressTitle variant='h6' gutterBottom>
-                      Address {index + 1}
+                      Address
                     </AddressTitle>
                     <IconButton
                       color='secondary'
@@ -98,7 +95,7 @@ const AddressList = ({ addresses, setAddresses }: AddressListProps) => {
                   </AddressDetails>
                 </AddressBox>
               </Grid>
-            ))}
+            )}
           </Grid>
         </CardContent>
         <Dialog

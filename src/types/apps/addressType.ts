@@ -20,10 +20,12 @@ export interface PostAddressType {
 }
 
 export interface AddressListProps {
-  addresses: PostAddressResponseType[]
-  setAddresses: (addresses: PostAddressResponseType[]) => void
+  address: PostAddressResponseType | null | undefined
+  setAddress: (address: PostAddressResponseType | null | undefined) => void
 }
 
 export interface AddressListSetAddressesProps {
-  setAddresses: React.Dispatch<React.SetStateAction<PostAddressResponseType[]>>
+  setAddress: React.Dispatch<
+    React.SetStateAction<PostAddressResponseType | null | undefined>
+  >
 }

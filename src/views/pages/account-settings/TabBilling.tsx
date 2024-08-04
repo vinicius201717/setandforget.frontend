@@ -5,12 +5,23 @@ import Grid from '@mui/material/Grid'
 import CurrentPlanCard from 'src/views/pages/account-settings/billing/CurrentPlanCard'
 import PaymentMethodCard from 'src/views/pages/account-settings/billing/PaymentMethodCard'
 import BillingAddressCard from './billing/BillingAddressCard'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { PostAddressResponseType } from 'src/types/apps/addressType'
 import AddressList from './billing/AddressList'
 
 const TabBilling = () => {
-  const [addresses, setAddresses] = useState<PostAddressResponseType[]>([])
+  const [address, setAddress] = useState<
+    PostAddressResponseType | null | undefined
+  >(null)
+
+  const billingAddressRef = useRef<HTMLDivElement | null>(null)
+
+  const scrollToBillingAddress = () => {
+    if (billingAddressRef.current) {
+      billingAddressRef.current.scrollIntoView({ behavior: 'smooth' })
+    }
+  }
+
   return (
     <Grid container spacing={6}>
       <Grid item xs={12}>
@@ -18,15 +29,18 @@ const TabBilling = () => {
       </Grid>
 
       <Grid item xs={12}>
-        <PaymentMethodCard />
+        <PaymentMethodCard
+          address={address}
+          scrollToBillingAddress={scrollToBillingAddress}
+        />
       </Grid>
 
       <Grid item xs={12}>
-        <BillingAddressCard setAddresses={setAddresses} />
+        <BillingAddressCard setAddress={setAddress} />
       </Grid>
 
-      <Grid item xs={12}>
-        <AddressList addresses={addresses} setAddresses={setAddresses} />
+      <Grid item xs={12} ref={billingAddressRef}>
+        <AddressList address={address} setAddress={setAddress} />
       </Grid>
     </Grid>
   )

@@ -1,5 +1,8 @@
+/* eslint-disable react/no-unescaped-entities */
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
+  Alert,
+  AlertTitle,
   Button,
   CircularProgress,
   DialogActions,
@@ -22,6 +25,7 @@ import {
   BankAccountData,
   BankAccountResponse,
 } from 'src/types/apps/bankAccountsType'
+import { WithdrawFormProps } from 'src/types/apps/withdrawType'
 import { currencies } from 'src/views/pages/account-settings/billing/currencies'
 import { z } from 'zod'
 
@@ -78,23 +82,18 @@ const schema = z.object({
     .min(1, 'Country is required'),
 })
 
-interface WithdrawFormProps {
-  openDelete: boolean
-  handleCloseDelete: () => void
-  handleDeleteDelete: () => void
-  selectedBankDelete: string
-  setBankAccounts: React.Dispatch<React.SetStateAction<BankAccountResponse[]>>
-}
-
 export const WithdrawForm = ({
   openDelete,
   setBankAccounts,
   handleCloseDelete,
   handleDeleteDelete,
+  scrollToBillingAddress,
+  address,
 }: WithdrawFormProps) => {
   const [loadingWithdraw, setLoadingWithdraw] = useState<boolean>(false)
-
   const { user } = useAuth()
+
+  console.log(address)
 
   const {
     control,
@@ -292,13 +291,33 @@ export const WithdrawForm = ({
               />
             </FormControl>
           </Grid>
+          {!address ? (
+            <Grid item xs={12} sm={12}>
+              <Alert severity='info'>
+                <AlertTitle>You still don't have registered address</AlertTitle>
+                <span
+                  onClick={scrollToBillingAddress}
+                  style={{ cursor: 'pointer' }}
+                >
+                  You need to register an address
+                </span>
+              </Alert>
+            </Grid>
+          ) : (
+            <Grid item xs={12} sm={12}>
+              <Alert severity='success'>
+                Your address has already been added and will be used
+                accordingly.
+              </Alert>
+            </Grid>
+          )}
         </Grid>
         <Grid item xs={12} marginLeft={4} marginTop={10}>
           <Button
             type='submit'
             variant='contained'
             sx={{ mr: 4, minWidth: '150px' }}
-            disabled={loadingWithdraw}
+            disabled={loadingWithdraw || !address}
           >
             {loadingWithdraw ? <CircularProgress size={24} /> : 'Save Changes'}
           </Button>

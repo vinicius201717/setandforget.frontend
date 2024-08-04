@@ -42,7 +42,7 @@ const schema = z.object({
 
 type BillingAddressForm = z.infer<typeof schema>
 
-const BillingAddressCard = ({ setAddresses }: AddressListSetAddressesProps) => {
+const BillingAddressCard = ({ setAddress }: AddressListSetAddressesProps) => {
   // ** Hooks
   const {
     handleSubmit,
@@ -63,10 +63,7 @@ const BillingAddressCard = ({ setAddresses }: AddressListSetAddressesProps) => {
     postAddress(postData).then(
       (response: PostAddressResponseType | null | undefined) => {
         if (response) {
-          setAddresses((prevAddresses: PostAddressResponseType[]) => [
-            ...prevAddresses,
-            response,
-          ])
+          setAddress(response)
           toast.success('Address saved successfully', {
             position: 'bottom-right',
           })

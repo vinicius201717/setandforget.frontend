@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react/no-unescaped-entities */
 // ** React Imports
-import { useState, ChangeEvent, useEffect } from 'react'
+import { useState, ChangeEvent, useEffect, FC } from 'react'
 
 // ** MUI Imports
 import Card from '@mui/material/Card'
@@ -15,12 +15,7 @@ import FormControlLabel from '@mui/material/FormControlLabel'
 
 // ** Third Party Imports
 import Payment from 'payment'
-import Cards, { Focused } from 'react-credit-cards'
-
-// ** Custom Components Imports
-
-// ** Styled Component Imports
-import CardWrapper from 'src/@core/styles/libs/react-credit-cards'
+import { Focused } from 'react-credit-cards'
 
 // ** Util Import
 import {
@@ -49,23 +44,8 @@ import toast from 'react-hot-toast'
 import { PaymentMethodCardComponent } from 'src/components/PaymentMethod/PaymentMethodCard'
 import { PaymentMethodCardAccouts } from 'src/components/PaymentMethod/PaymentMethodCardAccounts'
 import { DialogEditCard } from 'src/components/PaymentMethod/DialogEditCard'
-
-const CreditCardWrapper = styled(Box)<BoxProps>(({ theme }) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  [theme.breakpoints.down('xl')]: {
-    '& > div:first-of-type': {
-      marginBottom: theme.spacing(6),
-    },
-  },
-  [theme.breakpoints.up('xl')]: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    '& > div:first-of-type': {
-      marginRight: theme.spacing(6),
-    },
-  },
-}))
+import { PostAddressResponseType } from 'src/types/apps/addressType'
+import { PaymentMethodCardProps } from 'src/types/apps/paymentMethodType'
 
 const data: DataType[] = [
   {
@@ -88,7 +68,10 @@ const data: DataType[] = [
   },
 ]
 
-const PaymentMethodCard = () => {
+const PaymentMethodCard: FC<PaymentMethodCardProps> = ({
+  address,
+  scrollToBillingAddress,
+}) => {
   const user = useAuth()
   // ** States
   const [name, setName] = useState<string>('')
@@ -264,6 +247,8 @@ const PaymentMethodCard = () => {
                     openDelete={openDelete}
                     selectedBankDelete={selectedBankDelete as string}
                     setBankAccounts={setBankAccounts}
+                    address={address}
+                    scrollToBillingAddress={scrollToBillingAddress}
                   />
                 )}
               </Grid>

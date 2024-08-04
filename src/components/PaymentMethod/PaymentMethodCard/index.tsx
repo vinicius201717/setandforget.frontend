@@ -75,7 +75,6 @@ export const PaymentMethodCardComponent = () => {
     console.log(data)
 
     setLoading(true)
-    // Realizar a lógica para processar o pagamento
     setTimeout(() => {
       setLoading(false)
       toast.success('Payment method saved successfully!', {

@@ -3,7 +3,7 @@ import authConfig from 'src/configs/auth'
 import { PostAddressResponseType } from 'src/types/apps/addressType'
 
 export async function getAllAddress(): Promise<
-  PostAddressResponseType[] | null | undefined
+  PostAddressResponseType | null | undefined
 > {
   try {
     const storedToken = window.localStorage.getItem(
