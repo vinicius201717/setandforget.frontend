@@ -1,6 +1,8 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react/no-unescaped-entities */
 // ** React Imports
-import { useState, ChangeEvent } from 'react'
+import { useState, ChangeEvent, useEffect } from 'react'
 
 // ** Currencies
 import { currencies } from './currencies'
@@ -27,6 +29,7 @@ import DialogContent from '@mui/material/DialogContent'
 import DialogActions from '@mui/material/DialogActions'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import DialogContentText from '@mui/material/DialogContentText'
+import CreditCardIcon from '@mui/icons-material/CreditCard'
 
 // ** Third Party Imports
 import Payment from 'payment'
@@ -55,9 +58,14 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Controller, useForm } from 'react-hook-form'
 import { useAuth } from 'src/hooks/useAuth'
 import { createBankAccount } from 'src/pages/api/bank-account/createBankAccount'
-import { Alert, AlertTitle, CircularProgress } from '@mui/material'
-import { BankAccountData } from 'src/types/apps/bankAccounts'
+import { Alert, AlertTitle, CircularProgress, Modal } from '@mui/material'
+import {
+  BankAccountData,
+  BankAccountResponse,
+} from 'src/types/apps/bankAccounts'
 import toast from 'react-hot-toast'
+import { deleteBankAccountById } from 'src/pages/api/bank-account/deleteBankAccount'
+import { bankAccountGet } from 'src/pages/api/bank-account/getBankAccounts'
 
 interface DataType {
   name: string
@@ -66,14 +74,6 @@ interface DataType {
   cardCvc: string
   expiryDate: string
   cardNumber: string
-  cardStatus?: string
-  badgeColor?: ThemeColor
-}
-
-interface DataWithdrawType {
-  name: string
-  imgSrc: string
-  imgAlt: string
   cardStatus?: string
   badgeColor?: ThemeColor
 }
@@ -125,22 +125,6 @@ const data: DataType[] = [
   },
 ]
 
-const dataWithdraw: DataWithdrawType[] = [
-  {
-    name: 'Neon',
-    imgAlt: 'Visa card',
-    imgSrc: '/images/logos/visa.png',
-    badgeColor: 'primary',
-  },
-  {
-    imgAlt: 'Mastercard',
-    name: 'Nubank',
-    imgSrc: '/images/logos/mastercard.png',
-    badgeColor: 'primary',
-    cardStatus: 'Primary',
-  },
-]
-
 const schema = z.object({
   accountHolderName: z
     .string({
@@ -182,6 +166,18 @@ const schema = z.object({
     })
     .min(1, 'Country is required'),
 })
+
+const style = {
+  position: 'absolute' as const,
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 400,
+  bgcolor: 'background.paper',
+  boxShadow: 24,
+  p: 4,
+}
+
 const PaymentMethodCard = () => {
   const user = useAuth()
   // ** States
@@ -196,6 +192,59 @@ const PaymentMethodCard = () => {
     null,
   )
   const [loadingWithdraw, setLoadingWithdraw] = useState<boolean>(false)
+  const [bankAccounts, setBankAccounts] = useState<BankAccountResponse[]>([])
+  const [open, setOpen] = useState(false)
+  const [selectedBank, setSelectedBank] = useState<null | number>(null)
+
+  const [openDelete, setOpenDelete] = useState(false)
+  const [selectedBankDelete, setSelectedBankDelete] = useState<null | string>(
+    null,
+  )
+
+  const handleOpenDelete = (index: string) => {
+    setSelectedBankDelete(index)
+    setOpenDelete(true)
+  }
+
+  const handleCloseDelete = () => {
+    setOpenDelete(false)
+    setSelectedBankDelete(null)
+  }
+
+  const handleDeleteDelete = () => {
+    if (selectedBankDelete !== null) {
+      deleteBankAccountById(selectedBankDelete).then(
+        (response: BankAccountResponse | null) => {
+          if (response) {
+            setBankAccounts((prev) =>
+              prev.filter((bank) => bank.id !== selectedBankDelete),
+            )
+            toast.success('Bank account deleted successfully.', {
+              position: 'bottom-right',
+            })
+          }
+        },
+      )
+    }
+    handleCloseDelete()
+  }
+
+  const handleOpen = (index: number) => {
+    setSelectedBank(index)
+    setOpen(true)
+  }
+
+  const handleClose = () => {
+    setOpen(false)
+    setSelectedBank(null)
+  }
+
+  const handleDelete = () => {
+    if (selectedBank !== null) {
+      console.log(`Deleting bank account at index: ${selectedBank}`)
+    }
+    handleClose()
+  }
 
   const {
     control,
@@ -215,12 +264,24 @@ const PaymentMethodCard = () => {
     },
   })
 
+  useEffect(() => {
+    bankAccountGet().then((response: BankAccountResponse[] | null) => {
+      if (response) {
+        setBankAccounts(response)
+      }
+    })
+  }, [])
+
   const onSubmit = (data: BankAccountData) => {
     setLoadingWithdraw(true)
     createBankAccount(data)
       .then((response) => {
         setLoadingWithdraw(false)
         if (response) {
+          setBankAccounts((prev) => [
+            ...prev,
+            response as unknown as BankAccountResponse,
+          ])
           toast.success('Bank account created successfully!', {
             position: 'bottom-right',
           })
@@ -573,7 +634,7 @@ const PaymentMethodCard = () => {
                       <Button
                         type='submit'
                         variant='contained'
-                        sx={{ mr: 4 }}
+                        sx={{ mr: 4, minWidth: '150px' }}
                         disabled={loadingWithdraw}
                       >
                         {loadingWithdraw ? (
@@ -678,60 +739,63 @@ const PaymentMethodCard = () => {
                 <Typography sx={{ mb: 4, fontWeight: 500 }}>
                   My Cards
                 </Typography>
-                {dataWithdraw ? (
-                  dataWithdraw.map((item: DataWithdrawType, index: number) => (
-                    <Box
-                      key={index}
-                      sx={{
-                        p: 5,
-                        display: 'flex',
-                        borderRadius: 1,
-                        flexDirection: ['column', 'row'],
-                        justifyContent: ['space-between'],
-                        backgroundColor: 'action.hover',
-                        alignItems: ['flex-start', 'center'],
-                        mb: index !== data.length - 1 ? 4 : undefined,
-                      }}
-                    >
-                      <div>
-                        <img height='25' alt={item.imgAlt} src={item.imgSrc} />
-                        <Box
-                          sx={{
-                            mt: 1,
-                            mb: 2.5,
-                            display: 'flex',
-                            alignItems: 'center',
-                          }}
-                        >
-                          <Typography sx={{ fontWeight: 600 }}>
-                            {item.name}
-                          </Typography>
-                          {item.cardStatus ? (
-                            <CustomChip
-                              skin='light'
-                              size='small'
-                              sx={{ ml: 4 }}
-                              label={item.cardStatus}
-                              color={item.badgeColor}
-                            />
-                          ) : null}
-                        </Box>
-                      </div>
 
-                      <Box sx={{ mt: [3, 0], textAlign: ['start', 'end'] }}>
-                        <Button
-                          variant='outlined'
-                          sx={{ mr: 4 }}
-                          onClick={() => handleEditCardClickOpen(index)}
-                        >
-                          Edit
-                        </Button>
-                        <Button variant='outlined' color='secondary'>
-                          Delete
-                        </Button>
+                {bankAccounts.length > 0 ? (
+                  bankAccounts.map(
+                    (bank: BankAccountResponse, index: number) => (
+                      <Box
+                        key={bank.id}
+                        sx={{
+                          p: 5,
+                          display: 'flex',
+                          borderRadius: 1,
+                          flexDirection: ['column', 'row'],
+                          justifyContent: ['space-between'],
+                          backgroundColor: 'action.hover',
+                          alignItems: ['flex-start', 'center'],
+                          mb: index !== bankAccounts.length - 1 ? 4 : undefined,
+                        }}
+                      >
+                        <div>
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              alignItems: 'center',
+                            }}
+                          >
+                            <CreditCardIcon
+                              sx={{
+                                width: '50px',
+                                mr: 2,
+                                color: 'primary.main',
+                              }}
+                            />
+                            <div>
+                              <Typography sx={{ fontWeight: 600 }}>
+                                {bank.bankName}
+                              </Typography>
+                              <Typography variant='body2' color='textSecondary'>
+                                Last 4 digits:{' '}
+                                <Box component='span' sx={{ fontWeight: 600 }}>
+                                  {bank.last4}
+                                </Box>
+                              </Typography>
+                            </div>
+                          </Box>
+                        </div>
+
+                        <Box sx={{ mt: [3, 0], textAlign: ['start', 'end'] }}>
+                          <Button
+                            variant='outlined'
+                            color='secondary'
+                            onClick={() => handleOpenDelete(bank.id)}
+                          >
+                            Delete
+                          </Button>
+                        </Box>
                       </Box>
-                    </Box>
-                  ))
+                    ),
+                  )
                 ) : (
                   <Alert severity='info' sx={{ mb: 6 }}>
                     <AlertTitle>
@@ -740,6 +804,47 @@ const PaymentMethodCard = () => {
                     You need register
                   </Alert>
                 )}
+                <Modal
+                  open={openDelete}
+                  onClose={handleCloseDelete}
+                  aria-labelledby='modal-modal-title'
+                  aria-describedby='modal-modal-description'
+                >
+                  <Box sx={style}>
+                    <Typography
+                      id='modal-modal-title'
+                      variant='h6'
+                      component='h2'
+                    >
+                      Confirm Deletion
+                    </Typography>
+                    <Typography id='modal-modal-description' sx={{ mt: 2 }}>
+                      Are you sure you want to delete this bank account?
+                    </Typography>
+                    <Box
+                      sx={{
+                        mt: 4,
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                      }}
+                    >
+                      <Button
+                        variant='contained'
+                        color='primary'
+                        onClick={handleCloseDelete}
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        variant='outlined'
+                        color='secondary'
+                        onClick={handleDeleteDelete}
+                      >
+                        Delete
+                      </Button>
+                    </Box>
+                  </Box>
+                </Modal>
               </Grid>
             )}
           </Grid>

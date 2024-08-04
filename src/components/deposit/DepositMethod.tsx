@@ -11,6 +11,11 @@ import {
   TextField,
   Typography,
   useTheme,
+  FormControl,
+  FormLabel,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
 } from '@mui/material'
 import { deposit } from 'src/pages/api/payment/deposit'
 import toast from 'react-hot-toast'
@@ -33,48 +38,35 @@ function DefaultValuesDeposit({
   setAmount,
   triggerValidation,
 }: DefaultValuesDepositProps) {
-  const theme = useTheme()
   const values = ['50', '100', '200', '500', '1000', '2000']
-  const [selectedValue, setSelectedValue] = useState('')
 
   return (
-    <Grid container spacing={2} sx={{ marginBottom: '20px' }}>
-      {values.map((value) => (
-        <Grid item xs={12} sm={6} md={4} lg={1} key={value}>
-          <Box
-            onClick={() => {
-              setAmount(value)
-              setSelectedValue(value)
-              triggerValidation()
-            }}
-            width='80px'
-            height='50px'
-            sx={{
-              backgroundColor:
-                selectedValue === value
-                  ? theme.palette.primary.main
-                  : 'transparent',
-              border: `1px solid ${theme.palette.divider}`,
-              borderRadius: '10px',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              cursor: 'pointer',
-            }}
-          >
-            <Typography
-              sx={{
-                fontSize: '1rem',
-                color:
-                  selectedValue === value ? '#FFF' : theme.palette.text.primary,
-              }}
-            >
-              ${value}
-            </Typography>
-          </Box>
+    <FormControl component='fieldset'>
+      <FormLabel component='legend'>Suggestions</FormLabel>
+      <RadioGroup
+        onChange={(e) => {
+          setAmount(e.target.value)
+          triggerValidation()
+        }}
+      >
+        <Grid container spacing={2} sx={{ marginBottom: '20px' }}>
+          {values.map((value) => (
+            <Grid item xs={12} sm={6} md={4} lg={2} key={value}>
+              <FormControlLabel
+                value={value}
+                control={<Radio />}
+                label={`$${value}`}
+                sx={{
+                  width: '100%',
+                  display: 'flex',
+                  justifyContent: 'center',
+                }}
+              />
+            </Grid>
+          ))}
         </Grid>
-      ))}
-    </Grid>
+      </RadioGroup>
+    </FormControl>
   )
 }
 
@@ -118,21 +110,20 @@ export function DepositMethod() {
             />
           )}
         />
-        <Typography variant='h6' gutterBottom sx={{ mt: 4 }}>
-          Valores Padrão
-        </Typography>
         <DefaultValuesDeposit
           setAmount={(value) => setValue('amount', value)}
           triggerValidation={() => trigger('amount')}
         />
-        <Button
-          type='submit'
-          variant='contained'
-          color='primary'
-          sx={{ mt: 2 }}
-        >
-          Depositar
-        </Button>
+        <Grid container justifyContent='left'>
+          <Button
+            type='submit'
+            variant='contained'
+            color='primary'
+            sx={{ mt: 4 }}
+          >
+            Depositar
+          </Button>
+        </Grid>
       </form>
     </Paper>
   )

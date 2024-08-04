@@ -125,7 +125,7 @@ const MoneyDropdown = (props: Props) => {
               Deposit
             </Button>
           </Link>
-          <Link href={'/pages/deposit'}>
+          <Link href={'/pages/withdraw'}>
             <Button fullWidth variant='contained' onClick={handleDropdownClose}>
               Withdraw
             </Button>
