@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { api } from 'src/lib/axios'
 import authConfig from 'src/configs/auth'
-import { BankAccountResponse } from 'src/types/apps/bankAccounts'
+import { BankAccountResponse } from 'src/types/apps/bankAccountsType'
 
 export async function deleteBankAccountById(
   bankAccountId: string,

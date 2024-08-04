@@ -16,6 +16,7 @@ import {
   RadioGroup,
   FormControlLabel,
   Radio,
+  InputAdornment,
 } from '@mui/material'
 import { deposit } from 'src/pages/api/payment/deposit'
 import toast from 'react-hot-toast'
@@ -71,7 +72,13 @@ function DefaultValuesDeposit({
 }
 
 export function DepositMethod() {
-  const { control, handleSubmit, setValue, trigger } = useForm<FormValues>({
+  const {
+    control,
+    handleSubmit,
+    setValue,
+    trigger,
+    formState: { errors },
+  } = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
       amount: '',
@@ -97,15 +104,20 @@ export function DepositMethod() {
         <Controller
           name='amount'
           control={control}
-          render={({ field, fieldState }) => (
+          render={({ field }) => (
             <TextField
               {...field}
               label='Valor do Depósito'
               variant='outlined'
               fullWidth
-              error={!!fieldState.error}
-              helperText={fieldState.error?.message}
+              error={!!errors.amount}
+              helperText={errors.amount ? errors.amount.message : ''}
               type='number'
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position='start'>$</InputAdornment>
+                ),
+              }}
               sx={{ mb: 4, mt: 10 }}
             />
           )}

@@ -1,17 +1,19 @@
 import { api } from 'src/lib/axios'
 import authConfig from 'src/configs/auth'
-import { BankAccountData } from 'src/types/apps/bankAccountsType'
+import {
+  PostAddressResponseType,
+  PostAddressType,
+} from 'src/types/apps/addressType'
 
-export async function createBankAccount(
-  data: BankAccountData,
-): Promise<string | null | undefined> {
+export async function postAddress(
+  data: PostAddressType,
+): Promise<PostAddressResponseType | null | undefined> {
   try {
     const storedToken = window.localStorage.getItem(
       authConfig.storageTokenKeyName,
     )
-
     if (storedToken) {
-      const response = await api.post('/bank-account', data, {
+      const response = await api.post('/address', data, {
         headers: {
           Authorization: `Bearer ${storedToken}`,
         },

@@ -14,11 +14,12 @@ import {
   Select,
   InputLabel,
   MenuItem,
+  InputAdornment,
 } from '@mui/material'
 import { bankAccountGet } from 'src/pages/api/bank-account/getBankAccounts'
-import { BankAccountResponse } from 'src/types/apps/bankAccounts'
+import { BankAccountResponse } from 'src/types/apps/bankAccountsType'
 import { z } from 'zod'
-import { SubmitHandler, useForm } from 'react-hook-form'
+import { Controller, SubmitHandler, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
   InfoContainer,
@@ -28,20 +29,35 @@ import {
   StyledLink,
 } from './style'
 import { Box } from '@mui/system'
-
-const bankAccountSchema = z.object({
-  amount: z.number().min(1, 'Amount must be greater than 0'),
-  currency: z.string().min(1, 'Currency is required'),
-  selectedBank: z.string().min(1, 'You must select a bank'),
-})
-
-type BankAccountFormValues = z.infer<typeof bankAccountSchema>
+import { postWithdraw } from 'src/pages/api/payment/postWithdraw'
+import { useAuth } from 'src/hooks/useAuth'
+import { formatMoney } from 'src/utils/format-money'
 
 const WithdrawPage = () => {
   const [bankAccounts, setBankAccounts] = useState<BankAccountResponse[]>([])
 
+  const { user } = useAuth()
+
+  const accountBalance = user?.Account.amount as number
+  const bankAccountSchema = z.object({
+    amount: z
+      .number()
+      .min(10, 'Amount must be greater than 10')
+      .refine(
+        (value) => accountBalance !== null && value <= accountBalance / 100,
+        {
+          message: `Amount must be less than or equal to your account balance ${formatMoney(accountBalance / 100)}`,
+        },
+      ),
+    currency: z.string().min(1, 'Currency is required'),
+    selectedBank: z.string().min(1, 'You must select a bank'),
+  })
+
+  type BankAccountFormValues = z.infer<typeof bankAccountSchema>
+
   const {
     register,
+    control,
     handleSubmit,
     formState: { errors },
   } = useForm<BankAccountFormValues>({
@@ -57,9 +73,8 @@ const WithdrawPage = () => {
   }, [])
 
   const onSubmit: SubmitHandler<BankAccountFormValues> = (data) => {
-    console.log('Amount:', data.amount)
-    console.log('Currency:', data.currency)
-    console.log('Selected Bank:', data.selectedBank)
+    if (data.amount < accountBalance / 100)
+      postWithdraw(data).then((response) => console.log(response))
   }
 
   return (
@@ -73,13 +88,34 @@ const WithdrawPage = () => {
             <form onSubmit={handleSubmit(onSubmit)}>
               <Grid container spacing={3}>
                 <Grid item xs={12}>
-                  <TextField
-                    fullWidth
-                    label='Amount'
-                    variant='outlined'
-                    {...register('amount', { valueAsNumber: true })}
-                    error={!!errors.amount}
-                    helperText={errors.amount ? errors.amount.message : ''}
+                  <Controller
+                    name='amount'
+                    control={control}
+                    rules={{
+                      required: 'Amount is required',
+                      validate: (value) =>
+                        value <= accountBalance ||
+                        `Amount must be less than or equal to your account balance (${accountBalance})`,
+                    }}
+                    render={({ field }) => (
+                      <TextField
+                        fullWidth
+                        label='Amount'
+                        variant='outlined'
+                        {...field}
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position='start'>$</InputAdornment>
+                          ),
+                        }}
+                        error={!!errors.amount}
+                        helperText={errors.amount ? errors.amount.message : ''}
+                        onChange={(e) =>
+                          field.onChange(parseFloat(e.target.value))
+                        }
+                        type='number'
+                      />
+                    )}
                   />
                 </Grid>
                 <Grid item xs={12}>
@@ -114,7 +150,7 @@ const WithdrawPage = () => {
                         bankAccounts.map((bank) => (
                           <RadioOpcionContainer key={bank.id}>
                             <FormControlLabel
-                              value={bank.id}
+                              value={bank.stripeAccountId}
                               control={<Radio />}
                               label={
                                 <RadioBox>

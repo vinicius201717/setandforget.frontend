@@ -1,3 +1,6 @@
+import { Focused } from 'react-credit-cards'
+import { ThemeColor } from 'src/@core/layouts/types'
+
 export interface BankAccountData {
   accountHolderName: string
   accountHolderType: 'individual' | 'company'
@@ -26,4 +29,23 @@ export interface BankAccountResponse {
   status: string
   stripeAccountId: string
   updatedAt: string
+}
+
+export interface SelectedCardType {
+  cvc: string
+  name: string
+  expiry: string
+  cardId: number
+  cardNumber: string
+  focus: Focused | undefined
+}
+export interface DataType {
+  name: string
+  imgSrc: string
+  imgAlt: string
+  cardCvc: string
+  expiryDate: string
+  cardNumber: string
+  cardStatus?: string
+  badgeColor?: ThemeColor
 }

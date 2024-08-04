@@ -10,28 +10,76 @@ import CardHeader from '@mui/material/CardHeader'
 import CardContent from '@mui/material/CardContent'
 import FormControl from '@mui/material/FormControl'
 import FormHelperText from '@mui/material/FormHelperText'
-import InputAdornment from '@mui/material/InputAdornment'
 
 // ** Third Party Imports
 import { useForm, Controller } from 'react-hook-form'
+import { z } from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
 
 // ** Styles Import
 import 'react-credit-cards/es/styles-compiled.css'
-
+import { postAddress } from 'src/pages/api/address/postAddress'
+import toast from 'react-hot-toast'
+import {
+  AddressListSetAddressesProps,
+  PostAddressResponseType,
+} from 'src/types/apps/addressType'
 const defaultValues = {
-  companyName: '',
-  billingEmail: '',
+  address: '',
+  state: '',
+  city: '',
+  zipCode: '',
+  country: 'brazil',
 }
 
-const BillingAddressCard = () => {
+const schema = z.object({
+  address: z.string().min(1, 'Billing Address is required'),
+  state: z.string().min(1, 'State is required'),
+  city: z.string().min(1, 'City is required'),
+  zipCode: z.string().regex(/^\d+$/, 'Zip Code must be a number'),
+  country: z.string().min(1, 'Country is required'),
+})
+
+type BillingAddressForm = z.infer<typeof schema>
+
+const BillingAddressCard = ({ setAddresses }: AddressListSetAddressesProps) => {
   // ** Hooks
   const {
-    control,
     handleSubmit,
+    control,
+    reset,
     formState: { errors },
-  } = useForm({ defaultValues })
+  } = useForm<BillingAddressForm>({
+    defaultValues,
+    resolver: zodResolver(schema),
+  })
 
-  const onSubmit = () => {}
+  const onSubmit = (data: BillingAddressForm) => {
+    const postData = {
+      ...data,
+      zipCode: Number(data.zipCode),
+    }
+
+    postAddress(postData).then(
+      (response: PostAddressResponseType | null | undefined) => {
+        if (response) {
+          setAddresses((prevAddresses: PostAddressResponseType[]) => [
+            ...prevAddresses,
+            response,
+          ])
+          toast.success('Address saved successfully', {
+            position: 'bottom-right',
+          })
+        } else {
+          toast.error('Failed to save address', { position: 'bottom-right' })
+        }
+      },
+    )
+  }
+
+  const resetForm = () => {
+    reset()
+  }
 
   return (
     <Card>
@@ -39,111 +87,96 @@ const BillingAddressCard = () => {
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)}>
           <Grid container spacing={5}>
-            <Grid item xs={12} sm={6}>
-              <FormControl fullWidth>
-                <Controller
-                  name='companyName'
-                  control={control}
-                  rules={{ required: true }}
-                  render={({ field: { value, onChange } }) => (
-                    <TextField
-                      value={value}
-                      label='Company Name'
-                      onChange={onChange}
-                      placeholder='ThemeSelection'
-                      error={Boolean(errors.companyName)}
-                    />
-                  )}
-                />
-                {errors.companyName && (
-                  <FormHelperText sx={{ color: 'error.main' }}>
-                    This field is required
-                  </FormHelperText>
-                )}
-              </FormControl>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <FormControl fullWidth>
-                <Controller
-                  control={control}
-                  name='billingEmail'
-                  rules={{ required: true }}
-                  render={({ field: { value, onChange } }) => (
-                    <TextField
-                      type='email'
-                      value={value}
-                      onChange={onChange}
-                      label='Billing Email'
-                      placeholder='john.doe@example.com'
-                      error={Boolean(errors.billingEmail)}
-                    />
-                  )}
-                />
-                {errors.billingEmail && (
-                  <FormHelperText sx={{ color: 'error.main' }}>
-                    This field is required
-                  </FormHelperText>
-                )}
-              </FormControl>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField fullWidth label='TAX ID' placeholder='Enter TAX ID' />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                label='VAT Number'
-                placeholder='Enter VAT Number'
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                type='number'
-                label='Phone Number'
-                placeholder='202 555 0111'
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position='start'>US (+1)</InputAdornment>
-                  ),
-                }}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <FormControl fullWidth>
-                <InputLabel>Country</InputLabel>
-                <Select label='Country' defaultValue='australia'>
-                  <MenuItem value='australia'>Australia</MenuItem>
-                  <MenuItem value='canada'>Canada</MenuItem>
-                  <MenuItem value='france'>France</MenuItem>
-                  <MenuItem value='united-kingdom'>United Kingdom</MenuItem>
-                  <MenuItem value='united-states'>United States</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
             <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label='Billing Address'
-                placeholder='Billing Address'
+              <Controller
+                name='address'
+                control={control}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    fullWidth
+                    label='Address'
+                    placeholder='Address'
+                    error={!!errors.address}
+                    helperText={errors.address?.message}
+                  />
+                )}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
-              <TextField fullWidth label='State' placeholder='California' />
+              <Controller
+                name='state'
+                control={control}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    fullWidth
+                    label='State'
+                    placeholder='GO'
+                    error={!!errors.state}
+                    helperText={errors.state?.message}
+                  />
+                )}
+              />
             </Grid>
             <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                type='number'
-                label='Zip Code'
-                placeholder='231465'
+              <Controller
+                name='city'
+                control={control}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    fullWidth
+                    label='City'
+                    placeholder='Aparecida de Goiania'
+                    error={!!errors.city}
+                    helperText={errors.city?.message}
+                  />
+                )}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <Controller
+                name='zipCode'
+                control={control}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    fullWidth
+                    type='number'
+                    label='Zip Code'
+                    placeholder='231465'
+                    error={!!errors.zipCode}
+                    helperText={errors.zipCode?.message}
+                  />
+                )}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <Controller
+                name='country'
+                control={control}
+                render={({ field }) => (
+                  <FormControl fullWidth error={!!errors.country}>
+                    <InputLabel>Country</InputLabel>
+                    <Select {...field} label='Country'>
+                      <MenuItem value='brazil'>Brazil</MenuItem>
+                      <MenuItem value='australia'>Australia</MenuItem>
+                      <MenuItem value='canada'>Canada</MenuItem>
+                      <MenuItem value='france'>France</MenuItem>
+                      <MenuItem value='united-kingdom'>United Kingdom</MenuItem>
+                      <MenuItem value='united-states'>United States</MenuItem>
+                    </Select>
+                    <FormHelperText>{errors.country?.message}</FormHelperText>
+                  </FormControl>
+                )}
               />
             </Grid>
             <Grid item xs={12}>
               <Button type='submit' variant='contained' sx={{ mr: 4 }}>
                 Save Changes
               </Button>
-              <Button variant='outlined' color='secondary'>
+              <Button variant='outlined' color='secondary' onClick={resetForm}>
                 Discard
               </Button>
             </Grid>
