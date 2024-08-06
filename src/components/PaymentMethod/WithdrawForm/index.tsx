@@ -41,11 +41,17 @@ const style = {
 }
 
 const schema = z.object({
-  accountHolderName: z
+  firstName: z
     .string({
-      required_error: 'Account holder name is required',
+      required_error: 'First name is required',
     })
-    .min(1, 'Account holder name is required'),
+    .min(1, 'First name is required'),
+
+  lastName: z
+    .string({
+      required_error: 'Last name is required',
+    })
+    .min(1, 'Last name is required'),
 
   accountHolderType: z.enum(['individual', 'company'], {
     required_error: 'Account holder type is required',
@@ -93,8 +99,6 @@ export const WithdrawForm = ({
   const [loadingWithdraw, setLoadingWithdraw] = useState<boolean>(false)
   const { user } = useAuth()
 
-  console.log(address)
-
   const {
     control,
     reset,
@@ -103,7 +107,8 @@ export const WithdrawForm = ({
   } = useForm<BankAccountData>({
     resolver: zodResolver(schema),
     defaultValues: {
-      accountHolderName: user?.name.toUpperCase() || '',
+      firstName: user?.name.split(' ')[0]?.toUpperCase() || '',
+      lastName: user?.name.split(' ')[1]?.toUpperCase() || '',
       accountHolderType: 'individual',
       bankName: '',
       routingNumber: '',
@@ -146,17 +151,36 @@ export const WithdrawForm = ({
           <Grid item xs={12} sm={6}>
             <FormControl fullWidth>
               <Controller
-                name='accountHolderName'
+                name='firstName'
                 control={control}
                 render={({ field }) => (
                   <TextField
                     {...field}
                     fullWidth
-                    label='Account Holder Name'
+                    label='First name'
                     type='text'
-                    placeholder='VINICIUS CAETANO'
-                    error={!!errors.accountHolderName}
-                    helperText={errors.accountHolderName?.message}
+                    placeholder='VINICIUS'
+                    error={!!errors.firstName}
+                    helperText={errors.firstName?.message}
+                  />
+                )}
+              />
+            </FormControl>
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <FormControl fullWidth>
+              <Controller
+                name='lastName'
+                control={control}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    fullWidth
+                    label='Last name'
+                    type='text'
+                    placeholder='CAETANO'
+                    error={!!errors.lastName}
+                    helperText={errors.lastName?.message}
                   />
                 )}
               />

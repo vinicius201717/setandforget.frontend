@@ -2,7 +2,7 @@ import { api } from 'src/lib/axios'
 import authConfig from 'src/configs/auth'
 import { PostAddressResponseType } from 'src/types/apps/addressType'
 
-export async function getAllAddress(): Promise<
+export async function getAddress(): Promise<
   PostAddressResponseType | null | undefined
 > {
   try {

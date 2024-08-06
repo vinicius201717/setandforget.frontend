@@ -2,7 +2,8 @@ import { Focused } from 'react-credit-cards'
 import { ThemeColor } from 'src/@core/layouts/types'
 
 export interface BankAccountData {
-  accountHolderName: string
+  firstName: string
+  lastName: string
   accountHolderType: 'individual' | 'company'
   bankName: string
   routingNumber: string
@@ -14,7 +15,8 @@ export interface BankAccountData {
 export interface BankAccountResponse {
   id: string
   userId: string
-  accountHolderName: string
+  firstName: string
+  lastName: string
   accountHolderType: string
   accountType: string
   bankName: string

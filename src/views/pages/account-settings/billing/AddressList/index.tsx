@@ -13,7 +13,6 @@ import DialogContentText from '@mui/material/DialogContentText'
 import DialogTitle from '@mui/material/DialogTitle'
 import DeleteIcon from '@mui/icons-material/Delete'
 import { useEffect, useState } from 'react'
-import { getAllAddress } from 'src/pages/api/address/getAllAddress'
 import {
   AddressListProps,
   PostAddressResponseType,
@@ -21,13 +20,14 @@ import {
 import { AddressBox, AddressDetails, AddressTitle } from './style'
 import { deleteAddress } from 'src/pages/api/address/deleteAddress'
 import toast from 'react-hot-toast'
+import { getAddress } from 'src/pages/api/address/getAddress'
 
 const AddressList = ({ address, setAddress }: AddressListProps) => {
   const [open, setOpen] = useState(false)
   const [selectedAddress, setSelectedAddress] = useState<string | null>(null)
 
   useEffect(() => {
-    getAllAddress().then(
+    getAddress().then(
       (response: PostAddressResponseType | null | undefined) => {
         if (response) {
           setAddress(response)
@@ -63,39 +63,37 @@ const AddressList = ({ address, setAddress }: AddressListProps) => {
         <CardHeader title='Saved Addresses' />
         <CardContent>
           <Grid container spacing={4}>
-            {address && (
-              <Grid item xs={12} sm={6} md={4}>
-                <AddressBox>
-                  <Box
-                    display='flex'
-                    justifyContent='space-between'
-                    alignItems='center'
+            <Grid item xs={12} sm={6} md={4}>
+              <AddressBox>
+                <Box
+                  display='flex'
+                  justifyContent='space-between'
+                  alignItems='center'
+                >
+                  <AddressTitle variant='h6' gutterBottom>
+                    Address
+                  </AddressTitle>
+                  <IconButton
+                    color='secondary'
+                    onClick={() => handleClickOpen(address.id)}
                   >
-                    <AddressTitle variant='h6' gutterBottom>
-                      Address
-                    </AddressTitle>
-                    <IconButton
-                      color='secondary'
-                      onClick={() => handleClickOpen(address.id)}
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                  </Box>
-                  <AddressDetails variant='body1'>
-                    {address.address}
-                  </AddressDetails>
-                  <AddressDetails variant='body1'>
-                    {address.city}, {address.state}
-                  </AddressDetails>
-                  <AddressDetails variant='body1'>
-                    {address.zipCode}
-                  </AddressDetails>
-                  <AddressDetails variant='body1'>
-                    {address.country}
-                  </AddressDetails>
-                </AddressBox>
-              </Grid>
-            )}
+                    <DeleteIcon />
+                  </IconButton>
+                </Box>
+                <AddressDetails variant='body1'>
+                  {address.address}
+                </AddressDetails>
+                <AddressDetails variant='body1'>
+                  {address.city}, {address.state}
+                </AddressDetails>
+                <AddressDetails variant='body1'>
+                  {address.zipCode}
+                </AddressDetails>
+                <AddressDetails variant='body1'>
+                  {address.country}
+                </AddressDetails>
+              </AddressBox>
+            </Grid>
           </Grid>
         </CardContent>
         <Dialog
