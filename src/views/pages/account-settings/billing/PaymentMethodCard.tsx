@@ -24,13 +24,10 @@ import {
   formatCreditCardNumber,
 } from 'src/@core/utils/format'
 
-// ** Types
-import { ThemeColor } from 'src/@core/layouts/types'
-
 // ** Styles Import
 import 'react-credit-cards/es/styles-compiled.css'
 import { useAuth } from 'src/hooks/useAuth'
-import { Box, BoxProps, CardHeader, FormControl } from '@mui/material'
+import { CardHeader, FormControl } from '@mui/material'
 import { WithdrawForm } from 'src/components/PaymentMethod/WithdrawForm'
 import {
   BankAccountResponse,

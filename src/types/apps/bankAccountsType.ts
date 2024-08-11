@@ -10,6 +10,8 @@ export interface BankAccountData {
   accountNumber: string
   currency: string
   country: string
+  frontImage: File | null
+  backImage: File | null
 }
 
 export interface BankAccountResponse {
@@ -29,7 +31,7 @@ export interface BankAccountResponse {
   object: string
   routingNumber: string
   status: string
-  stripeAccountId: string
+  stripeId: string
   updatedAt: string
 }
 

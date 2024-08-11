@@ -21,7 +21,7 @@ export async function postWithdraw(
         {
           amount: numberAmount,
           currency: data.currency,
-          stripeAccountId: data.selectedBank,
+          stripeId: data.selectedBank,
         },
         {
           headers: {
@@ -29,8 +29,9 @@ export async function postWithdraw(
           },
         },
       )
-      if (response.status === 201) {
-        return response.data.url
+
+      if (response.data.status === 201) {
+        return response.data
       } else {
         return null
       }

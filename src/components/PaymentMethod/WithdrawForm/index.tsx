@@ -28,6 +28,7 @@ import {
 import { WithdrawFormProps } from 'src/types/apps/withdrawType'
 import { currencies } from 'src/views/pages/account-settings/billing/currencies'
 import { z } from 'zod'
+import { BoxInputFile } from './style'
 
 const style = {
   position: 'absolute' as const,
@@ -86,6 +87,14 @@ const schema = z.object({
       required_error: 'Country is required',
     })
     .min(1, 'Country is required'),
+
+  frontImage: z.any().refine((file) => file instanceof File, {
+    message: 'Front image is required and must be a valid image file',
+  }),
+
+  backImage: z.any().refine((file) => file instanceof File, {
+    message: 'Back image is required and must be a valid image file',
+  }),
 })
 
 export const WithdrawForm = ({
@@ -115,6 +124,8 @@ export const WithdrawForm = ({
       accountNumber: '',
       currency: '',
       country: '',
+      frontImage: null,
+      backImage: null,
     },
   })
 
@@ -315,6 +326,107 @@ export const WithdrawForm = ({
               />
             </FormControl>
           </Grid>
+          <Grid item xs={12}>
+            <Typography variant='body1' color='textPrimary' gutterBottom>
+              <strong>Document Submission Requirements</strong>
+              <br />
+              Please ensure that you upload the necessary documents as part of
+              this process. It is important to provide clear and accurate images
+              to facilitate the verification. Upload the front and back images
+              of your identification document in the designated fields below.
+              These documents are essential for verifying your identity and
+              ensuring the security of your account. Thank you for your
+              cooperation.
+            </Typography>
+          </Grid>
+          <Grid item xs={12}>
+            <FormControl fullWidth>
+              <Controller
+                name='frontImage'
+                control={control}
+                render={({ field: { onChange, onBlur, ref, value } }) => (
+                  <BoxInputFile>
+                    <input
+                      type='file'
+                      accept='image/*'
+                      id='frontImage'
+                      style={{ display: 'none' }}
+                      onChange={(e) => {
+                        onChange(e.target.files?.[0] || null)
+                        onBlur()
+                      }}
+                      name='frontImage'
+                      ref={ref}
+                    />
+                    <label htmlFor='frontImage'>
+                      <Button
+                        variant='contained'
+                        component='span'
+                        color='primary'
+                        sx={{ marginRight: '20px' }}
+                      >
+                        Select Front Image
+                      </Button>
+                    </label>
+                    {errors.frontImage ? (
+                      <Typography color='error' variant='body2' mt={1}>
+                        {errors.frontImage.message}
+                      </Typography>
+                    ) : (
+                      <Typography variant='body2' mt={1}>
+                        {value?.name || 'No file selected'}
+                      </Typography>
+                    )}
+                  </BoxInputFile>
+                )}
+              />
+            </FormControl>
+          </Grid>
+
+          <Grid item xs={12}>
+            <FormControl fullWidth>
+              <Controller
+                name='backImage'
+                control={control}
+                render={({ field: { onChange, onBlur, ref, value } }) => (
+                  <BoxInputFile>
+                    <input
+                      type='file'
+                      accept='image/*'
+                      id='backImage'
+                      style={{ display: 'none' }}
+                      onChange={(e) => {
+                        onChange(e.target.files?.[0] || null)
+                        onBlur()
+                      }}
+                      name='backImage'
+                      ref={ref}
+                    />
+                    <label htmlFor='backImage'>
+                      <Button
+                        variant='contained'
+                        component='span'
+                        color='primary'
+                        sx={{ marginRight: '20px' }}
+                      >
+                        Select Back Image
+                      </Button>
+                    </label>
+                    {errors.backImage ? (
+                      <Typography color='error' variant='body2' mt={1}>
+                        {errors.backImage.message}
+                      </Typography>
+                    ) : (
+                      <Typography variant='body2' mt={1}>
+                        {value?.name || 'No file selected'}
+                      </Typography>
+                    )}
+                  </BoxInputFile>
+                )}
+              />
+            </FormControl>
+          </Grid>
+
           {!address ? (
             <Grid item xs={12} sm={12}>
               <Alert severity='info'>

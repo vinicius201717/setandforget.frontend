@@ -21,17 +21,11 @@ import { BankAccountResponse } from 'src/types/apps/bankAccountsType'
 import { z } from 'zod'
 import { Controller, SubmitHandler, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import {
-  InfoContainer,
-  RadioBox,
-  RadioOpcionContainer,
-  RadioSpan,
-  StyledLink,
-} from './style'
-import { Box } from '@mui/system'
+import { RadioBox, RadioOpcionContainer, RadioSpan } from './style'
 import { postWithdraw } from 'src/pages/api/payment/postWithdraw'
 import { useAuth } from 'src/hooks/useAuth'
 import { formatMoney } from 'src/utils/format-money'
+import { WithdrawInfoToCreateAccount } from 'src/components/WithdrawInforToCreateAccount'
 
 const WithdrawPage = () => {
   const [bankAccounts, setBankAccounts] = useState<BankAccountResponse[]>([])
@@ -59,6 +53,7 @@ const WithdrawPage = () => {
     register,
     control,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<BankAccountFormValues>({
     resolver: zodResolver(bankAccountSchema),
@@ -68,9 +63,12 @@ const WithdrawPage = () => {
     bankAccountGet().then((response: BankAccountResponse[] | null) => {
       if (response) {
         setBankAccounts(response)
+        if (response.length > 0) {
+          setValue('selectedBank', response[0].stripeId)
+        }
       }
     })
-  }, [])
+  }, [setValue])
 
   const onSubmit: SubmitHandler<BankAccountFormValues> = (data) => {
     if (data.amount < accountBalance / 100)
@@ -126,6 +124,7 @@ const WithdrawPage = () => {
                   >
                     <InputLabel>Currency</InputLabel>
                     <Select label='Currency' {...register('currency')}>
+                      <MenuItem value='brl'>BRL</MenuItem>
                       <MenuItem value='usd'>USD</MenuItem>
                       <MenuItem value='eur'>EUR</MenuItem>
                       <MenuItem value='gbp'>GBP</MenuItem>
@@ -142,86 +141,36 @@ const WithdrawPage = () => {
                     style={{ width: '100%' }}
                   >
                     <FormLabel component='legend'>Select Bank</FormLabel>
-                    <RadioGroup
-                      {...register('selectedBank')}
-                      style={{ width: '100%' }}
-                    >
-                      {bankAccounts.length > 0 ? (
-                        bankAccounts.map((bank) => (
-                          <RadioOpcionContainer key={bank.id}>
-                            <FormControlLabel
-                              value={bank.stripeAccountId}
-                              control={<Radio />}
-                              label={
-                                <RadioBox>
-                                  <span>{bank.bankName}</span>
-                                  <RadioSpan>
-                                    Last 4 digits: {bank.last4}
-                                  </RadioSpan>
-                                </RadioBox>
-                              }
-                              style={{ width: '100%', margin: 0 }}
-                            />
-                            <span>{bank.currency.toUpperCase()}</span>
-                          </RadioOpcionContainer>
-                        ))
-                      ) : (
-                        <InfoContainer>
-                          <Typography variant='body1' gutterBottom>
-                            No bank accounts available. Please add a bank
-                            account to proceed with the withdrawal. The link
-                            takes you to the page to add a withdrawal bank
-                            account with instructions. When the page opens, the
-                            options{' '}
-                            <Box component='span' fontWeight='fontWeightBold'>
-                              Credit/Debit/ATM
-                            </Box>{' '}
-                            Card will be selected. Change the selection to{' '}
-                            <Box component='span' fontWeight='fontWeightBold'>
-                              Withdraw
-                            </Box>
-                            . Follow these steps:
-                            <ol>
-                              <li>
-                                Click on the{' '}
-                                <Box
-                                  component='span'
-                                  fontWeight='fontWeightBold'
-                                >
-                                  Withdraw
-                                </Box>{' '}
-                                dropdown menu.
-                              </li>
-                              <li>
-                                Fill in your bank account details, including
-                                account number and routing number.
-                              </li>
-                              <li>
-                                Ensure all provided information is accurate to
-                                avoid any issues with transactions.
-                              </li>
-                              <li>
-                                Click on the{' '}
-                                <Box
-                                  component='span'
-                                  fontWeight='fontWeightBold'
-                                >
-                                  Submit
-                                </Box>{' '}
-                                button to save your bank account details.
-                              </li>
-                              <li>
-                                After submitting and completing the addition of
-                                the account, return here and try again.
-                              </li>
-                            </ol>
-                          </Typography>
-                          <StyledLink href='/pages/account-settings/billing'>
-                            Add Bank Account
-                          </StyledLink>
-                        </InfoContainer>
+                    <Controller
+                      name='selectedBank'
+                      control={control}
+                      render={({ field }) => (
+                        <RadioGroup {...field} style={{ width: '100%' }}>
+                          {bankAccounts.length > 0 ? (
+                            bankAccounts.map((bank) => (
+                              <RadioOpcionContainer key={bank.id}>
+                                <FormControlLabel
+                                  value={bank.stripeId}
+                                  control={<Radio />}
+                                  label={
+                                    <RadioBox>
+                                      <span>{bank.bankName}</span>
+                                      <RadioSpan>
+                                        Last 4 digits: {bank.last4}
+                                      </RadioSpan>
+                                    </RadioBox>
+                                  }
+                                  style={{ width: '100%', margin: 0 }}
+                                />
+                                <span>{bank.currency.toUpperCase()}</span>
+                              </RadioOpcionContainer>
+                            ))
+                          ) : (
+                            <WithdrawInfoToCreateAccount />
+                          )}
+                        </RadioGroup>
                       )}
-                    </RadioGroup>
+                    />
                     {errors.selectedBank && (
                       <p style={{ color: 'red' }}>
                         {errors.selectedBank.message}
