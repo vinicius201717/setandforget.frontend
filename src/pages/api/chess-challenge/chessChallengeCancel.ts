@@ -8,7 +8,7 @@ interface ApiResponse {
 export async function chessChallengeCancel(
   challengeId: string,
   roomId: string,
-  amount: string,
+  amount?: string,
 ): Promise<ApiResponse | null> {
   try {
     const storedToken = window.localStorage.getItem(

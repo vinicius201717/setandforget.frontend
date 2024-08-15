@@ -15,6 +15,7 @@ import {
   InputLabel,
   MenuItem,
   InputAdornment,
+  CircularProgress,
 } from '@mui/material'
 import { bankAccountGet } from 'src/pages/api/bank-account/getBankAccounts'
 import { BankAccountResponse } from 'src/types/apps/bankAccountsType'
@@ -26,11 +27,13 @@ import { postWithdraw } from 'src/pages/api/payment/postWithdraw'
 import { useAuth } from 'src/hooks/useAuth'
 import { formatMoney } from 'src/utils/format-money'
 import { WithdrawInfoToCreateAccount } from 'src/components/WithdrawInforToCreateAccount'
+import toast from 'react-hot-toast'
 
 const WithdrawPage = () => {
   const [bankAccounts, setBankAccounts] = useState<BankAccountResponse[]>([])
+  const [loading, setLoading] = useState<boolean>(false)
 
-  const { user } = useAuth()
+  const { user, setUser } = useAuth()
 
   const accountBalance = user?.Account.amount as number
   const bankAccountSchema = z.object({
@@ -70,9 +73,42 @@ const WithdrawPage = () => {
     })
   }, [setValue])
 
+  const updateBalance = (amount: number) => {
+    if (user) {
+      const newAmount: number = user?.Account.amount - amount * 100
+      const updatedUser = {
+        ...user,
+        Account: {
+          ...user.Account,
+          amount: newAmount,
+        },
+      }
+      setUser(updatedUser)
+    }
+  }
+
   const onSubmit: SubmitHandler<BankAccountFormValues> = (data) => {
-    if (data.amount < accountBalance / 100)
-      postWithdraw(data).then((response) => console.log(response))
+    setLoading(true)
+
+    if (data.amount < accountBalance / 100) {
+      postWithdraw(data)
+        .then(() => {
+          setLoading(false)
+          updateBalance(data.amount)
+          toast.success('Withdrawal successful!', { position: 'bottom-right' })
+        })
+        .catch(() => {
+          setLoading(false)
+          toast.error('Withdrawal failed. Please try again.', {
+            position: 'bottom-right',
+          })
+        })
+    } else {
+      setLoading(false)
+      toast.error('Insufficient balance for this withdrawal.', {
+        position: 'bottom-right',
+      })
+    }
   }
 
   return (
@@ -184,8 +220,13 @@ const WithdrawPage = () => {
                     variant='contained'
                     color='primary'
                     type='submit'
+                    disabled={loading}
                   >
-                    Withdraw
+                    {loading ? (
+                      <CircularProgress size={24} color='inherit' />
+                    ) : (
+                      'Withdraw'
+                    )}
                   </Button>
                 </Grid>
               </Grid>

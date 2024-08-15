@@ -66,7 +66,7 @@ const TableRowStatus = (status: 'PENDING' | 'COMPLETED' | 'FAILED') => {
   }
 }
 
-const TableCustomized = ({ transactions }: TableCustomizedProps) => {
+const TableCustomizedDeposit = ({ transactions }: TableCustomizedProps) => {
   const theme = useTheme()
   return (
     <TableContainer component={Paper}>
@@ -137,4 +137,4 @@ const TableCustomized = ({ transactions }: TableCustomizedProps) => {
   )
 }
 
-export default TableCustomized
+export default TableCustomizedDeposit

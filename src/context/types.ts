@@ -130,6 +130,27 @@ export interface Transaction {
   account: Account
 }
 
+export interface TransfersTransaction {
+  id: string
+  userId: string
+  amount: number
+  amountReversed: number
+  balanceTransaction: string
+  currency: string
+  description: string
+  destination: string
+  destinationPayment: string
+  livemode: boolean
+  reversed: boolean
+  sourceTransaction: string
+  sourceType: string
+  transferGroup: string
+  stripeTransferId: string
+  createdAt: Date
+  reversalsUrl: string
+  status: 'PENDING' | 'COMPLETED' | 'FAILED'
+}
+
 export type AuthValuesType = {
   loading: boolean
   logout: () => void

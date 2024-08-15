@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { UserDataType } from 'src/context/types'
 import { chessResultCreate } from 'src/pages/api/chess-result/chessResultCreate'
 import { endGame } from 'src/pages/api/chess-room/chess-challenge-websocket'
