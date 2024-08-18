@@ -10,15 +10,12 @@ import { useEffect, useState } from 'react'
 import { Transaction, TransfersTransaction } from 'src/context/types'
 import TableCustomizedDeposit from 'src/views/pages/transaction/TableCustomizedDeposit'
 import TableCustomizedWithdraw from 'src/views/pages/transaction/TableCustomizedWithdraw'
-import {
-  AlterButton,
-  HeaderContainer,
-  HeaderContainerBottom,
-  StyledAnchor,
-} from './style'
-import { GridArrowDownwardIcon, GridArrowUpwardIcon } from '@mui/x-data-grid'
+import CircularProgress from '@mui/material/CircularProgress'
+import { AlterButton, HeaderContainer, HeaderContainerBottom } from './style'
+import SwapVertIcon from '@mui/icons-material/SwapVert'
 import { getTransfersTransaction } from 'src/pages/api/transaction/getWithdrawTransaction'
-import { useAuth } from 'src/hooks/useAuth'
+
+import { getTransaction } from 'src/pages/api/transaction/getDepositTransaction'
 
 const Transactions = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([])
@@ -26,8 +23,7 @@ const Transactions = () => {
     TransfersTransaction[]
   >([])
   const [alter, setAlter] = useState<boolean>(true)
-
-  const { setLoading } = useAuth()
+  const [loading, setLoading] = useState<boolean>(false)
 
   const handleAlter: React.MouseEventHandler<HTMLButtonElement> = () => {
     setAlter(!alter)
@@ -53,18 +49,29 @@ const Transactions = () => {
     }
   }, [alter])
 
+  useEffect(() => {
+    getTransaction()
+      .then((response: Transaction[] | null) => {
+        if (response !== null) {
+          setTransactions(response)
+        } else {
+          setTransactions([])
+        }
+      })
+      .catch((error) => {
+        console.error('Failed to fetch transfers:', error)
+      })
+      .finally(() => {
+        setLoading(false)
+      })
+  }, [])
+
   return (
     <Grid container spacing={6}>
       <Grid item xs={12}>
         <HeaderContainer>
           <PageHeader
-            title={
-              <Typography variant='h5'>
-                <StyledAnchor href={'/transaction'} target='_blank'>
-                  Transactions
-                </StyledAnchor>
-              </Typography>
-            }
+            title={<Typography variant='h5'>Transactions</Typography>}
             subtitle={
               <Typography variant='body2'>
                 Deposit and withdraw transactions
@@ -73,10 +80,7 @@ const Transactions = () => {
           />
           <HeaderContainerBottom>
             <AlterButton onClick={handleAlter}>
-              <GridArrowUpwardIcon />
-            </AlterButton>
-            <AlterButton onClick={handleAlter}>
-              <GridArrowDownwardIcon />
+              <SwapVertIcon />
             </AlterButton>
           </HeaderContainerBottom>
         </HeaderContainer>
@@ -84,7 +88,13 @@ const Transactions = () => {
       <Grid item xs={12}>
         <Card>
           {alter ? (
-            <TableCustomizedDeposit transactions={transactions} />
+            loading ? (
+              <CircularProgress />
+            ) : (
+              <TableCustomizedDeposit transactions={transactions} />
+            )
+          ) : loading ? (
+            <CircularProgress />
           ) : (
             <TableCustomizedWithdraw
               transfersTransactions={transfersTransactions}

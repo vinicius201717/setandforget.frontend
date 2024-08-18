@@ -72,6 +72,7 @@ const TableCustomizedDeposit = ({ transactions }: TableCustomizedProps) => {
     <TableContainer component={Paper}>
       <Table sx={{ minWidth: 700 }} aria-label='Transactions'>
         <TableRow>
+          <StyledTableCell>Deposit ID</StyledTableCell>
           <StyledTableCell>status</StyledTableCell>
           <StyledTableCell align='left'>Method</StyledTableCell>
           <StyledTableCell align='left'>Amount</StyledTableCell>
@@ -80,57 +81,66 @@ const TableCustomizedDeposit = ({ transactions }: TableCustomizedProps) => {
           <StyledTableCell align='right'>Receipt</StyledTableCell>
         </TableRow>
         <TableBody>
-          {transactions
-            ? transactions.map((row, index) => (
-                <StyledTableRow key={index}>
-                  <StyledTableCell
-                    component='td'
-                    scope='row'
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '20px',
-                    }}
-                  >
-                    {TableRowStatus(
-                      row.status as 'PENDING' | 'COMPLETED' | 'FAILED',
-                    )}{' '}
-                    {row.status}
+          {transactions ? (
+            transactions.map((row, index) => (
+              <StyledTableRow key={index}>
+                <StyledTableCell align='left'>
+                  {row.paymentIntentId}
+                </StyledTableCell>
+                <StyledTableCell
+                  component='td'
+                  scope='row'
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '20px',
+                  }}
+                >
+                  {TableRowStatus(
+                    row.status as 'PENDING' | 'COMPLETED' | 'FAILED',
+                  )}{' '}
+                  {row.status}
+                </StyledTableCell>
+                <StyledTableCell align='left'>
+                  {row.paymentMethod}
+                </StyledTableCell>
+                <StyledTableCell align='left'>
+                  {formatMoney(row.amount / 100)}
+                </StyledTableCell>
+                <StyledTableCell align='left'>{row.type}</StyledTableCell>
+                <StyledTableCell align='left'>
+                  {' '}
+                  {row.createdAt
+                    ? format(new Date(row.createdAt), 'dd/MM/yyyy HH:mm:ss')
+                    : 'Data não disponível'}
+                </StyledTableCell>
+                {row.receiptUrl ? (
+                  <StyledTableCell align='right'>
+                    <Link
+                      href={row.receiptUrl as string}
+                      target='_blank'
+                      rel='noopener noreferrer'
+                      style={{
+                        textDecoration: 'none',
+                        color: theme.palette.text.primary,
+                        opacity: 0.5,
+                      }}
+                    >
+                      <ReceiptIcon />
+                    </Link>
                   </StyledTableCell>
-                  <StyledTableCell align='left'>
-                    {row.paymentMethod}
-                  </StyledTableCell>
-                  <StyledTableCell align='left'>
-                    {formatMoney(row.amount / 100)}
-                  </StyledTableCell>
-                  <StyledTableCell align='left'>{row.type}</StyledTableCell>
-                  <StyledTableCell align='left'>
-                    {' '}
-                    {row.createdAt
-                      ? format(new Date(row.createdAt), 'dd/MM/yyyy HH:mm:ss')
-                      : 'Data não disponível'}
-                  </StyledTableCell>
-                  {row.receiptUrl ? (
-                    <StyledTableCell align='right'>
-                      <Link
-                        href={row.receiptUrl as string}
-                        target='_blank'
-                        rel='noopener noreferrer'
-                        style={{
-                          textDecoration: 'none',
-                          color: theme.palette.text.primary,
-                          opacity: 0.5,
-                        }}
-                      >
-                        <ReceiptIcon />
-                      </Link>
-                    </StyledTableCell>
-                  ) : (
-                    <StyledTableCell align='right'></StyledTableCell>
-                  )}
-                </StyledTableRow>
-              ))
-            : ''}
+                ) : (
+                  <StyledTableCell align='right'></StyledTableCell>
+                )}
+              </StyledTableRow>
+            ))
+          ) : (
+            <StyledTableRow>
+              <StyledTableCell colSpan={6} align='center'>
+                None available transactions
+              </StyledTableCell>
+            </StyledTableRow>
+          )}
         </TableBody>
       </Table>
     </TableContainer>

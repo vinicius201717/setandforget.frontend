@@ -6,6 +6,9 @@ const path = require('path')
 // Remove this if you're not using Fullcalendar features
 
 module.exports = {
+  images: {
+    domains: ['media.api-sports.io'],
+  },
   trailingSlash: true,
   reactStrictMode: false,
   webpack: (config) => {

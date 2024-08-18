@@ -4,12 +4,10 @@ import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableContainer from '@mui/material/TableContainer'
 import TableRow from '@mui/material/TableRow'
-import ReceiptIcon from '@mui/icons-material/Receipt'
 
 import { format } from 'date-fns'
 import { StyledTableCell, StyledTableRow } from './style'
-import { Badge, useTheme } from '@mui/material'
-import Link from 'next/link'
+import { Badge } from '@mui/material'
 import { formatMoney } from 'src/utils/format-money'
 import { TransfersTransaction } from 'src/context/types'
 
@@ -69,70 +67,58 @@ const TableRowStatus = (status: 'PENDING' | 'COMPLETED' | 'FAILED') => {
 const TableCustomizedWithdraw = ({
   transfersTransactions,
 }: TableCustomizedProps) => {
-  const theme = useTheme()
   return (
     <TableContainer component={Paper}>
       <Table sx={{ minWidth: 700 }} aria-label='Transactions'>
         <TableRow>
-          <StyledTableCell>status</StyledTableCell>
-          <StyledTableCell align='left'>Methods</StyledTableCell>
+          <StyledTableCell>Transfer ID</StyledTableCell>
+          <StyledTableCell align='left'>Status</StyledTableCell>
           <StyledTableCell align='left'>Amount</StyledTableCell>
-          <StyledTableCell align='left'>Type</StyledTableCell>
           <StyledTableCell align='left'>Date</StyledTableCell>
-          <StyledTableCell align='right'>Receipt</StyledTableCell>
+          <StyledTableCell align='left'>Description</StyledTableCell>
         </TableRow>
         <TableBody>
-          {transfersTransactions
-            ? transfersTransactions.map((row, index) => (
-                <StyledTableRow key={index}>
-                  <StyledTableCell
-                    component='td'
-                    scope='row'
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '20px',
-                    }}
-                  >
-                    {TableRowStatus(
-                      row.status as 'PENDING' | 'COMPLETED' | 'FAILED',
-                    )}{' '}
-                    {row.status}
-                  </StyledTableCell>
-                  <StyledTableCell align='left'>{row.livemode}</StyledTableCell>
-                  <StyledTableCell align='left'>
-                    {formatMoney(row.amount / 100)}
-                  </StyledTableCell>
-                  <StyledTableCell align='left'>
-                    {row.sourceType}
-                  </StyledTableCell>
-                  <StyledTableCell align='left'>
-                    {' '}
-                    {row.createdAt
-                      ? format(new Date(row.createdAt), 'dd/MM/yyyy HH:mm:ss')
-                      : 'Data não disponível'}
-                  </StyledTableCell>
-                  {row.reversalsUrl ? (
-                    <StyledTableCell align='right'>
-                      <Link
-                        href={row.reversalsUrl as string}
-                        target='_blank'
-                        rel='noopener noreferrer'
-                        style={{
-                          textDecoration: 'none',
-                          color: theme.palette.text.primary,
-                          opacity: 0.5,
-                        }}
-                      >
-                        <ReceiptIcon />
-                      </Link>
-                    </StyledTableCell>
-                  ) : (
-                    <StyledTableCell align='right'></StyledTableCell>
+          {transfersTransactions && transfersTransactions.length > 0 ? (
+            transfersTransactions.map((row, index) => (
+              <StyledTableRow key={index}>
+                <StyledTableCell align='left'>
+                  {row.stripeTransferId || 'ID not available'}
+                </StyledTableCell>
+                <StyledTableCell
+                  component='td'
+                  scope='row'
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '20px',
+                  }}
+                >
+                  {TableRowStatus(
+                    (row.status as 'PENDING' | 'COMPLETED' | 'FAILED') ||
+                      'FAILED',
                   )}
-                </StyledTableRow>
-              ))
-            : ''}
+                  {row.status || 'FAILED'}
+                </StyledTableCell>
+                <StyledTableCell align='left'>
+                  {formatMoney(row.amount / 100)}
+                </StyledTableCell>
+                <StyledTableCell align='left'>
+                  {row.createdAt
+                    ? format(new Date(row.createdAt), 'dd/MM/yyyy HH:mm:ss')
+                    : 'None available data'}
+                </StyledTableCell>
+                <StyledTableCell align='left'>
+                  {row.description || 'No description'}
+                </StyledTableCell>
+              </StyledTableRow>
+            ))
+          ) : (
+            <StyledTableRow>
+              <StyledTableCell colSpan={6} align='center'>
+                None available transactions
+              </StyledTableCell>
+            </StyledTableRow>
+          )}
         </TableBody>
       </Table>
     </TableContainer>
