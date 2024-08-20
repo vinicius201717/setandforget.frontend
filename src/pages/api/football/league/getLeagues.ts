@@ -19,11 +19,12 @@ export async function getLeagues(
         Authorization: `Bearer ${storedToken}`,
       },
     })
+    const leagues = response.data.leagues.response.slice(start, end)
+    const allLeagues = response.data.leagues.response
+    const total = response.data.leagues.response.length
+    const userFavoriteLeagues = response.data.userFavoriteLeagues
 
-    const leagues = response.data.response.slice(start, end)
-    const total = response.data.response.length
-
-    return { leagues, total }
+    return { leagues, userFavoriteLeagues, total, allLeagues }
   } catch (error) {
     console.error(error)
     return null

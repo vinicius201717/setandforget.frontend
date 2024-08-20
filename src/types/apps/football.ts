@@ -42,7 +42,16 @@ export interface LeagueResponse {
   seasons: Season[]
 }
 
+export interface UserFavoriteLeague {
+  id: string
+  userId: string
+  leagueId: number
+  addedAt: Date
+}
+
 export interface LeagueWithPagination {
+  userFavoriteLeagues: UserFavoriteLeague[]
   leagues: LeagueResponse[]
+  allLeagues: LeagueResponse[]
   total: number
 }

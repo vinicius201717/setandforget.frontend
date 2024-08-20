@@ -20,6 +20,9 @@ export const ToolbarContainer = styled(Box)<BoxProps>(({ theme }) => ({
 export const BottomLink = styled(Link)<LinkProps>(({ theme }) => ({
   textDecoration: 'none',
   marginRight: '20px',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
   padding: theme.spacing(3),
   borderRadius: theme.shape.borderRadius,
   backgroundColor: theme.palette.background.paper,

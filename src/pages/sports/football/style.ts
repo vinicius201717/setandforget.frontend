@@ -3,6 +3,8 @@ import {
   BoxProps,
   Card,
   CardProps,
+  IconButton,
+  IconButtonProps,
   styled,
   Typography,
   TypographyProps,
@@ -19,6 +21,12 @@ export const StyledCard = styled(Card)<CardProps>(({ theme }) => ({
   alignItems: 'center',
   position: 'relative',
 }))
+
+export const IconButtonStar = styled(IconButton)<IconButtonProps>(() => ({
+  position: 'absolute',
+  right: '10px',
+}))
+
 export const Header = styled(Typography)<TypographyProps>(({ theme }) => ({
   textAlign: 'center',
   marginTop: theme.spacing(2),

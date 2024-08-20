@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
-import { getFixtureLeague } from 'src/pages/api/football/getFixtureLeague'
+import { getFixtureLeague } from 'src/pages/api/football/fixture/getFixtureLeague'
 
 export default function LeagueFixture() {
   const router = useRouter()

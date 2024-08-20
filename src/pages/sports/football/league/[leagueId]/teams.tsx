@@ -3,7 +3,7 @@ import { Container, Grid, Typography } from '@mui/material'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import PageHeader from 'src/@core/components/page-header'
-import { getLeagueTeams } from 'src/pages/api/football/getLeagueTeams'
+import { getLeagueTeams } from 'src/pages/api/football/league/getLeagueTeams'
 export default function Football() {
   const router = useRouter()
   const { leagueId } = router.query
