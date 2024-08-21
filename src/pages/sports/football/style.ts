@@ -45,10 +45,11 @@ export const LeagueImage = styled(Image)(({ theme }) => ({
 export const ContainerProgress = styled(Box)<BoxProps>(() => ({
   width: '100%',
   display: 'flex',
+  flexDirection: 'column',
   justifyContent: 'center',
   alignItems: 'center',
   height: '100vh',
-  paddingBottom: '200px',
+  paddingBottom: '300px',
 }))
 
 export const LinkLeague = styled(Link)(() => ({
@@ -67,9 +68,6 @@ export const InfoLabel = styled(Typography)<TypographyProps>(({ theme }) => ({
   marginRight: theme.spacing(1),
 }))
 
-export const ContainerFixture = styled(Box)<BoxProps>(({ theme }) => ({
+export const ContainerFixture = styled(Box)<BoxProps>(() => ({
   width: '100%',
-  height: '400px',
-  borderRadius: theme.shape.borderRadius,
-  backgroundColor: theme.palette.background.paper,
 }))
