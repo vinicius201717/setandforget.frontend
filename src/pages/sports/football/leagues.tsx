@@ -15,7 +15,6 @@ import StarIcon from '@mui/icons-material/Star'
 import StarBorderIcon from '@mui/icons-material/StarBorder'
 import { useEffect, useState } from 'react'
 import { getLeagues } from 'src/pages/api/football/league/getLeagues'
-import { LeagueResponse, UserFavoriteLeague } from 'src/types/apps/football'
 import {
   ContainerProgress,
   IconButtonStar,
@@ -32,6 +31,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { DeleteUserFavoriteLeague } from 'src/pages/api/football/league/deleteUserFavoriteLeague'
 import { postUserFavoriteLeague } from 'src/pages/api/football/league/postUserFavoriteLeague'
+import { LeagueResponse, UserFavoriteLeague } from 'src/types/apps/footballType'
 
 const searchSchema = z.object({
   searchQuery: z.string().min(1, 'Search query is required'),
@@ -107,7 +107,7 @@ export default function Football() {
     }
     if (data?.userFavoriteLeagues) {
       const favoriteLeagueIds = data.userFavoriteLeagues.map(
-        (favorite) => favorite,
+        (favorite: UserFavoriteLeague) => favorite,
       )
       setFavoriteLeague(favoriteLeagueIds)
     }

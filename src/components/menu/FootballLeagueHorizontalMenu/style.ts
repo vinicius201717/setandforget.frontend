@@ -3,9 +3,8 @@ import Link, { LinkProps } from 'next/link'
 
 export const AppBarContainer = styled(Box)<BoxProps>(({ theme }) => ({
   width: '100%',
-  padding: theme.spacing(5),
   display: 'flex',
-  justifyContent: 'flex-start',
+  flexDirection: 'column',
   borderRadius: theme.shape.borderRadius,
 }))
 

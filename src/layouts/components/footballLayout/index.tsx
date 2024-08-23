@@ -1,7 +1,7 @@
 import { ReactNode } from 'react'
 import { useRouter } from 'next/router'
 import { Container } from '@mui/material'
-import HorizontalMenu from 'src/components/menu/HorizontalMenu'
+import FootballHorizontalMenu from 'src/components/menu/FootballHorizontalMenu'
 
 interface FootballLayoutProps {
   children: ReactNode
@@ -14,7 +14,7 @@ export default function FootballLayout({ children }: FootballLayoutProps) {
 
   return (
     <Container>
-      {isFootballPage && <HorizontalMenu />}
+      {isFootballPage && <FootballHorizontalMenu />}
       {children}
     </Container>
   )

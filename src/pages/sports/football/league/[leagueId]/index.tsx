@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import { useRouter } from 'next/router'
 import { getLeague } from 'src/pages/api/football/league/getLeague'
 import {
@@ -9,28 +9,21 @@ import {
   Grid,
   Typography,
 } from '@mui/material'
-import { BoxHeader, BoxText, LeagueCard, LeagueLogo } from './style'
+import { BoxHeader, BoxText, LeagueCard, LeagueLogo, LinkNext } from './style'
 import { ContainerProgress } from '../../style'
-import { LeagueResponse } from 'src/types/apps/football'
+import { LeagueResponse } from 'src/types/apps/footballType'
 import FootballLayout from 'src/layouts/components/footballLayout'
+import { useQuery } from '@tanstack/react-query'
 
 export default function LeaguePage() {
   const router = useRouter()
   const { leagueId } = router.query
-  const [leagueData, setLeagueData] = useState<LeagueResponse | null>(null)
 
-  useEffect(() => {
-    if (leagueId) {
-      try {
-        getLeague(leagueId as string).then((league) => {
-          setLeagueData(league)
-        })
-      } catch (error) {
-        console.error('Erro ao buscar os dados da liga:', error)
-      }
-    }
-  }, [leagueId])
-
+  const { data: leagueData } = useQuery<LeagueResponse>({
+    queryKey: ['league', leagueId],
+    queryFn: () => getLeague(leagueId as string),
+    enabled: !!leagueId,
+  })
   return (
     <FootballLayout>
       <Container>
@@ -62,27 +55,31 @@ export default function LeaguePage() {
                 .sort((a, b) => b.year - a.year)
                 .map((season) => (
                   <Grid item xs={2} key={season.year}>
-                    <LeagueCard>
-                      <CardContent>
-                        <Typography>{season.year} </Typography>
-                      </CardContent>
-                      {season.current ? (
-                        <Badge
-                          color='success'
-                          variant='dot'
-                          sx={{
-                            marginRight: '10px',
-                            '& .MuiBadge-badge': {
-                              right: 4,
-                              boxShadow: (theme) =>
-                                `0 0 0 2px ${theme.palette.background.paper}`,
-                            },
-                          }}
-                        />
-                      ) : (
-                        ''
-                      )}
-                    </LeagueCard>
+                    <LinkNext
+                      href={`/sports/football/league/${leagueData.league.id}/${season.year}/standings`}
+                    >
+                      <LeagueCard>
+                        <CardContent>
+                          <Typography>{season.year} </Typography>
+                        </CardContent>
+                        {season.current ? (
+                          <Badge
+                            color='success'
+                            variant='dot'
+                            sx={{
+                              marginRight: '10px',
+                              '& .MuiBadge-badge': {
+                                right: 4,
+                                boxShadow: (theme) =>
+                                  `0 0 0 2px ${theme.palette.background.paper}`,
+                              },
+                            }}
+                          />
+                        ) : (
+                          ''
+                        )}
+                      </LeagueCard>
+                    </LinkNext>
                   </Grid>
                 ))}
             </Grid>

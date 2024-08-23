@@ -1,14 +1,14 @@
 import { api } from 'src/lib/axios'
 import authConfig from 'src/configs/auth'
 
-export async function getLeagueTeams(leagueId: number, season: number) {
+export async function getLeagueDetails(leagueId: number, season: number) {
   const storedToken = window.localStorage.getItem(
     authConfig.storageTokenKeyName,
   )
 
   try {
     const response = await api.get(
-      `/football/league/teams/${leagueId}/${season}`,
+      `/football/league/details/${leagueId}/${season}`,
       {
         headers: {
           Authorization: `Bearer ${storedToken}`,

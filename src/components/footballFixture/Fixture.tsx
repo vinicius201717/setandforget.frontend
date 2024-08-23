@@ -8,15 +8,22 @@ import {
   TeamImage,
 } from './style'
 import { Divider, Typography } from '@mui/material'
-import { FixtureTypeResponse } from 'src/types/apps/football'
 import { formatDate } from 'src/@core/utils/format'
+import { FixtureTypeResponse } from 'src/types/apps/footballType'
 
 interface FixtureProps {
   data: FixtureTypeResponse
 }
 
 const Fixture: React.FC<FixtureProps> = ({ data }) => {
-  console.log(data)
+  const isActive =
+    data.fixture.status.short === 'NS' ||
+    data.fixture.status.short === '1H' ||
+    data.fixture.status.short === '2H'
+
+  if (!isActive) {
+    return null
+  }
 
   return (
     <FixtureContainer>

@@ -4,7 +4,7 @@ import FootballLayout from 'src/layouts/components/footballLayout'
 import { useState, useEffect, useRef } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { getFixture } from 'src/pages/api/football/fixture/getFixture'
-import { FixtureTypeResponse } from 'src/types/apps/football'
+import { FixtureTypeResponse } from 'src/types/apps/footballType'
 import Image from 'next/image'
 
 import timeoutImage from 'public/images/pages/misc-under-maintenance.png'
@@ -29,7 +29,7 @@ export default function Football() {
   useEffect(() => {
     timerRef.current = setTimeout(() => {
       setIsTimeout(true)
-    }, 10000) // 10 segundos
+    }, 10000)
 
     return () => {
       if (timerRef.current) {
