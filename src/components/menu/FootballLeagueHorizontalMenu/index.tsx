@@ -3,20 +3,20 @@
 import React, { useState, useEffect } from 'react'
 import { Coverage, LeagueResponse } from 'src/types/apps/footballType'
 import { Box, Tabs, Tab } from '@mui/material'
-import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { AppBarContainer, ToolbarContainer } from './style'
 
 interface CoverageProps {
   league: LeagueResponse
-  season: number
+  tabValue: number
+  handleChange: (event: React.SyntheticEvent, newValue: number) => void
 }
 
 const FootballLeagueHorizontalMenu: React.FC<CoverageProps> = ({
   league,
-  season,
+  tabValue,
+  handleChange,
 }) => {
-  const [tabValue, setTabValue] = useState<number>(0)
   const [coverage, setCoverage] = useState<Coverage>()
   const router = useRouter()
 
@@ -31,14 +31,8 @@ const FootballLeagueHorizontalMenu: React.FC<CoverageProps> = ({
       const tabIndex = coverageKeys.findIndex((key) =>
         path.includes(key.toLowerCase()),
       )
-
-      setTabValue(tabIndex !== -1 ? tabIndex : 0)
     }
   }, [router.pathname, league])
-
-  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
-    setTabValue(newValue)
-  }
 
   const coverageEntries = coverage
     ? Object.entries(coverage).filter(
@@ -59,8 +53,7 @@ const FootballLeagueHorizontalMenu: React.FC<CoverageProps> = ({
               <Tab
                 key={key}
                 label={key.replace(/_/g, ' ').toUpperCase()}
-                component={Link}
-                href={`/sports/football/league/${league.league.id}/${season}/${key.toLowerCase()}`}
+                component={'div'}
               />
             ))}
           </Tabs>

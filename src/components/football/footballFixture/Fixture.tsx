@@ -1,15 +1,19 @@
 import React from 'react'
 import {
-  DateContainer,
+  DateContainerDate,
   FixtureContainer,
   FixtureTeamsContainer,
   LogoNameContainer,
   OddsContaier,
   TeamImage,
+  ViewContainer,
 } from './style'
+import VisibilityIcon from '@mui/icons-material/Visibility'
 import { Divider, Typography } from '@mui/material'
-import { formatDate } from 'src/@core/utils/format'
 import { FixtureTypeResponse } from 'src/types/apps/footballType'
+import { formatFixtureDate } from 'src/utils/format-date-local'
+import { formatHour } from 'src/utils/format-hours'
+import { formatDate } from 'src/utils/format-data'
 
 interface FixtureProps {
   data: FixtureTypeResponse
@@ -27,7 +31,13 @@ const Fixture: React.FC<FixtureProps> = ({ data }) => {
 
   return (
     <FixtureContainer>
-      <DateContainer>{formatDate(data.fixture.date)}</DateContainer>
+      <DateContainerDate>
+        {formatDate(formatFixtureDate(data.fixture.date).date)} -{' '}
+        {formatHour(formatFixtureDate(data.fixture.date).time)}
+      </DateContainerDate>
+      <ViewContainer>
+        <VisibilityIcon />
+      </ViewContainer>
       <FixtureTeamsContainer>
         <LogoNameContainer>
           <TeamImage

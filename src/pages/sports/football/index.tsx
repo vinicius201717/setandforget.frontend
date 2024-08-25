@@ -8,8 +8,8 @@ import { FixtureTypeResponse } from 'src/types/apps/footballType'
 import Image from 'next/image'
 
 import timeoutImage from 'public/images/pages/misc-under-maintenance.png'
-import LeagueFixture from 'src/components/footballFixture/LeagueFixture'
-import Fixture from 'src/components/footballFixture/Fixture'
+import LeagueFixture from 'src/components/football/footballFixture/LeagueFixture'
+import Fixture from 'src/components/football/footballFixture/Fixture'
 
 export default function Football() {
   const [isTimeout, setIsTimeout] = useState(false)
@@ -47,6 +47,14 @@ export default function Football() {
     }
   }, [isLoading, fixturesGroups])
 
+  const sortFixturesByDate = (fixtures: FixtureTypeResponse[]) => {
+    return fixtures.sort((a, b) => {
+      const dateA = new Date(a.fixture.date).getTime()
+      const dateB = new Date(b.fixture.date).getTime()
+      return dateA - dateB
+    })
+  }
+
   return (
     <FootballLayout>
       <Container>
@@ -63,22 +71,16 @@ export default function Football() {
           ) : (
             fixturesGroups &&
             fixturesGroups.map((fixtures, groupIndex) => (
-              <>
-                {fixtures.length > 0 ? (
-                  <LeagueFixture
-                    key={groupIndex}
-                    leagueName={fixtures[0].league.name || ''}
-                  >
-                    {fixtures.map(
-                      (fixture: FixtureTypeResponse, fixtureIndex: number) => (
-                        <Fixture key={fixtureIndex} data={fixture} />
-                      ),
-                    )}
-                  </LeagueFixture>
-                ) : (
-                  ''
+              <LeagueFixture
+                key={groupIndex}
+                leagueName={fixtures[0].league.name || ''}
+              >
+                {sortFixturesByDate(fixtures).map(
+                  (fixture: FixtureTypeResponse, fixtureIndex: number) => (
+                    <Fixture key={fixtureIndex} data={fixture} />
+                  ),
                 )}
-              </>
+              </LeagueFixture>
             ))
           )}
         </ContainerFixture>

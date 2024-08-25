@@ -56,7 +56,7 @@ export default function LeaguePage() {
                 .map((season) => (
                   <Grid item xs={2} key={season.year}>
                     <LinkNext
-                      href={`/sports/football/league/${leagueData.league.id}/${season.year}/standings`}
+                      href={`/sports/football/league/${leagueData.league.id}/${season.year}/details`}
                     >
                       <LeagueCard>
                         <CardContent>

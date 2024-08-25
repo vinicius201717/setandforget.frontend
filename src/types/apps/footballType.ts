@@ -186,3 +186,40 @@ export interface LeagueStadings {
     standings: Standing[][]
   }
 }
+
+export interface PlayerData {
+  player: {
+    id: number
+    name: string
+    age: number
+    nationality: string
+    height: string
+    weight: string
+    photo: string
+  }
+  statistics: Array<{
+    league: {
+      name: string
+      logo: string
+      country: string
+    }
+    team: {
+      name: string
+      logo: string
+    }
+    games: {
+      appearences: number
+      lineups: number
+      minutes: number
+      position: string
+    }
+    goals: {
+      total: number
+      assists: number
+    }
+    cards: {
+      yellow: number | null
+      red: number | null
+    }
+  }>
+}

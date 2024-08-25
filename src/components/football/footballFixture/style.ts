@@ -63,11 +63,23 @@ export const LogoNameContainer = styled(Box)<BoxProps>(() => ({
   justifyContent: 'center',
 }))
 
-export const DateContainer = styled(Typography)<TypographyProps>(() => ({
+export const DateContainerDate = styled(Typography)<TypographyProps>(() => ({
+  position: 'absolute',
+  left: '5px',
+  top: '5px',
+  fontSize: '0.8rem',
+}))
+
+export const ViewContainer = styled(Box)<BoxProps>(({ theme }) => ({
   position: 'absolute',
   right: '5px',
   top: '5px',
   fontSize: '0.8rem',
+  transition: '0.3s',
+  cursor: 'pointer',
+  '&:hover': {
+    color: theme.palette.primary.main,
+  },
 }))
 
 export const TeamImage = styled(Image)(({ theme }) => ({

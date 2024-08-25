@@ -8,6 +8,9 @@ export const LeagueLogo = styled(Image)<ImageProps>(() => ({
 }))
 
 export const ContainerHeader = styled(Box)<BoxProps>(({ theme }) => ({
+  marginBottom: 2,
+  display: 'flex',
+  alignItems: 'center',
   gap: theme.spacing(5),
 }))
 
