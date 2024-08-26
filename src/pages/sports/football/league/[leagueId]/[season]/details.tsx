@@ -9,8 +9,9 @@ import { LeagueResponse } from 'src/types/apps/footballType'
 import { ContainerProgress } from '../style'
 import { CircularProgress, Card, CardContent, Typography } from '@mui/material'
 import FootballLayout from 'src/layouts/components/footballLayout'
-import LeagueStandings from 'src/components/football/footballLeague/standings'
-import LeaguePlayers from 'src/components/football/footballLeague/players'
+import LeagueStandings from 'src/components/football/footballLeague/Standings'
+import LeaguePlayers from 'src/components/football/footballLeague/Players'
+import LeagueTopScorers from 'src/components/football/footballLeague/TopScorers'
 
 export default function DetailsPage() {
   const [tabValue, setTabValue] = useState<number>(0)
@@ -30,43 +31,83 @@ export default function DetailsPage() {
     enabled: !!leagueId && !!season,
   })
 
+  const componentMap: { [key: string]: JSX.Element } = {
+    STANDINGS: (
+      <Card>
+        <CardContent>
+          <LeagueStandings />
+        </CardContent>
+      </Card>
+    ),
+    PLAYERS: (
+      <Card>
+        <CardContent>
+          <LeaguePlayers />
+        </CardContent>
+      </Card>
+    ),
+    TOP_SCORERS: (
+      <Card>
+        <CardContent>
+          <LeagueTopScorers />
+        </CardContent>
+      </Card>
+    ),
+    INJURIES: (
+      <Card>
+        <CardContent>
+          <Typography variant='h6'>Injuries</Typography>
+          <Typography>Exibe informações sobre lesões.</Typography>
+        </CardContent>
+      </Card>
+    ),
+    ODDS: (
+      <Card>
+        <CardContent>
+          <Typography variant='h6'>Odds</Typography>
+          <Typography>Exibe informações sobre probabilidades.</Typography>
+        </CardContent>
+      </Card>
+    ),
+    PREDICTIONS: (
+      <Card>
+        <CardContent>
+          <Typography variant='h6'>Predictions</Typography>
+          <Typography>Exibe previsões para os jogos.</Typography>
+        </CardContent>
+      </Card>
+    ),
+    TOP_ASSISTS: (
+      <Card>
+        <CardContent>
+          <Typography variant='h6'>Top Assists</Typography>
+          <Typography>Exibe os principais assistentes.</Typography>
+        </CardContent>
+      </Card>
+    ),
+    TOP_CARDS: (
+      <Card>
+        <CardContent>
+          <Typography variant='h6'>Top Cards</Typography>
+          <Typography>Exibe informações sobre cartões.</Typography>
+        </CardContent>
+      </Card>
+    ),
+  }
+
+  const componentArray = Object.values(componentMap)
+
   const renderContent = () => {
-    switch (tabValue) {
-      case 0:
-        return (
-          <Card>
-            <CardContent>
-              <LeagueStandings />
-            </CardContent>
-          </Card>
-        )
-      case 1:
-        return (
-          <Card>
-            <CardContent>
-              <LeaguePlayers />
-            </CardContent>
-          </Card>
-        )
-      case 2:
-        return (
-          <Card>
-            <CardContent>
-              <Typography variant='h6'>Conteúdo do Tab 3</Typography>
-              <Typography>Exibe a tabela de classificação.</Typography>
-            </CardContent>
-          </Card>
-        )
-      default:
-        return (
-          <Card>
-            <CardContent>
-              <Typography variant='h6'>Conteúdo Padrão</Typography>
-              <Typography>Selecione uma aba para ver o conteúdo.</Typography>
-            </CardContent>
-          </Card>
-        )
-    }
+    return (
+      componentArray[tabValue] || (
+        <Card>
+          <CardContent>
+            <Typography variant='h6'>Conteúdo Padrão</Typography>
+            <Typography>Selecione uma aba para ver o conteúdo.</Typography>
+          </CardContent>
+        </Card>
+      )
+    )
   }
 
   return (

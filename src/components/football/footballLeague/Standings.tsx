@@ -22,7 +22,7 @@ import {
   GetIcon,
   TeamCellClube,
   TeamLogo,
-} from '../../../pages/sports/football/league/[leagueId]/style'
+} from './style'
 
 const getIcon = (result: string, isLast: boolean) => {
   const iconSize = 16
@@ -69,76 +69,73 @@ export default function LeagueStandings() {
       return <div>Error fetching league data</div>
     }
 
-    if (data && data.length > 0) {
-      const standingsData = data[0]
-
-      return (
-        <div>
-          {!isLoading ? (
-            <TableContainer component={Paper}>
-              <Table sx={{ minWidth: 650 }} aria-label='league standings table'>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>CLUB</TableCell>
-                    <TableCell>Pts</TableCell>
-                    <TableCell>PJ</TableCell>
-                    <TableCell>VIT</TableCell>
-                    <TableCell>E</TableCell>
-                    <TableCell>DER</TableCell>
-                    <TableCell>GM</TableCell>
-                    <TableCell>GC</TableCell>
-                    <TableCell>SG</TableCell>
-                    <TableCell align='right'>LATEST</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {standingsData.league.standings.map(
-                    (standingGroup, groupIndex) =>
-                      standingGroup.map((standing, index) => (
-                        <TableRow key={`${groupIndex}-${index}`}>
-                          <TeamCellClube>
-                            <TeamLogo
-                              src={standing.team.logo}
-                              width={30}
-                              height={30}
-                              alt={standing.team.name}
-                            />
-                            <Typography>{standing.team.name}</Typography>
-                          </TeamCellClube>
-                          <TableCell>{standing.points}</TableCell>
-                          <TableCell>{standing.all.played}</TableCell>
-                          <TableCell>{standing.all.win}</TableCell>
-                          <TableCell>{standing.all.draw}</TableCell>
-                          <TableCell>{standing.all.lose}</TableCell>
-                          <TableCell>{standing.all.goals.for}</TableCell>
-                          <TableCell>{standing.all.goals.against}</TableCell>
-                          <TableCell>{standing.goalsDiff}</TableCell>
-                          <TableCell align='right'>
-                            <BoxForm>
-                              {standing.form
-                                .split('')
-                                .reverse()
-                                .map((result, i) =>
-                                  i === standing.form.length - 1
-                                    ? getIcon(result, true)
-                                    : getIcon(result, false),
-                                )}
-                            </BoxForm>
-                          </TableCell>
-                        </TableRow>
-                      )),
+    return (
+      <div>
+        {!isLoading ? (
+          <TableContainer component={Paper}>
+            <Table sx={{ minWidth: 650 }} aria-label='league standings table'>
+              <TableHead>
+                <TableRow>
+                  <TableCell>CLUB</TableCell>
+                  <TableCell>Pts</TableCell>
+                  <TableCell>PJ</TableCell>
+                  <TableCell>VIT</TableCell>
+                  <TableCell>E</TableCell>
+                  <TableCell>DER</TableCell>
+                  <TableCell>GM</TableCell>
+                  <TableCell>GC</TableCell>
+                  <TableCell>SG</TableCell>
+                  <TableCell align='right'>LATEST</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {data &&
+                  data[0] &&
+                  data[0].league.standings.map((standingGroup, groupIndex) =>
+                    standingGroup.map((standing, index) => (
+                      <TableRow key={`${groupIndex}-${index}`}>
+                        <TeamCellClube>
+                          <TeamLogo
+                            src={standing.team.logo}
+                            width={30}
+                            height={30}
+                            alt={standing.team.name}
+                          />
+                          <Typography>{standing.team.name}</Typography>
+                        </TeamCellClube>
+                        <TableCell>{standing.points}</TableCell>
+                        <TableCell>{standing.all.played}</TableCell>
+                        <TableCell>{standing.all.win}</TableCell>
+                        <TableCell>{standing.all.draw}</TableCell>
+                        <TableCell>{standing.all.lose}</TableCell>
+                        <TableCell>{standing.all.goals.for}</TableCell>
+                        <TableCell>{standing.all.goals.against}</TableCell>
+                        <TableCell>{standing.goalsDiff}</TableCell>
+                        <TableCell align='right'>
+                          <BoxForm>
+                            {standing.form
+                              .split('')
+                              .reverse()
+                              .map((result, i) =>
+                                i === standing.form.length - 1
+                                  ? getIcon(result, true)
+                                  : getIcon(result, false),
+                              )}
+                          </BoxForm>
+                        </TableCell>
+                      </TableRow>
+                    )),
                   )}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          ) : (
-            <ContainerProgress>
-              <CircularProgress />
-            </ContainerProgress>
-          )}
-        </div>
-      )
-    }
+              </TableBody>
+            </Table>
+          </TableContainer>
+        ) : (
+          <ContainerProgress>
+            <CircularProgress />
+          </ContainerProgress>
+        )}
+      </div>
+    )
   }
 
   return <>{renderContent()}</>

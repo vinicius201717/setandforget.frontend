@@ -18,12 +18,9 @@ import { useState, Fragment } from 'react'
 import { useRouter } from 'next/router'
 import { useQuery } from '@tanstack/react-query'
 import { PlayerData } from 'src/types/apps/footballType'
-import {
-  ContainerProgress,
-  PlayerPhoto,
-} from '../../../pages/sports/football/league/[leagueId]/style'
 import { getPlayers } from 'src/pages/api/football/player/getPlayers'
 import Icon from 'src/@core/components/icon'
+import { ContainerProgress, PlayerPhoto } from './style'
 
 const createData = (playerData: PlayerData) => ({
   name: playerData.player.name,
@@ -50,6 +47,7 @@ const Row = (props: { row: ReturnType<typeof createData> }) => {
               width={50}
               height={50}
             />
+
             <Typography>{row.name}</Typography>
           </Box>
         </TableCell>
@@ -134,52 +132,48 @@ export default function LeaguePlayers() {
       return <div>Error fetching league data</div>
     }
 
-    if (data && data.length > 0) {
-      const rows = data.map(createData)
+    const rows = data?.map(createData)
 
-      return (
-        <>
-          {isLoading || !data || !(data.length > 0) ? (
-            <ContainerProgress>
-              <CircularProgress />
-            </ContainerProgress>
-          ) : (
-            <TableContainer component={Paper}>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Player</TableCell>
-                    <TableCell align='right'>Age</TableCell>
-                    <TableCell align='right'>Nationality</TableCell>
-                    <TableCell align='right'>Height</TableCell>
-                    <TableCell align='right'>Weight</TableCell>
-                    <TableCell align='right'>Statistics</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {rows.map((row) => (
-                    <Row key={row.name} row={row} />
-                  ))}
-                </TableBody>
-              </Table>
-              <Box sx={{ display: 'flex', justifyContent: 'center', py: 2 }}>
-                <TablePagination
-                  rowsPerPageOptions={[]}
-                  component='div'
-                  count={-1}
-                  rowsPerPage={rowsPerPage}
-                  page={page}
-                  onPageChange={handleChangePage}
-                  labelDisplayedRows={() => null}
-                  nextIconButtonProps={{ 'aria-label': 'Next page' }}
-                  backIconButtonProps={{ 'aria-label': 'Previous page' }}
-                />
-              </Box>
-            </TableContainer>
-          )}
-        </>
-      )
-    }
+    return (
+      <>
+        {isLoading ? (
+          <ContainerProgress>
+            <CircularProgress />
+          </ContainerProgress>
+        ) : (
+          <TableContainer component={Paper}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Player</TableCell>
+                  <TableCell align='right'>Age</TableCell>
+                  <TableCell align='right'>Nationality</TableCell>
+                  <TableCell align='right'>Height</TableCell>
+                  <TableCell align='right'>Weight</TableCell>
+                  <TableCell align='right'>Statistics</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {rows?.map((row) => <Row key={row.name} row={row} />)}
+              </TableBody>
+            </Table>
+            <Box sx={{ display: 'flex', justifyContent: 'center', py: 2 }}>
+              <TablePagination
+                rowsPerPageOptions={[]}
+                component='div'
+                count={-1}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                onPageChange={handleChangePage}
+                labelDisplayedRows={() => null}
+                nextIconButtonProps={{ 'aria-label': 'Next page' }}
+                backIconButtonProps={{ 'aria-label': 'Previous page' }}
+              />
+            </Box>
+          </TableContainer>
+        )}
+      </>
+    )
   }
 
   return <>{renderContent()}</>

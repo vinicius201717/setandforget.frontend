@@ -223,3 +223,131 @@ export interface PlayerData {
     }
   }>
 }
+
+// Tipagem do Objeto Principal (PlayerData)
+
+// Tipagem para Birth
+interface Birth {
+  date: string
+  place: string
+  country: string
+}
+
+// Tipagem para Statistic
+
+interface Games {
+  appearences: number
+  lineups: number
+  minutes: number
+  number: number | null
+  position: string
+  rating: string
+  captain: boolean
+}
+
+// Tipagem para Substitutes
+interface Substitutes {
+  in: number
+  out: number
+  bench: number
+}
+
+// Tipagem para Shots
+interface Shots {
+  total: number
+  on: number
+}
+
+// Tipagem para Goals
+interface Goals {
+  total: number
+  conceded: number
+  assists: number
+  saves: number | null
+}
+
+// Tipagem para Passes
+interface Passes {
+  total: number
+  key: number
+  accuracy: number
+}
+
+// Tipagem para Tackles
+interface Tackles {
+  total: number
+  blocks: number
+  interceptions: number
+}
+
+// Tipagem para Duels
+interface Duels {
+  total: number
+  won: number
+}
+
+// Tipagem para Dribbles
+interface Dribbles {
+  attempts: number
+  success: number
+  past: number | null
+}
+
+// Tipagem para Fouls
+interface Fouls {
+  drawn: number
+  committed: number
+}
+
+// Tipagem para Cards
+interface Cards {
+  yellow: number
+  yellowred: number
+  red: number
+}
+
+// Tipagem para Penalty
+interface Penalty {
+  won: number | null
+  commited: number | null
+  scored: number
+  missed: number
+  saved: number | null
+}
+
+interface Statistic {
+  team: Team
+  league: League
+  season: number
+  games: Games
+  substitutes: Substitutes
+  shots: Shots
+  goals: Goals
+  passes: Passes
+  tackles: Tackles
+  duels: Duels
+  dribbles: Dribbles
+  fouls: Fouls
+  cards: Cards
+  penalty: Penalty
+}
+
+// Tipagem para Player
+interface Player {
+  id: number
+  name: string
+  firstname: string
+  lastname: string
+  age: number
+  birth: Birth
+  nationality: string
+  height: string
+  weight: string
+  injured: boolean
+  photo: string
+}
+
+export interface PlayerDataStatistics {
+  player: Player
+  statistics: Statistic[]
+}
