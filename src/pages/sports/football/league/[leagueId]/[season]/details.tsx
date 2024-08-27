@@ -12,9 +12,13 @@ import FootballLayout from 'src/layouts/components/footballLayout'
 import LeagueStandings from 'src/components/football/footballLeague/Standings'
 import LeaguePlayers from 'src/components/football/footballLeague/Players'
 import LeagueTopScorers from 'src/components/football/footballLeague/TopScorers'
+import LeagueTopAssists from 'src/components/football/footballLeague/TopAssists'
+import LeagueTopCard from 'src/components/football/footballLeague/TopCard'
+import LeagueInjuries from 'src/components/football/footballLeague/Injuries'
 
 export default function DetailsPage() {
   const [tabValue, setTabValue] = useState<number>(0)
+  const [options, setOptions] = useState<string[]>([])
   const { query } = useRouter()
   const leagueId = query.leagueId
     ? parseInt(query.leagueId as string, 10)
@@ -23,6 +27,10 @@ export default function DetailsPage() {
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue)
+  }
+
+  const handleOptions = (options: string[]) => {
+    setOptions(options)
   }
 
   const { data: league, isLoading } = useQuery<LeagueResponse[]>({
@@ -53,11 +61,17 @@ export default function DetailsPage() {
         </CardContent>
       </Card>
     ),
+    TOP_ASSISTS: (
+      <Card>
+        <CardContent>
+          <LeagueTopAssists />
+        </CardContent>
+      </Card>
+    ),
     INJURIES: (
       <Card>
         <CardContent>
-          <Typography variant='h6'>Injuries</Typography>
-          <Typography>Exibe informações sobre lesões.</Typography>
+          <LeagueInjuries />
         </CardContent>
       </Card>
     ),
@@ -77,29 +91,19 @@ export default function DetailsPage() {
         </CardContent>
       </Card>
     ),
-    TOP_ASSISTS: (
-      <Card>
-        <CardContent>
-          <Typography variant='h6'>Top Assists</Typography>
-          <Typography>Exibe os principais assistentes.</Typography>
-        </CardContent>
-      </Card>
-    ),
+
     TOP_CARDS: (
       <Card>
         <CardContent>
-          <Typography variant='h6'>Top Cards</Typography>
-          <Typography>Exibe informações sobre cartões.</Typography>
+          <LeagueTopCard />
         </CardContent>
       </Card>
     ),
   }
 
-  const componentArray = Object.values(componentMap)
-
   const renderContent = () => {
     return (
-      componentArray[tabValue] || (
+      componentMap[options[tabValue]] || (
         <Card>
           <CardContent>
             <Typography variant='h6'>Conteúdo Padrão</Typography>
@@ -123,6 +127,7 @@ export default function DetailsPage() {
               <>
                 <FootballLeagueHorizontalMenu
                   handleChange={handleChange}
+                  handleOptions={handleOptions}
                   tabValue={tabValue}
                   league={league[0]}
                 />

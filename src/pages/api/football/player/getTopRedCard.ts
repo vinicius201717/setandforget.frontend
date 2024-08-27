@@ -2,7 +2,7 @@
 import { api } from 'src/lib/axios'
 import authConfig from 'src/configs/auth'
 
-export async function getTopScorers(
+export async function getTopRedCard(
   leagueId: number,
   season: number,
 ): Promise<any> {
@@ -11,7 +11,7 @@ export async function getTopScorers(
   )
   try {
     const response = await api.get(
-      `/football/players/top_scorers/${leagueId}/${season}/`,
+      `/football/players/top_red_card/${leagueId}/${season}/`,
       {
         headers: {
           Authorization: `Bearer ${storedToken}`,

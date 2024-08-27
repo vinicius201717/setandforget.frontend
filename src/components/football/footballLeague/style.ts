@@ -3,9 +3,13 @@ import {
   BoxProps,
   Chip,
   ChipProps,
+  Pagination,
   styled,
   TableCell,
   TableCellProps,
+  TableRow,
+  Typography,
+  TypographyProps,
 } from '@mui/material'
 import Image, { ImageProps } from 'next/image'
 
@@ -53,6 +57,12 @@ export const TeamCellClube = styled(TableCell)<TableCellProps>(({ theme }) => ({
   gap: theme.spacing(2),
 }))
 
+export const TypographyPrimary = styled(Typography)<TypographyProps>(
+  ({ theme }) => ({
+    color: theme.palette.primary.main,
+  }),
+)
+
 export const BoxForm = styled(Box)<BoxProps>(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
@@ -95,3 +105,26 @@ export const GetIcon = styled(Box)<InfoItemProps>(
     fontSize: '1.2rem',
   }),
 )
+
+//
+export const StyledPagination = styled(Pagination)(() => ({
+  '& .MuiPaginationItem-root': {
+    color: '#ffffff',
+  },
+  '& .Mui-selected': {
+    backgroundColor: '#4caf50',
+    color: '#ffffff',
+  },
+}))
+
+export const StyledTableCell = styled(TableCell)(({ theme }) => ({
+  fontWeight: theme.typography.fontWeightMedium,
+  fontSize: '0.875rem',
+  padding: theme.spacing(2),
+}))
+
+export const StyledTableRow = styled(TableRow)(({ theme }) => ({
+  '&:hover': {
+    backgroundColor: theme.palette.action.hover,
+  },
+}))

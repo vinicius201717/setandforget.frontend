@@ -18,6 +18,15 @@ interface CoverageDetails {
   statistics_players: boolean
 }
 
+interface LeagueInjurie {
+  id: number
+  name: string
+  logo: string
+  flag: string
+  country: string
+  season: number
+}
+
 export interface Coverage {
   [key: string]: boolean | any
   fixtures: CoverageDetails
@@ -37,6 +46,13 @@ interface Season {
   end: string
   current: boolean
   coverage: Coverage
+}
+
+interface Fixture {
+  id: number
+  date: string
+  timestamp: number
+  timezone: string
 }
 
 export interface LeagueResponse {
@@ -347,7 +363,22 @@ interface Player {
   photo: string
 }
 
+interface PlayerInsure {
+  id: number
+  name: string
+  photo: string
+  reason: string
+  type: string
+}
+
 export interface PlayerDataStatistics {
   player: Player
   statistics: Statistic[]
+}
+
+export interface Injuries {
+  fixture: Fixture
+  league: LeagueInjurie
+  player: PlayerInsure
+  team: Team
 }

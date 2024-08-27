@@ -11,12 +11,14 @@ interface CoverageProps {
   league: LeagueResponse
   tabValue: number
   handleChange: (event: React.SyntheticEvent, newValue: number) => void
+  handleOptions: (options: string[]) => void
 }
 
 const FootballLeagueHorizontalMenu: React.FC<CoverageProps> = ({
   league,
   tabValue,
   handleChange,
+  handleOptions,
 }) => {
   const [coverage, setCoverage] = useState<Coverage>()
   const router = useRouter()
@@ -40,6 +42,7 @@ const FootballLeagueHorizontalMenu: React.FC<CoverageProps> = ({
       const stringsArray: string[] = coverageEntries.map((entry) =>
         entry[0].toUpperCase(),
       )
+      handleOptions(stringsArray)
     }
   }, [coverageEntries])
 

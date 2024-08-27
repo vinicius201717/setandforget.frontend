@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import {
   Typography,
   CircularProgress,
@@ -17,7 +18,6 @@ import { useState, Fragment } from 'react'
 import { useRouter } from 'next/router'
 import { useQuery } from '@tanstack/react-query'
 import { PlayerDataStatistics } from 'src/types/apps/footballType'
-import { getTopScorers } from 'src/pages/api/football/player/getTopScorers'
 import Icon from 'src/@core/components/icon'
 import {
   ContainerProgress,
@@ -26,6 +26,7 @@ import {
   TeamLogoContainer,
   TypographyPrimary,
 } from './style'
+import { getTopYellowCard } from 'src/pages/api/football/player/getTopYellowCard'
 
 const createData = (playerData: PlayerDataStatistics) => ({
   name: playerData.player.name,
@@ -60,12 +61,14 @@ const Row = (props: { row: ReturnType<typeof createData> }) => {
         <TableCell align='right'>
           {primaryStat.games?.appearences || 0}
         </TableCell>
-        <TableCell align='right'>
-          <TypographyPrimary>{primaryStat.goals?.total || 0}</TypographyPrimary>
-        </TableCell>
         <TableCell align='right'>{primaryStat.goals?.assists || 0}</TableCell>
-        <TableCell align='right'>{primaryStat.cards?.yellow || 0}</TableCell>
+        <TableCell align='right'>{primaryStat.goals?.total || 0}</TableCell>
         <TableCell align='right'>{primaryStat.cards?.red || 0}</TableCell>
+        <TableCell align='right'>
+          <TypographyPrimary>
+            {primaryStat.cards?.yellow || 0}{' '}
+          </TypographyPrimary>
+        </TableCell>
         <TableCell align='right'>
           <IconButton
             aria-label='expand row'
@@ -153,7 +156,11 @@ const Row = (props: { row: ReturnType<typeof createData> }) => {
   )
 }
 
-export default function TopScorersTable() {
+interface CardProps {
+  handleCard: (card: 'RED' | 'YELLOW') => void
+}
+
+export default function TopAssistsTable({ handleCard }: CardProps) {
   const router = useRouter()
   const { leagueId, season } = router.query
 
@@ -161,9 +168,9 @@ export default function TopScorersTable() {
   const seasonNumber = season ? parseInt(season as string, 10) : undefined
 
   const { data, error, isLoading } = useQuery<PlayerDataStatistics[]>({
-    queryKey: ['topScorers', leagueIdNumber, seasonNumber],
+    queryKey: ['topYellowCard', leagueIdNumber, seasonNumber],
     queryFn: () =>
-      getTopScorers(leagueIdNumber as number, seasonNumber as number),
+      getTopYellowCard(leagueIdNumber as number, seasonNumber as number),
     enabled: !!leagueIdNumber && !!seasonNumber,
   })
 
@@ -173,6 +180,10 @@ export default function TopScorersTable() {
     }
 
     const rows = data?.map(createData)
+
+    const handleClick = () => {
+      handleCard('RED')
+    }
 
     return (
       <>
@@ -189,8 +200,16 @@ export default function TopScorersTable() {
                   <TableCell align='right'>Matches</TableCell>
                   <TableCell align='right'>Goals</TableCell>
                   <TableCell align='right'>Assists</TableCell>
-                  <TableCell align='right'>Yellow Cards</TableCell>
-                  <TableCell align='right'>Red Cards</TableCell>
+                  <TableCell
+                    align='right'
+                    onClick={handleClick}
+                    sx={{ cursor: 'pointer' }}
+                  >
+                    Red Cards
+                  </TableCell>
+                  <TableCell align='right'>
+                    <TypographyPrimary>Yellow Cards </TypographyPrimary>
+                  </TableCell>
                   <TableCell align='right'>Details</TableCell>
                 </TableRow>
               </TableHead>
