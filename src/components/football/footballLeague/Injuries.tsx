@@ -12,13 +12,18 @@ import {
   PaginationItem,
   Typography,
 } from '@mui/material'
-import { useState, Fragment, useEffect } from 'react'
+import { useState, Fragment } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Injuries } from 'src/types/apps/footballType'
 import { getInjuries } from 'src/pages/api/football/injuries/getInjuries'
 import Icon from 'src/@core/components/icon'
 import { useRouter } from 'next/router'
-import { PlayerPhoto, StyledPagination, StyledTableCell } from './style'
+import {
+  ContainerProgress,
+  PlayerPhoto,
+  StyledPagination,
+  StyledTableCell,
+} from './style'
 import { formatFixtureDate } from 'src/utils/format-date-local'
 import { formatDate } from 'src/utils/format-data'
 
@@ -104,9 +109,6 @@ export default function LeagueInjuriesTable() {
       getInjuries(leagueIdNumber as number, seasonNumber as number),
     enabled: !!leagueIdNumber && !!seasonNumber,
   })
-  useEffect(() => {
-    console.log(data)
-  }, [data])
 
   const [page, setPage] = useState(1)
   const rowsPerPage = 20
@@ -116,7 +118,11 @@ export default function LeagueInjuriesTable() {
   }
 
   if (isLoading) {
-    return <CircularProgress />
+    return (
+      <ContainerProgress>
+        <CircularProgress />
+      </ContainerProgress>
+    )
   }
 
   if (error) {
@@ -128,8 +134,6 @@ export default function LeagueInjuriesTable() {
   }
 
   const rows = data?.map(createData) || []
-
-  console.log(rows[0])
 
   const paginatedRows = rows.slice((page - 1) * rowsPerPage, page * rowsPerPage)
 

@@ -8,6 +8,10 @@ import {
 import Image from 'next/image'
 import Link, { LinkProps } from 'next/link'
 
+interface FixtureContainerProps extends BoxProps {
+  prediction: boolean
+}
+
 export const LeagueFixtureContainer = styled(Box)<BoxProps>(({ theme }) => ({
   width: '100%',
   margin: theme.spacing(5),
@@ -24,14 +28,16 @@ export const LeagueFixtureContent = styled(Box)<BoxProps>(({ theme }) => ({
   borderRadius: theme.shape.borderRadius,
 }))
 
-export const FixtureContainer = styled(Box)<BoxProps>(({ theme }) => ({
-  padding: theme.spacing(2),
-  marginBottom: theme.spacing(3),
-  borderRadius: theme.shape.borderRadius,
-  backgroundColor: theme.palette.background.paper,
-  paddingTop: theme.spacing(9),
-  position: 'relative',
-}))
+export const FixtureContainer = styled(Box)<FixtureContainerProps>(
+  ({ theme, prediction }) => ({
+    padding: !prediction ? theme.spacing(2) : theme.spacing(1),
+    marginBottom: theme.spacing(3),
+    borderRadius: theme.shape.borderRadius,
+    backgroundColor: theme.palette.background.paper,
+    paddingTop: theme.spacing(9),
+    position: 'relative',
+  }),
+)
 
 export const FixtureTeamsContainer = styled(Box)<BoxProps>(({ theme }) => ({
   flex: '0 0 350px',

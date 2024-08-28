@@ -3,7 +3,7 @@ import { LeagueFixtureContainer, LeagueFixtureContent } from './style'
 import { Typography } from '@mui/material'
 
 interface LeagueFixtureProps {
-  leagueName: string
+  leagueName?: string
   children?: React.ReactNode
 }
 
@@ -13,7 +13,7 @@ const LeagueFixture: React.FC<LeagueFixtureProps> = ({
 }) => {
   return (
     <LeagueFixtureContainer>
-      <Typography variant='h6'>{leagueName}</Typography>
+      {leagueName && <Typography variant='h6'>{leagueName}</Typography>}
       <LeagueFixtureContent>{children}</LeagueFixtureContent>
     </LeagueFixtureContainer>
   )

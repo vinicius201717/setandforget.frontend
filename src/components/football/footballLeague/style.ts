@@ -3,11 +3,14 @@ import {
   BoxProps,
   Chip,
   ChipProps,
+  Modal,
+  ModalProps,
   Pagination,
   styled,
   TableCell,
   TableCellProps,
   TableRow,
+  TableRowProps,
   Typography,
   TypographyProps,
 } from '@mui/material'
@@ -41,6 +44,10 @@ export const TeamLogo = styled(Image)<ImageProps>(() => ({
   height: '30px',
   objectFit: 'contain',
   marginRight: '6px',
+}))
+
+export const ContainerFixture = styled(Box)<BoxProps>(() => ({
+  width: '100%',
 }))
 
 export const PlayerPhoto = styled(Image)<ImageProps>(() => ({
@@ -117,14 +124,48 @@ export const StyledPagination = styled(Pagination)(() => ({
   },
 }))
 
-export const StyledTableCell = styled(TableCell)(({ theme }) => ({
-  fontWeight: theme.typography.fontWeightMedium,
-  fontSize: '0.875rem',
-  padding: theme.spacing(2),
-}))
+export const StyledTableCell = styled(TableCell)<TableCellProps>(
+  ({ theme }) => ({
+    fontWeight: theme.typography.fontWeightMedium,
+    fontSize: '0.875rem',
+    padding: theme.spacing(2),
+  }),
+)
 
-export const StyledTableRow = styled(TableRow)(({ theme }) => ({
+export const StyledTableRow = styled(TableRow)<TableRowProps>(({ theme }) => ({
   '&:hover': {
     backgroundColor: theme.palette.action.hover,
+  },
+}))
+
+export const ModalProdiction = styled(Modal)<ModalProps>(({ theme }) => ({
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: '90%',
+  height: '90vh',
+  maxWidth: '1000px',
+  backgroundColor: theme.palette.background.paper,
+  boxShadow: theme.shadows[24],
+  padding: theme.spacing(4),
+  borderRadius: theme.shape.borderRadius,
+  outline: 'none',
+  overflowY: 'auto',
+  scrollbarWidth: 'thin',
+  scrollbarColor: `${theme.palette.primary.main} ${theme.palette.background.default}`,
+  '&::-webkit-scrollbar': {
+    width: '7px',
+  },
+  '&::-webkit-scrollbar-thumb': {
+    backgroundColor: theme.palette.primary.main,
+    borderRadius: theme.shape.borderRadius,
+    '&:hover': {
+      backgroundColor: theme.palette.primary.dark,
+    },
+  },
+  '&::-webkit-scrollbar-track': {
+    backgroundColor: theme.palette.background.default,
+    borderRadius: theme.shape.borderRadius,
   },
 }))

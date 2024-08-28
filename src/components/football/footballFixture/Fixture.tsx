@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React from 'react'
 import {
   DateContainerDate,
@@ -17,9 +18,15 @@ import { formatDate } from 'src/utils/format-data'
 
 interface FixtureProps {
   data: FixtureTypeResponse
+  prediction?: boolean
+  handlePrediction: (id: number) => void
 }
 
-const Fixture: React.FC<FixtureProps> = ({ data }) => {
+const Fixture: React.FC<FixtureProps> = ({
+  data,
+  prediction = false,
+  handlePrediction,
+}) => {
   const isActive =
     data.fixture.status.short === 'NS' ||
     data.fixture.status.short === '1H' ||
@@ -30,12 +37,12 @@ const Fixture: React.FC<FixtureProps> = ({ data }) => {
   }
 
   return (
-    <FixtureContainer>
+    <FixtureContainer prediction={prediction}>
       <DateContainerDate>
         {formatDate(formatFixtureDate(data.fixture.date).date)} -{' '}
         {formatHour(formatFixtureDate(data.fixture.date).time)}
       </DateContainerDate>
-      <ViewContainer>
+      <ViewContainer onClick={() => handlePrediction(data.fixture.id)}>
         <VisibilityIcon />
       </ViewContainer>
       <FixtureTeamsContainer>

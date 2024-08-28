@@ -7,7 +7,13 @@ import LeagueLayout from 'src/layouts/components/leagueLayout'
 import { getLeagueDetails } from 'src/pages/api/football/league/getLeagueDetails'
 import { LeagueResponse } from 'src/types/apps/footballType'
 import { ContainerProgress } from '../style'
-import { CircularProgress, Card, CardContent, Typography } from '@mui/material'
+import {
+  CircularProgress,
+  Card,
+  CardContent,
+  Typography,
+  useTheme,
+} from '@mui/material'
 import FootballLayout from 'src/layouts/components/footballLayout'
 import LeagueStandings from 'src/components/football/footballLeague/Standings'
 import LeaguePlayers from 'src/components/football/footballLeague/Players'
@@ -15,6 +21,7 @@ import LeagueTopScorers from 'src/components/football/footballLeague/TopScorers'
 import LeagueTopAssists from 'src/components/football/footballLeague/TopAssists'
 import LeagueTopCard from 'src/components/football/footballLeague/TopCard'
 import LeagueInjuries from 'src/components/football/footballLeague/Injuries'
+import LeagueFixtureComponent from 'src/components/football/footballLeague/Predictions'
 
 export default function DetailsPage() {
   const [tabValue, setTabValue] = useState<number>(0)
@@ -39,62 +46,70 @@ export default function DetailsPage() {
     enabled: !!leagueId && !!season,
   })
 
+  const theme = useTheme()
+
   const componentMap: { [key: string]: JSX.Element } = {
     STANDINGS: (
       <Card>
-        <CardContent>
+        <CardContent sx={{ padding: 0 }}>
           <LeagueStandings />
         </CardContent>
       </Card>
     ),
     PLAYERS: (
       <Card>
-        <CardContent>
+        <CardContent sx={{ padding: 0 }}>
           <LeaguePlayers />
         </CardContent>
       </Card>
     ),
     TOP_SCORERS: (
       <Card>
-        <CardContent>
+        <CardContent sx={{ padding: 0 }}>
           <LeagueTopScorers />
         </CardContent>
       </Card>
     ),
     TOP_ASSISTS: (
       <Card>
-        <CardContent>
+        <CardContent sx={{ padding: 0 }}>
           <LeagueTopAssists />
         </CardContent>
       </Card>
     ),
     INJURIES: (
       <Card>
-        <CardContent>
+        <CardContent sx={{ padding: 0 }}>
           <LeagueInjuries />
         </CardContent>
       </Card>
     ),
     ODDS: (
       <Card>
-        <CardContent>
+        <CardContent sx={{ padding: 0 }}>
           <Typography variant='h6'>Odds</Typography>
           <Typography>Exibe informações sobre probabilidades.</Typography>
         </CardContent>
       </Card>
     ),
     PREDICTIONS: (
-      <Card>
-        <CardContent>
-          <Typography variant='h6'>Predictions</Typography>
-          <Typography>Exibe previsões para os jogos.</Typography>
+      <Card
+        sx={{
+          backgroundColor: theme.palette.background.default,
+          marginTop: '10px',
+        }}
+      >
+        <CardContent
+          sx={{ padding: 0, backgroundColor: theme.palette.background.default }}
+        >
+          <LeagueFixtureComponent />
         </CardContent>
       </Card>
     ),
 
     TOP_CARDS: (
       <Card>
-        <CardContent>
+        <CardContent sx={{ padding: 0 }}>
           <LeagueTopCard />
         </CardContent>
       </Card>

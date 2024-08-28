@@ -7,7 +7,7 @@ export async function getFixture(): Promise<any> {
   )
 
   try {
-    const response = await api.get(`/football/fixture`, {
+    const response = await api.get(`/football/fixture/leagues`, {
       headers: {
         Authorization: `Bearer ${storedToken}`,
       },

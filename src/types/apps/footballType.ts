@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+
 interface Country {
   name: string
   code: string | null
@@ -381,4 +382,216 @@ export interface Injuries {
   league: LeagueInjurie
   player: PlayerInsure
   team: Team
+} // Importe as interfaces que você já tem definidas
+
+interface PredictionTeamStats {
+  att: string // Ataque
+  def: string // Defesa
+  form: string // Forma
+  goals: {
+    against: {
+      average: string
+      total: number
+    }
+    for: {
+      average: string
+      total: number
+    }
+  }
+  played: number
+}
+
+interface PredictionComparison {
+  away: string
+  home: string
+}
+
+interface Prediction {
+  advice: string
+  goals: {
+    away: string
+    home: string
+  }
+  percent: {
+    away: string
+    draw: string
+    home: string
+  }
+  under_over: string | null
+  win_or_draw: boolean
+  winner: {
+    comment: string
+    id: number
+    name: string
+  } | null
+}
+
+interface TeamPrediction {
+  id: number
+  name: string
+  logo: string
+  last_5: PredictionTeamStats
+  league: {
+    biggest: {
+      goals: {
+        against: {
+          away: number
+          home: number
+        }
+        for: {
+          away: number
+          home: number
+        }
+      }
+      streak: {
+        draws: number
+        loses: number
+        wins: number
+      }
+    }
+    clean_sheet: {
+      home: number
+      away: number
+      total: number
+    }
+    failed_to_score: {
+      home: number
+      away: number
+      total: number
+    }
+    fixtures: {
+      played: {
+        home: number
+        away: number
+        total: number
+      }
+      wins: {
+        home: number
+        away: number
+        total: number
+      }
+      draws: {
+        home: number
+        away: number
+        total: number
+      }
+      loses: {
+        home: number
+        away: number
+        total: number
+      }
+    }
+    form: string
+    goals: {
+      for: {
+        average: {
+          away: string
+          home: string
+          total: string
+        }
+      }
+      against: {
+        average: {
+          away: string
+          home: string
+          total: string
+        }
+      }
+    }
+    lineups: {
+      formation: string
+      played: number
+    }[]
+    penalty: {
+      scored: {
+        percentage: string
+        total: number
+      }
+      missed: {
+        percentage: string
+        total: number
+      }
+    }
+  }
+}
+
+interface Fixture {
+  id: number
+  date: string
+  timestamp: number
+  referee: string
+  timezone: string
+  venue: {
+    id: number
+    name: string
+    city: string
+  }
+  status: {
+    short: string
+    long: string
+    elapsed: number | null
+  }
+}
+
+interface H2H {
+  fixture: Fixture
+  goals: {
+    home: number
+    away: number
+  }
+  league: {
+    id: number
+    name: string
+    country: string
+    logo: string
+    flag: string
+  }
+  score: {
+    halftime: {
+      home: number | null
+      away: number | null
+    }
+    fulltime: {
+      home: number | null
+      away: number | null
+    }
+    extratime: {
+      home: number | null
+      away: number | null
+    }
+    penalty: {
+      home: number | null
+      away: number | null
+    }
+  }
+  teams: {
+    home: TeamPrediction
+    away: TeamPrediction
+  }
+}
+
+export interface PredictionsResponse {
+  comparison: {
+    att: PredictionComparison
+    def: PredictionComparison
+    form: PredictionComparison
+    goals: PredictionComparison
+    h2h: PredictionComparison
+    poisson_distribution: PredictionComparison
+    total: PredictionComparison
+  }
+  h2h: H2H[]
+  league: {
+    country: string
+    flag: string
+    id: number
+    logo: string
+    name: string
+    season: number
+  }
+  predictions: Prediction
+  teams: {
+    home: Team
+    away: Team
+  }
 }

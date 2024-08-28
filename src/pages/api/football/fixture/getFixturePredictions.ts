@@ -1,16 +1,14 @@
 import { api } from 'src/lib/axios'
 import authConfig from 'src/configs/auth'
-import { UserFavoriteLeague } from 'src/types/apps/footballType'
 
-export async function DeleteUserFavoriteLeague(
-  leagueId: string,
-): Promise<UserFavoriteLeague | null> {
+export async function getFixturePredictions(fixtureId: number): Promise<any> {
   const storedToken = window.localStorage.getItem(
     authConfig.storageTokenKeyName,
   )
+
   try {
-    const response = await api.delete(
-      `/football/user/favorite/league/${leagueId}`,
+    const response = await api.get(
+      `/football/fixture/predictions/${fixtureId}`,
       {
         headers: {
           Authorization: `Bearer ${storedToken}`,
