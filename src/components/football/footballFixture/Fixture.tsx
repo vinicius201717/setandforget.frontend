@@ -48,22 +48,22 @@ const Fixture: React.FC<FixtureProps> = ({
       <FixtureTeamsContainer>
         <LogoNameContainer>
           <TeamImage
-            src={data.teams.away.logo}
-            height={30}
-            width={30}
-            alt={data.teams.away.name}
-          />
-          <Typography>{data.teams.away.name}</Typography>
-        </LogoNameContainer>
-        <Typography>X</Typography>
-        <LogoNameContainer>
-          <TeamImage
             src={data.teams.home.logo}
             height={30}
             width={30}
             alt={data.teams.home.name}
           />
           <Typography>{data.teams.home.name}</Typography>
+        </LogoNameContainer>
+        <Typography>X</Typography>
+        <LogoNameContainer>
+          <TeamImage
+            src={data.teams.away.logo}
+            height={30}
+            width={30}
+            alt={data.teams.away.name}
+          />
+          <Typography>{data.teams.away.name}</Typography>
         </LogoNameContainer>
         <Divider sx={{ marginTop: '10px' }} />
       </FixtureTeamsContainer>

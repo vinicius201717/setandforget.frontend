@@ -1,6 +1,6 @@
-import { LeagueWithPagination } from 'src/types/apps/football'
 import { api } from 'src/lib/axios'
 import authConfig from 'src/configs/auth'
+import { LeagueWithPagination } from 'src/types/apps/footballType'
 
 export async function getLeagues(
   page = 1,

@@ -4,7 +4,6 @@ import {
   Card,
   CardContent,
   Typography,
-  Avatar,
   Table,
   TableBody,
   TableCell,
@@ -13,6 +12,13 @@ import {
   Divider,
 } from '@mui/material'
 import { PredictionsResponse } from 'src/types/apps/footballType'
+import {
+  BoxPercent,
+  BoxPercentContainer,
+  CardContentContainer,
+  TeamLogo,
+  TeamsContent,
+} from './style'
 
 interface PredictionsProps {
   data: PredictionsResponse
@@ -23,76 +29,74 @@ const PredictionsComponent: React.FC<PredictionsProps> = ({ data }) => {
 
   return (
     <Grid container spacing={4}>
-      {/* Liga e Equipes */}
-      <Grid item xs={12} md={4}>
-        <Card>
-          <CardContent>
-            <Grid container spacing={2} alignItems='center'>
-              <Grid item>
-                <Avatar src={league.logo} alt={league.name} />
-              </Grid>
-              <Grid item>
-                <Typography variant='h6'>{league.name}</Typography>
-                <Typography variant='body2' color='textSecondary'>
-                  {league.country}
-                </Typography>
-              </Grid>
-            </Grid>
-          </CardContent>
-        </Card>
-      </Grid>
-
-      {/* Equipes */}
-      <Grid item xs={12} md={8}>
-        <Card>
-          <CardContent>
-            <Grid container spacing={2}>
-              <Grid item xs={6}>
-                <Grid container alignItems='center' spacing={2}>
-                  <Grid item>
-                    <Avatar src={teams.home.logo} alt={teams.home.name} />
-                  </Grid>
-                  <Grid item>
-                    <Typography variant='h6'>{teams.home.name}</Typography>
-                  </Grid>
-                </Grid>
-              </Grid>
-              <Grid item xs={6}>
-                <Grid container alignItems='center' spacing={2}>
-                  <Grid item>
-                    <Avatar src={teams.away.logo} alt={teams.away.name} />
-                  </Grid>
-                  <Grid item>
-                    <Typography variant='h6'>{teams.away.name}</Typography>
-                  </Grid>
-                </Grid>
-              </Grid>
-            </Grid>
-          </CardContent>
-        </Card>
-      </Grid>
-
-      {/* Comparação */}
-      <Grid item xs={12}>
-        <Card>
-          <CardContent>
-            <Typography variant='h6' gutterBottom>
-              Comparação das Equipes
+      <Grid item xs={12} md={12}>
+        <CardContentContainer>
+          <Grid item>
+            <TeamLogo
+              src={league.logo}
+              alt={league.name}
+              width={80}
+              height={80}
+            />
+          </Grid>
+          <Grid item>
+            <Typography variant='body1'>{league.name}</Typography>
+            <Typography variant='body2' color='textSecondary'>
+              {league.country}
             </Typography>
+          </Grid>
+        </CardContentContainer>
+      </Grid>
+
+      <Grid item xs={12} md={12}>
+        <Card>
+          <CardContent>
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell>Estatística</TableCell>
-                  <TableCell>{teams.home.name}</TableCell>
-                  <TableCell>{teams.away.name}</TableCell>
+                  <TableCell align='center'>
+                    <TeamsContent>
+                      <Grid item>
+                        <TeamLogo
+                          src={teams.home.logo}
+                          alt={teams.home.name}
+                          width={80}
+                          height={80}
+                        />
+                      </Grid>
+                      <Grid item>
+                        <Typography variant='body2'>
+                          {teams.home.name}
+                        </Typography>
+                      </Grid>
+                    </TeamsContent>
+                  </TableCell>
+                  <TableCell align='center'>VS</TableCell>
+                  <TableCell align='center'>
+                    <TeamsContent>
+                      <Grid item>
+                        <TeamLogo
+                          src={teams.away.logo}
+                          alt={teams.away.name}
+                          width={80}
+                          height={80}
+                        />
+                      </Grid>
+                      <Grid item>
+                        <Typography variant='body2'>
+                          {teams.away.name}
+                        </Typography>
+                      </Grid>
+                    </TeamsContent>
+                  </TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {Object.entries(comparison).map(([key, value]) => (
                   <TableRow key={key}>
-                    <TableCell>{key.toUpperCase()}</TableCell>
-                    <TableCell>{value.home}</TableCell>
-                    <TableCell>{value.away}</TableCell>
+                    <TableCell align='center'>{value.home}</TableCell>
+                    <TableCell align='center'>{key.toUpperCase()}</TableCell>
+                    <TableCell align='center'>{value.away}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -101,39 +105,79 @@ const PredictionsComponent: React.FC<PredictionsProps> = ({ data }) => {
         </Card>
       </Grid>
 
-      {/* Previsão */}
       <Grid item xs={12}>
         <Card>
           <CardContent>
             <Typography variant='h6' gutterBottom>
-              Previsão da Partida
+              Match Prediction
             </Typography>
             <Typography variant='body1'>{predictions.advice}</Typography>
             <Divider style={{ margin: '20px 0' }} />
-            <Grid container spacing={2}>
-              <Grid item xs={4}>
-                <Typography variant='body2'>Vitória Casa:</Typography>
-                <Typography variant='h6'>{predictions.percent.home}</Typography>
-              </Grid>
-              <Grid item xs={4}>
-                <Typography variant='body2'>Empate:</Typography>
-                <Typography variant='h6'>{predictions.percent.draw}</Typography>
-              </Grid>
-              <Grid item xs={4}>
-                <Typography variant='body2'>Vitória Fora:</Typography>
-                <Typography variant='h6'>{predictions.percent.away}</Typography>
-              </Grid>
-            </Grid>
+            <BoxPercentContainer>
+              <BoxPercent
+                percent={predictions.percent.home}
+                color={'#4caf50'}
+                title={`Home win: ${predictions.percent.home}`}
+              >
+                <Typography
+                  variant='body2'
+                  color={'black'}
+                  fontWeight={'600'}
+                  sx={{
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  Home Win: {predictions.percent.home}
+                </Typography>
+              </BoxPercent>
+              <BoxPercent
+                percent={predictions.percent.draw}
+                color={'#ffeb3b'}
+                title={`Draw: ${predictions.percent.draw}`}
+              >
+                <Typography
+                  variant='body2'
+                  color={'black'}
+                  fontWeight={'600'}
+                  sx={{
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  Draw: {predictions.percent.draw}
+                </Typography>
+              </BoxPercent>
+              <BoxPercent
+                percent={predictions.percent.away}
+                color={'#1a90ff'}
+                title={`Away win: ${predictions.percent.away}`}
+              >
+                <Typography
+                  variant='body2'
+                  color={'black'}
+                  fontWeight={'600'}
+                  sx={{
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  Away Win: {predictions.percent.away}
+                </Typography>
+              </BoxPercent>
+            </BoxPercentContainer>
           </CardContent>
         </Card>
       </Grid>
 
-      {/* H2H - Confrontos Diretos */}
       <Grid item xs={12}>
         <Card>
           <CardContent>
             <Typography variant='h6' gutterBottom>
-              Confrontos Diretos (H2H)
+              Head-to-Head (H2H)
             </Typography>
             {h2h.map((match, index) => (
               <div key={index}>

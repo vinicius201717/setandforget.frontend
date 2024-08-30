@@ -71,7 +71,7 @@ export default function Football() {
           }
         })
       } else {
-        postUserFavoriteLeague(leagueId).then((response) => {
+        postUserFavoriteLeague(data?.leagues).then((response) => {
           if (response) {
             setFavoriteLeague([...prevFavorites, response])
           }

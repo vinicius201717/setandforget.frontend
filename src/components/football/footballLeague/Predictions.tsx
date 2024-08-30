@@ -1,7 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { CircularProgress, Typography, Box, IconButton } from '@mui/material'
+import { CircularProgress, Typography, IconButton } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
-import { ContainerFixture, ContainerProgress, ModalProdiction } from './style'
+import {
+  ContainerFixture,
+  ContainerProgress,
+  ModalContent,
+  ModalProdiction,
+} from './style'
 import { useQuery } from '@tanstack/react-query'
 import {
   FixtureTypeResponse,
@@ -114,13 +119,15 @@ export default function LeagueFixtureComponent() {
         aria-labelledby='modal-title'
         aria-describedby='modal-description'
       >
-        <Box>
+        <ModalContent>
           <IconButton
             onClick={() => setIsModalOpen(false)}
-            sx={{ position: 'absolute', top: 8, right: 8 }}
+            sx={{ position: 'absolute', top: 16, right: 16, zIndex: 1300 }}
           >
             <CloseIcon />
           </IconButton>
+
+          {/* Conteúdo do modal */}
           {fpIsLoading ? (
             <ContainerProgress>
               <CircularProgress />
@@ -134,7 +141,7 @@ export default function LeagueFixtureComponent() {
           ) : (
             <Typography variant='h6'>No data available</Typography>
           )}
-        </Box>
+        </ModalContent>
       </ModalProdiction>
     </ContainerFixture>
   )

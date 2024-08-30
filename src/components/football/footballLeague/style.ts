@@ -137,15 +137,17 @@ export const StyledTableRow = styled(TableRow)<TableRowProps>(({ theme }) => ({
     backgroundColor: theme.palette.action.hover,
   },
 }))
+export const ModalProdiction = styled(Modal)<ModalProps>(() => ({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+}))
 
-export const ModalProdiction = styled(Modal)<ModalProps>(({ theme }) => ({
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
+export const ModalContent = styled(Box)(({ theme }) => ({
+  position: 'relative',
   width: '90%',
-  height: '90vh',
   maxWidth: '1000px',
+  height: '90vh',
   backgroundColor: theme.palette.background.paper,
   boxShadow: theme.shadows[24],
   padding: theme.spacing(4),

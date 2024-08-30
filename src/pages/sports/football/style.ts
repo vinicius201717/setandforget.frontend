@@ -8,6 +8,8 @@ import {
   styled,
   Typography,
   TypographyProps,
+  Modal,
+  ModalProps,
 } from '@mui/material'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -70,4 +72,39 @@ export const InfoLabel = styled(Typography)<TypographyProps>(({ theme }) => ({
 
 export const ContainerFixture = styled(Box)<BoxProps>(() => ({
   width: '100%',
+}))
+
+export const ModalProdiction = styled(Modal)<ModalProps>(() => ({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+}))
+
+export const ModalContent = styled(Box)(({ theme }) => ({
+  position: 'relative',
+  width: '90%',
+  maxWidth: '1000px',
+  height: '90vh',
+  backgroundColor: theme.palette.background.paper,
+  boxShadow: theme.shadows[24],
+  padding: theme.spacing(4),
+  borderRadius: theme.shape.borderRadius,
+  outline: 'none',
+  overflowY: 'auto',
+  scrollbarWidth: 'thin',
+  scrollbarColor: `${theme.palette.primary.main} ${theme.palette.background.default}`,
+  '&::-webkit-scrollbar': {
+    width: '7px',
+  },
+  '&::-webkit-scrollbar-thumb': {
+    backgroundColor: theme.palette.primary.main,
+    borderRadius: theme.shape.borderRadius,
+    '&:hover': {
+      backgroundColor: theme.palette.primary.dark,
+    },
+  },
+  '&::-webkit-scrollbar-track': {
+    backgroundColor: theme.palette.background.default,
+    borderRadius: theme.shape.borderRadius,
+  },
 }))
