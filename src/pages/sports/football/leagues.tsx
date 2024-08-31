@@ -71,11 +71,14 @@ export default function Football() {
           }
         })
       } else {
-        postUserFavoriteLeague(data?.leagues).then((response) => {
-          if (response) {
-            setFavoriteLeague([...prevFavorites, response])
-          }
-        })
+        const favoriteLeague = leagues.find((fav) => fav.league.id === leagueId)
+        if (favoriteLeague && favoriteLeague?.league) {
+          postUserFavoriteLeague(favoriteLeague?.league).then((response) => {
+            if (response) {
+              setFavoriteLeague([...prevFavorites, response])
+            }
+          })
+        }
       }
 
       return prevFavorites
@@ -156,6 +159,44 @@ export default function Football() {
           }
         />
         <Divider sx={{ margin: '10px' }} />
+        <Grid container spacing={3}>
+          {isLoading && favoriteLeague.length > 0 ? (
+            <ContainerProgress>
+              <CircularProgress />
+            </ContainerProgress>
+          ) : (
+            favoriteLeague &&
+            favoriteLeague.map((league: UserFavoriteLeague) => (
+              <Grid item xs={4} key={league.id}>
+                <StyledCard>
+                  <LeagueImage
+                    src={league.logo}
+                    alt={league.name}
+                    width={30}
+                    height={30}
+                  />
+                  <CardContent>
+                    <LinkLeague
+                      href={`/sports/football/league/${league.leagueId}`}
+                    >
+                      <Typography component='span'>{league.name}</Typography>
+                    </LinkLeague>
+                    <Typography color='textSecondary'>
+                      {league.type} ({league.type})
+                    </Typography>
+                  </CardContent>
+                  <IconButtonStar
+                    onClick={() => handleToggleFavorite(league.leagueId)}
+                  >
+                    <StarIcon color='primary' />
+                  </IconButtonStar>
+                </StyledCard>
+              </Grid>
+            ))
+          )}
+        </Grid>
+        {favoriteLeague.length > 0 ? <Divider sx={{ margin: '10px' }} /> : null}
+
         <Grid container spacing={3}>
           {isLoading ? (
             <ContainerProgress>

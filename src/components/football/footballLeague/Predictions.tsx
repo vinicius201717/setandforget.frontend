@@ -4,6 +4,7 @@ import CloseIcon from '@mui/icons-material/Close'
 import {
   ContainerFixture,
   ContainerProgress,
+  ContentUnavailable,
   ModalContent,
   ModalProdiction,
 } from './style'
@@ -21,6 +22,8 @@ import { useRouter } from 'next/router'
 import LeagueFixture from '../footballFixture/LeagueFixture'
 import { getFixturePredictions } from 'src/pages/api/football/fixture/getFixturePredictions'
 import PredictionsComponent from '../footballPrediction'
+
+import noContent from 'public/images/pages/tree.png'
 
 export default function LeagueFixtureComponent() {
   const [isTimeout, setIsTimeout] = useState<boolean>(false)
@@ -101,7 +104,7 @@ export default function LeagueFixtureComponent() {
           <Typography variant='h6'>No signal</Typography>
           <Image src={timeoutImage} alt='Timeout' width={400} />
         </ContainerProgress>
-      ) : (
+      ) : data.length > 0 ? (
         <LeagueFixture>
           {sortFixturesByDate(data).map((fixture, index) => (
             <Fixture
@@ -112,6 +115,17 @@ export default function LeagueFixtureComponent() {
             />
           ))}
         </LeagueFixture>
+      ) : (
+        <ContentUnavailable>
+          <Image
+            src={noContent}
+            alt='The content is unavailable.'
+            title='The content is unavailable.'
+            width={150}
+            height={150}
+          />
+          <Typography variant='h6'>The content is unavailable.</Typography>
+        </ContentUnavailable>
       )}
       <ModalProdiction
         open={isModalOpen}

@@ -119,7 +119,7 @@ export default function Football() {
             fixturesGroups.map((fixtures, groupIndex) => (
               <LeagueFixture
                 key={groupIndex}
-                leagueName={fixtures[0].league.name || ''}
+                leagueName={fixtures[0]?.league.name || ''}
               >
                 {sortFixturesByDate(fixtures).map(
                   (fixture: FixtureTypeResponse, fixtureIndex: number) => (

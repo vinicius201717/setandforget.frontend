@@ -1,29 +1,32 @@
+import React, { useState, Fragment } from 'react'
 import {
+  CircularProgress,
+  Typography,
+  Paper,
+  Box,
   Table,
   TableHead,
   TableRow,
   TableCell,
   TableBody,
-  Box,
-  Paper,
   IconButton,
   Collapse,
-  CircularProgress,
   PaginationItem,
-  Typography,
 } from '@mui/material'
-import { useState, Fragment } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Injuries } from 'src/types/apps/footballType'
 import { getInjuries } from 'src/pages/api/football/injuries/getInjuries'
-import Icon from 'src/@core/components/icon'
 import { useRouter } from 'next/router'
+import Icon from 'src/@core/components/icon'
 import {
   ContainerProgress,
   PlayerPhoto,
   StyledPagination,
   StyledTableCell,
+  ContentUnavailable,
 } from './style'
+import Image from 'next/image'
+import noContent from 'public/images/pages/tree.png'
 import { formatFixtureDate } from 'src/utils/format-date-local'
 import { formatDate } from 'src/utils/format-data'
 
@@ -136,6 +139,21 @@ export default function LeagueInjuriesTable() {
   const rows = data?.map(createData) || []
 
   const paginatedRows = rows.slice((page - 1) * rowsPerPage, page * rowsPerPage)
+
+  if (rows.length === 0) {
+    return (
+      <ContentUnavailable>
+        <Image
+          src={noContent}
+          alt='The content is unavailable.'
+          title='The content is unavailable.'
+          width={150}
+          height={150}
+        />
+        <Typography variant='h6'>The content is unavailable.</Typography>
+      </ContentUnavailable>
+    )
+  }
 
   return (
     <Paper>

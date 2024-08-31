@@ -11,7 +11,7 @@ import {
   Modal,
   ModalProps,
 } from '@mui/material'
-import Image from 'next/image'
+import Image, { ImageProps } from 'next/image'
 import Link from 'next/link'
 
 export const StyledCard = styled(Card)<CardProps>(({ theme }) => ({
@@ -35,7 +35,7 @@ export const Header = styled(Typography)<TypographyProps>(({ theme }) => ({
   fontSize: '2rem',
 }))
 
-export const LeagueImage = styled(Image)(({ theme }) => ({
+export const LeagueImage = styled(Image)<ImageProps>(({ theme }) => ({
   marginLeft: '15px',
   borderRadius: theme.shape.borderRadius,
   maxWidth: '100%',

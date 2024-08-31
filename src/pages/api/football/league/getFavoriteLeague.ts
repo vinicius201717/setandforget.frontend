@@ -7,7 +7,7 @@ export async function getFavoriteLeague(): Promise<any> {
     authConfig.storageTokenKeyName,
   )
   try {
-    const response = await api.get(`/football/league/favorite`, {
+    const response = await api.get(`/football/user/favorite/league`, {
       headers: {
         Authorization: `Bearer ${storedToken}`,
       },

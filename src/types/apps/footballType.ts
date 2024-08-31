@@ -12,6 +12,16 @@ export interface League {
   logo: string
   type: string
 }
+
+export interface LeagueResponseFavorite {
+  id: number
+  leagueId: number
+  userId: string
+  name: string
+  logo: string
+  type: string
+}
+
 interface CoverageDetails {
   events: boolean
   lineups: boolean
@@ -66,7 +76,10 @@ export interface UserFavoriteLeague {
   id: string
   userId: string
   leagueId: number
-  addedAt: Date
+  logo: string
+  name: string
+  type: string
+  createdAt: string
 }
 
 export interface LeagueWithPagination {

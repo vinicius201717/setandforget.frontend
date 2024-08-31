@@ -6,7 +6,7 @@ import { LeagueProvider } from 'src/context/LeagueContext'
 import LeagueLayout from 'src/layouts/components/leagueLayout'
 import { getLeagueDetails } from 'src/pages/api/football/league/getLeagueDetails'
 import { LeagueResponse } from 'src/types/apps/footballType'
-import { ContainerProgress } from '../style'
+import { ContainerProgress, ContentUnavailable } from '../style'
 import {
   CircularProgress,
   Card,
@@ -22,6 +22,9 @@ import LeagueTopAssists from 'src/components/football/footballLeague/TopAssists'
 import LeagueTopCard from 'src/components/football/footballLeague/TopCard'
 import LeagueInjuries from 'src/components/football/footballLeague/Injuries'
 import LeagueFixtureComponent from 'src/components/football/footballLeague/Predictions'
+import Image from 'next/image'
+
+import noContent from 'public/images/pages/tree.png'
 
 export default function DetailsPage() {
   const [tabValue, setTabValue] = useState<number>(0)
@@ -120,10 +123,15 @@ export default function DetailsPage() {
     return (
       componentMap[options[tabValue]] || (
         <Card>
-          <CardContent>
-            <Typography variant='h6'>Conteúdo Padrão</Typography>
-            <Typography>Selecione uma aba para ver o conteúdo.</Typography>
-          </CardContent>
+          <ContentUnavailable>
+            <Image
+              src={noContent}
+              alt='The content is unavailable.'
+              width={150}
+              height={150}
+            />
+            <Typography variant='h6'>The content is unavailable.</Typography>
+          </ContentUnavailable>
         </Card>
       )
     )

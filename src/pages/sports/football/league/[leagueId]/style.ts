@@ -1,6 +1,8 @@
 import {
   Box,
   Card,
+  CardContent,
+  CardContentProps,
   Chip,
   ChipProps,
   styled,
@@ -25,6 +27,14 @@ export const LeagueCard = styled(Card)(({ theme }) => ({
   display: 'flex',
   justifyContent: 'space-between',
   alignItems: 'center',
+}))
+
+export const ContentUnavailable = styled(CardContent)<CardContentProps>(() => ({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'center',
+  marginTop: '30px',
 }))
 
 export const SeasonBox = styled(Box)(({ theme }) => ({

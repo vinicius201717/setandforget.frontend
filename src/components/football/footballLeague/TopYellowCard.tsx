@@ -25,8 +25,11 @@ import {
   TeamLogo,
   TeamLogoContainer,
   TypographyPrimary,
+  ContentUnavailable,
 } from './style'
 import { getTopYellowCard } from 'src/pages/api/football/player/getTopYellowCard'
+import Image from 'next/image'
+import noContent from 'public/images/pages/tree.png'
 
 const createData = (playerData: PlayerDataStatistics) => ({
   name: playerData.player.name,
@@ -144,6 +147,12 @@ const Row = (props: { row: ReturnType<typeof createData> }) => {
                           {stat.penalty.missed || 0}
                         </TableCell>
                       </TableRow>
+                      <TableRow style={{ borderBottom: 'none' }}>
+                        <TableCell
+                          colSpan={6}
+                          style={{ height: '20px', borderBottom: 'none' }}
+                        />
+                      </TableRow>
                     </TableBody>
                   </Table>
                 </Box>
@@ -160,7 +169,7 @@ interface CardProps {
   handleCard: (card: 'RED' | 'YELLOW') => void
 }
 
-export default function TopAssistsTable({ handleCard }: CardProps) {
+export default function TopYellowCardTable({ handleCard }: CardProps) {
   const router = useRouter()
   const { leagueId, season } = router.query
 
@@ -175,8 +184,27 @@ export default function TopAssistsTable({ handleCard }: CardProps) {
   })
 
   const renderContent = () => {
-    if (error) {
-      return <div>Error fetching data</div>
+    if (isLoading) {
+      return (
+        <ContainerProgress>
+          <CircularProgress />
+        </ContainerProgress>
+      )
+    }
+
+    if (error || !data || data.length === 0) {
+      return (
+        <ContentUnavailable>
+          <Image
+            src={noContent}
+            alt='The content is unavailable.'
+            title='The content is unavailable.'
+            width={150}
+            height={150}
+          />
+          <Typography variant='h6'>The content is unavailable.</Typography>
+        </ContentUnavailable>
+      )
     }
 
     const rows = data?.map(createData)
@@ -186,40 +214,32 @@ export default function TopAssistsTable({ handleCard }: CardProps) {
     }
 
     return (
-      <>
-        {isLoading ? (
-          <ContainerProgress>
-            <CircularProgress />
-          </ContainerProgress>
-        ) : (
-          <TableContainer component={Paper}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell colSpan={2}>Player</TableCell>
-                  <TableCell align='right'>Matches</TableCell>
-                  <TableCell align='right'>Goals</TableCell>
-                  <TableCell align='right'>Assists</TableCell>
-                  <TableCell
-                    align='right'
-                    onClick={handleClick}
-                    sx={{ cursor: 'pointer' }}
-                  >
-                    Red Cards
-                  </TableCell>
-                  <TableCell align='right'>
-                    <TypographyPrimary>Yellow Cards </TypographyPrimary>
-                  </TableCell>
-                  <TableCell align='right'>Details</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {rows?.map((row) => <Row key={row.name} row={row} />)}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        )}
-      </>
+      <TableContainer component={Paper}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell colSpan={2}>Player</TableCell>
+              <TableCell align='right'>Matches</TableCell>
+              <TableCell align='right'>Goals</TableCell>
+              <TableCell align='right'>Assists</TableCell>
+              <TableCell
+                align='right'
+                onClick={handleClick}
+                sx={{ cursor: 'pointer' }}
+              >
+                Red Cards
+              </TableCell>
+              <TableCell align='right'>
+                <TypographyPrimary>Yellow Cards </TypographyPrimary>
+              </TableCell>
+              <TableCell align='right'>Details</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {rows?.map((row) => <Row key={row.name} row={row} />)}
+          </TableBody>
+        </Table>
+      </TableContainer>
     )
   }
 

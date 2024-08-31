@@ -1,6 +1,8 @@
 import {
   Box,
   BoxProps,
+  CardContent,
+  CardContentProps,
   Chip,
   ChipProps,
   Modal,
@@ -141,6 +143,14 @@ export const ModalProdiction = styled(Modal)<ModalProps>(() => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
+}))
+
+export const ContentUnavailable = styled(CardContent)<CardContentProps>(() => ({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'center',
+  marginTop: '30px',
 }))
 
 export const ModalContent = styled(Box)(({ theme }) => ({

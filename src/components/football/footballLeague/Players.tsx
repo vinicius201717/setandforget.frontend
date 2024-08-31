@@ -20,7 +20,9 @@ import { useQuery } from '@tanstack/react-query'
 import { PlayerData } from 'src/types/apps/footballType'
 import { getPlayers } from 'src/pages/api/football/player/getPlayers'
 import Icon from 'src/@core/components/icon'
-import { ContainerProgress, PlayerPhoto } from './style'
+import { ContainerProgress, PlayerPhoto, ContentUnavailable } from './style'
+import Image from 'next/image'
+import noContent from 'public/images/pages/tree.png'
 
 const createData = (playerData: PlayerData) => ({
   name: playerData.player.name,
@@ -47,7 +49,6 @@ const Row = (props: { row: ReturnType<typeof createData> }) => {
               width={50}
               height={50}
             />
-
             <Typography>{row.name}</Typography>
           </Box>
         </TableCell>
@@ -94,6 +95,12 @@ const Row = (props: { row: ReturnType<typeof createData> }) => {
                         <TableCell>{stat.cards.yellow || 0}</TableCell>
                         <TableCell>{stat.cards.red || 0}</TableCell>
                       </TableRow>
+                      <TableRow style={{ borderBottom: 'none' }}>
+                        <TableCell
+                          colSpan={6}
+                          style={{ height: '20px', borderBottom: 'none' }}
+                        />
+                      </TableRow>
                     </TableBody>
                   </Table>
                 </Box>
@@ -128,50 +135,63 @@ export default function LeaguePlayers() {
   }
 
   const renderContent = () => {
-    if (error) {
-      return <div>Error fetching league data</div>
+    if (isLoading) {
+      return (
+        <ContainerProgress>
+          <CircularProgress />
+        </ContainerProgress>
+      )
+    }
+
+    if (error || !data || data.length === 0) {
+      return (
+        <ContentUnavailable>
+          <Image
+            src={noContent}
+            alt='The content is unavailable.'
+            title='The content is unavailable.'
+            width={150}
+            height={150}
+          />
+          <Typography variant='h6'>The content is unavailable.</Typography>
+        </ContentUnavailable>
+      )
     }
 
     const rows = data?.map(createData)
 
     return (
       <>
-        {isLoading ? (
-          <ContainerProgress>
-            <CircularProgress />
-          </ContainerProgress>
-        ) : (
-          <TableContainer component={Paper}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Player</TableCell>
-                  <TableCell align='right'>Age</TableCell>
-                  <TableCell align='right'>Nationality</TableCell>
-                  <TableCell align='right'>Height</TableCell>
-                  <TableCell align='right'>Weight</TableCell>
-                  <TableCell align='right'>Statistics</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {rows?.map((row) => <Row key={row.name} row={row} />)}
-              </TableBody>
-            </Table>
-            <Box sx={{ display: 'flex', justifyContent: 'center', py: 2 }}>
-              <TablePagination
-                rowsPerPageOptions={[]}
-                component='div'
-                count={-1}
-                rowsPerPage={rowsPerPage}
-                page={page}
-                onPageChange={handleChangePage}
-                labelDisplayedRows={() => null}
-                nextIconButtonProps={{ 'aria-label': 'Next page' }}
-                backIconButtonProps={{ 'aria-label': 'Previous page' }}
-              />
-            </Box>
-          </TableContainer>
-        )}
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Player</TableCell>
+                <TableCell align='right'>Age</TableCell>
+                <TableCell align='right'>Nationality</TableCell>
+                <TableCell align='right'>Height</TableCell>
+                <TableCell align='right'>Weight</TableCell>
+                <TableCell align='right'>Statistics</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {rows?.map((row) => <Row key={row.name} row={row} />)}
+            </TableBody>
+          </Table>
+          <Box sx={{ display: 'flex', justifyContent: 'center', py: 2 }}>
+            <TablePagination
+              rowsPerPageOptions={[]}
+              component='div'
+              count={-1}
+              rowsPerPage={rowsPerPage}
+              page={page}
+              onPageChange={handleChangePage}
+              labelDisplayedRows={() => null}
+              nextIconButtonProps={{ 'aria-label': 'Next page' }}
+              backIconButtonProps={{ 'aria-label': 'Previous page' }}
+            />
+          </Box>
+        </TableContainer>
       </>
     )
   }
