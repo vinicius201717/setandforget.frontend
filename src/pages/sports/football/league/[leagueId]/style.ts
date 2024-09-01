@@ -139,3 +139,24 @@ export const InfoItem = styled(Box)<BoxProps>(({ theme }) => ({
 export const LinkNext = styled(Link)<LinkProps>(() => ({
   textDecoration: 'none',
 }))
+
+export const LastResultsContainer = styled(Box)<BoxProps>(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  overflowX: 'auto',
+  whiteSpace: 'nowrap',
+  '&::-webkit-scrollbar': {
+    height: '8px',
+  },
+  '&::-webkit-scrollbar-thumb': {
+    backgroundColor: theme.palette.primary.main,
+    borderRadius: '4px',
+  },
+  '&::-webkit-scrollbar-thumb:hover': {
+    backgroundColor: theme.palette.primary.main,
+  },
+  '&::-webkit-scrollbar-track': {
+    backgroundColor: theme.palette.background.default,
+    borderRadius: '4px',
+  },
+}))

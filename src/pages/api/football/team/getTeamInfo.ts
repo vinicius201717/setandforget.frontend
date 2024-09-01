@@ -9,7 +9,6 @@ export async function getTeamInfo(
   const storedToken = window.localStorage.getItem(
     authConfig.storageTokenKeyName,
   )
-  console.log(id, leagueId, season)
 
   try {
     const response = await api.get(
