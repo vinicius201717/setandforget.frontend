@@ -4,8 +4,9 @@ import {
   DateContainerDate,
   FixtureContainer,
   FixtureTeamsContainer,
+  LinkButtom,
   LogoNameContainer,
-  OddsContaier,
+  OddsContainer,
   TeamImage,
   ViewContainer,
 } from './style'
@@ -42,8 +43,12 @@ const Fixture: React.FC<FixtureProps> = ({
         {formatDate(formatFixtureDate(data.fixture.date).date)} -{' '}
         {formatHour(formatFixtureDate(data.fixture.date).time)}
       </DateContainerDate>
-      <ViewContainer onClick={() => handlePrediction(data.fixture.id)}>
-        <VisibilityIcon />
+      <ViewContainer>
+        <LinkButtom href={`/sports/football/fixture/${data.fixture.id}`}>
+          <Typography variant='body2'> View more</Typography>
+        </LinkButtom>
+
+        <VisibilityIcon onClick={() => handlePrediction(data.fixture.id)} />
       </ViewContainer>
       <FixtureTeamsContainer>
         <LogoNameContainer>
@@ -67,7 +72,7 @@ const Fixture: React.FC<FixtureProps> = ({
         </LogoNameContainer>
         <Divider sx={{ marginTop: '10px' }} />
       </FixtureTeamsContainer>
-      <OddsContaier />
+      <OddsContainer />
     </FixtureContainer>
   )
 }

@@ -1,5 +1,7 @@
 import {
   Box,
+  Button,
+  ButtonProps,
   Card,
   CardContent,
   CardContentProps,
@@ -70,8 +72,8 @@ export const LeagueLogo = styled(Image)<ImageProps>(() => ({
 }))
 
 export const TeamLogo = styled(Image)<ImageProps>(() => ({
-  width: '30px',
-  height: '30px',
+  width: '100px',
+  height: '100px',
   objectFit: 'contain',
   marginRight: '6px',
 }))
@@ -140,23 +142,14 @@ export const LinkNext = styled(Link)<LinkProps>(() => ({
   textDecoration: 'none',
 }))
 
-export const LastResultsContainer = styled(Box)<BoxProps>(({ theme }) => ({
+export const ButtonLink = styled(Button)<ButtonProps>(({ theme }) => ({
+  marginRight: '20px',
   display: 'flex',
   alignItems: 'center',
-  overflowX: 'auto',
-  whiteSpace: 'nowrap',
-  '&::-webkit-scrollbar': {
-    height: '8px',
-  },
-  '&::-webkit-scrollbar-thumb': {
-    backgroundColor: theme.palette.primary.main,
-    borderRadius: '4px',
-  },
-  '&::-webkit-scrollbar-thumb:hover': {
-    backgroundColor: theme.palette.primary.main,
-  },
-  '&::-webkit-scrollbar-track': {
-    backgroundColor: theme.palette.background.default,
-    borderRadius: '4px',
-  },
+  justifyContent: 'center',
+  gap: theme.spacing(2),
+  padding: theme.spacing(3),
+  borderRadius: theme.shape.borderRadius,
+  backgroundColor: theme.palette.background.paper,
+  color: theme.palette.getContrastText(theme.palette.background.paper),
 }))

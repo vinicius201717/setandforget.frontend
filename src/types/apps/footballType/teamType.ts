@@ -41,12 +41,12 @@ interface ForAgainst {
   }
 }
 
-interface Goals {
+export interface Goals {
   for: ForAgainst
   against: ForAgainst
 }
 
-interface Cards {
+export interface Cards {
   yellow: {
     '0-15': MinuteData
     '16-30': MinuteData
@@ -69,7 +69,7 @@ interface Cards {
   }
 }
 
-interface Fixtures {
+export interface Fixtures {
   played: {
     home: number
     away: number
@@ -92,13 +92,13 @@ interface Fixtures {
   }
 }
 
-interface CleanSheetAndFailedToScore {
+export interface CleanSheetAndFailedToScore {
   home: number
   away: number
   total: number
 }
 
-interface Penalty {
+export interface Penalty {
   scored: {
     total: number
     percentage: string
@@ -110,7 +110,7 @@ interface Penalty {
   total: number
 }
 
-interface Biggest {
+export interface Biggest {
   streak: {
     wins: number
     draws: number
@@ -136,7 +136,7 @@ interface Biggest {
   }
 }
 
-interface Lineup {
+export interface Lineup {
   formation: string
   played: number
 }
@@ -153,4 +153,30 @@ export interface FootballTeamStatistics {
   cards: Cards
   biggest: Biggest
   lineups: Lineup[]
+}
+
+interface Venue {
+  id: number
+  name: string
+  address: string
+  city: string
+  capacity: number
+  surface: string
+  image: string
+}
+
+interface Team {
+  id: number
+  name: string
+  code: string | null
+  country: string
+  founded: number
+  national: boolean
+  logo: string
+  venue: Venue
+}
+
+export interface TeamInformationInterface {
+  team: Team
+  venue: Venue
 }

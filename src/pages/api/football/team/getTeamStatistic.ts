@@ -1,7 +1,7 @@
 import { api } from 'src/lib/axios'
 import authConfig from 'src/configs/auth'
 
-export async function getTeamInfo(
+export async function getTeamStatistics(
   id: number,
   leagueId: number,
   season: number,
@@ -12,14 +12,13 @@ export async function getTeamInfo(
 
   try {
     const response = await api.get(
-      `/football/team/${id}/${leagueId}/${season}`,
+      `/football/team/statistic/${id}/${leagueId}/${season}`,
       {
         headers: {
           Authorization: `Bearer ${storedToken}`,
         },
       },
     )
-    console.log(response)
 
     return response.data
   } catch (error) {

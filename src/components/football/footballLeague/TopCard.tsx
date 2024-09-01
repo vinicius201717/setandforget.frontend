@@ -6,8 +6,6 @@ export default function TopCardComponent() {
   const [card, setCard] = useState<'RED' | 'YELLOW'>('RED')
 
   const handleCard = (card: 'RED' | 'YELLOW') => {
-    console.log('ok')
-
     setCard(card)
   }
 

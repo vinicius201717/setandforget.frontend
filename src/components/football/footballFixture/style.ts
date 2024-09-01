@@ -83,8 +83,24 @@ export const ViewContainer = styled(Box)<BoxProps>(({ theme }) => ({
   fontSize: '0.8rem',
   transition: '0.3s',
   cursor: 'pointer',
-  '&:hover': {
-    color: theme.palette.primary.main,
+  width: 'auto',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  gap: 10,
+
+  '& > :first-child': {
+    cursor: 'pointer',
+    '&:hover': {
+      color: theme.palette.secondary.main,
+    },
+  },
+
+  '& > :nth-child(2)': {
+    cursor: 'pointer',
+    '&:hover': {
+      color: theme.palette.error.main,
+    },
   },
 }))
 
@@ -96,7 +112,12 @@ export const TeamImage = styled(Image)(({ theme }) => ({
   objectFit: 'contain',
 }))
 
-export const OddsContaier = styled(Box)<BoxProps>(({ theme }) => ({
+export const LinkButtom = styled(Link)<LinkProps>(() => ({
+  cursor: 'pointer',
+  textDecoration: 'none',
+}))
+
+export const OddsContainer = styled(Box)<BoxProps>(({ theme }) => ({
   width: '100%',
   height: '40px',
   display: 'flex',

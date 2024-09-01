@@ -44,7 +44,7 @@ export default function DetailsPage() {
   }
 
   const { data: league, isLoading } = useQuery<LeagueResponse[]>({
-    queryKey: ['leaguePlayers', leagueId, season],
+    queryKey: ['leagueDetails', leagueId, season],
     queryFn: () => getLeagueDetails(leagueId as number, season as number),
     enabled: !!leagueId && !!season,
   })
