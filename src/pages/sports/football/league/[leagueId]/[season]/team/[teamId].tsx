@@ -48,6 +48,9 @@ import { ButtonLink, TeamLogo } from '../../style'
 import { getTeamStatistics } from 'src/pages/api/football/team/getTeamStatistic'
 import { getTeamInformation } from 'src/pages/api/football/team/getTeamInformation'
 import TeamCard from 'src/components/football/footballTeam/TeamInformation'
+import { getPlayerSquad } from 'src/pages/api/football/player/getPlayersSquad'
+import { PlayersResponse } from 'src/types/apps/footballType/playersType'
+import PlayersList from 'src/components/football/footballPlayers'
 
 Chart.register(
   CategoryScale,
@@ -65,8 +68,8 @@ Chart.register(
 export default function TeamDetails() {
   const { query } = useRouter()
 
-  const [enabledManualQuery, setEnabledManualQuery] = useState(false)
-  const [changePage, setChangePage] = useState<1 | 2>(1)
+  const [enabledManualQuery, setEnabledManualQuery] = useState<boolean>(false)
+  const [changePage, setChangePage] = useState<1 | 2 | 3>(1)
   const leagueId = parseInt(query.leagueId as string, 10)
   const season = parseInt(query.season as string, 10)
   const teamId = parseInt(query.teamId as string, 10)
@@ -78,22 +81,42 @@ export default function TeamDetails() {
   })
 
   const {
+    data: playerSquad,
+    isLoading: isPlayerSquadLoading,
+    refetch: squadRefetch,
+  } = useQuery<PlayersResponse[]>({
+    queryKey: ['teamInformation', teamId],
+    queryFn: () => getPlayerSquad(teamId),
+    enabled: enabledManualQuery,
+  })
+
+  const {
     data: teamInformation,
     isLoading: isInformationLoading,
-    refetch,
+    refetch: informationRefetch,
   } = useQuery<TeamInformationInterface[]>({
     queryKey: ['teamInformation', leagueId, season, teamId],
     queryFn: () => getTeamInformation(teamId, leagueId, season),
     enabled: enabledManualQuery,
   })
 
+  const handleTeamStatistics = () => {
+    handleChangePage(1)
+  }
+
   const handleTeamInformation = () => {
     setEnabledManualQuery(true)
-    refetch()
+    informationRefetch()
     handleChangePage(2)
   }
 
-  const handleChangePage = (page: 1 | 2) => {
+  const handleSquad = () => {
+    setEnabledManualQuery(true)
+    squadRefetch()
+    handleChangePage(3)
+  }
+
+  const handleChangePage = (page: 1 | 2 | 3) => {
     setChangePage(page)
   }
 
@@ -125,15 +148,20 @@ export default function TeamDetails() {
           </Grid>
         </Grid>
         <Grid item xs display={'flex'}>
-          <ButtonLink onClick={() => handleChangePage(1)}>
+          <ButtonLink bg={changePage === 1} onClick={handleTeamStatistics}>
             Statistics
           </ButtonLink>
-          <ButtonLink onClick={handleTeamInformation}>Informations</ButtonLink>
+          <ButtonLink bg={changePage === 2} onClick={handleTeamInformation}>
+            Informations
+          </ButtonLink>
+          <ButtonLink bg={changePage === 3} onClick={handleSquad}>
+            Squad
+          </ButtonLink>
         </Grid>
 
         <Divider sx={{ marginBottom: 5, marginTop: 5 }} />
 
-        {changePage === 1 ? (
+        {changePage === 1 && (
           <>
             <Grid item xs={12} md={6}>
               <LastResults form={data.form} />
@@ -145,10 +173,8 @@ export default function TeamDetails() {
               <Grid item xs={12} md={6}>
                 <CardDistribution card={data.cards} />
               </Grid>
-
               <Grid container spacing={2} padding={3}>
                 <GoalsFormAgainst biggest={data.biggest} />
-
                 {data.biggest?.streak?.wins ||
                 data.biggest?.streak?.loses ||
                 data.biggest?.streak?.draws ? (
@@ -156,7 +182,6 @@ export default function TeamDetails() {
                     <BiggestStreaks biggest={data.biggest} />
                   </Grid>
                 ) : null}
-
                 {data.biggest?.wins?.home || data.biggest?.wins?.away ? (
                   <Grid item xs={12} md={4}>
                     <BiggestWins biggest={data.biggest} />
@@ -171,11 +196,9 @@ export default function TeamDetails() {
                 <Grid item xs={12} md={8}>
                   <CleanSheets cleanSheets={data.clean_sheet} />
                 </Grid>
-
                 <Grid item xs={12} md={6}>
                   <Fixture fixture={data.fixtures} />
                 </Grid>
-
                 <Grid
                   item
                   xs={12}
@@ -186,7 +209,6 @@ export default function TeamDetails() {
                     goalsDistributionByMinute={data.goals}
                   />
                 </Grid>
-
                 <Grid item xs={12} md={6}>
                   <Card>
                     <CardContent>
@@ -199,14 +221,15 @@ export default function TeamDetails() {
                     </CardContent>
                   </Card>
                 </Grid>
-
                 <Grid item xs={12} md={6}>
                   <PenaltyStats data={data.penalty} />
                 </Grid>
               </Grid>
             </Grid>
           </>
-        ) : (
+        )}
+
+        {changePage === 2 && (
           <>
             {isInformationLoading ? (
               <ContainerProgress>
@@ -216,6 +239,25 @@ export default function TeamDetails() {
               teamInformation && (
                 <Grid container alignItems='center' spacing={2}>
                   <TeamCard teamProps={teamInformation} />
+                </Grid>
+              )
+            )}
+          </>
+        )}
+
+        {changePage === 3 && (
+          <>
+            {isPlayerSquadLoading ? (
+              <ContainerProgress>
+                <CircularProgress />
+              </ContainerProgress>
+            ) : (
+              playerSquad && (
+                <Grid container alignItems='center' spacing={2}>
+                  <PlayersList
+                    season={season}
+                    players={playerSquad[0].players}
+                  />
                 </Grid>
               )
             )}

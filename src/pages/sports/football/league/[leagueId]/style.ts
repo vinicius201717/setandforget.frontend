@@ -20,6 +20,10 @@ interface InfoItemProps extends BoxProps {
   isLast: boolean
 }
 
+interface ButtonCProps extends ButtonProps {
+  bg: boolean
+}
+
 export const LeagueCard = styled(Card)(({ theme }) => ({
   margin: theme.spacing(2, 0),
   padding: theme.spacing(1),
@@ -142,7 +146,7 @@ export const LinkNext = styled(Link)<LinkProps>(() => ({
   textDecoration: 'none',
 }))
 
-export const ButtonLink = styled(Button)<ButtonProps>(({ theme }) => ({
+export const ButtonLink = styled(Button)<ButtonCProps>(({ theme, bg }) => ({
   marginRight: '20px',
   display: 'flex',
   alignItems: 'center',
@@ -150,6 +154,8 @@ export const ButtonLink = styled(Button)<ButtonProps>(({ theme }) => ({
   gap: theme.spacing(2),
   padding: theme.spacing(3),
   borderRadius: theme.shape.borderRadius,
-  backgroundColor: theme.palette.background.paper,
+  backgroundColor: bg
+    ? theme.palette.primary.main
+    : theme.palette.background.paper,
   color: theme.palette.getContrastText(theme.palette.background.paper),
 }))
