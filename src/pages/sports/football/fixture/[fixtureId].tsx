@@ -12,41 +12,48 @@ import {
 } from '@mui/material'
 import FootballLayout from 'src/layouts/components/footballLayout'
 import { useQuery } from '@tanstack/react-query'
-import { getOddsByFixture } from 'src/pages/api/football/odds/getOddsByFixture'
-import { Bets, BetsData } from 'src/types/apps/footballType/oddsType'
-import { FixtureTypeResponse } from 'src/types/apps/footballType'
+import { Bets, OddsBetType } from 'src/types/apps/footballType/oddsType'
 import FootballBetHorizontalMenu from 'src/components/menu/FootballBetHorizontalMenu'
-
-interface BetsFixtureResponse {
-  odds: BetsData[]
-  fixture: FixtureTypeResponse[]
-}
+import { getOddsBet } from 'src/pages/api/football/odds/getOddsBet'
+import { getOddsByFixture } from 'src/pages/api/football/odds/getOddsByFixture'
+import { fixtureType } from 'src/types/apps/footballType/fixtureType'
 
 export default function LeaguePage() {
   const router = useRouter()
   const { fixtureId } = router.query
 
-  const { data } = useQuery<BetsFixtureResponse>({
-    queryKey: ['league', fixtureId],
+  const { data } = useQuery<OddsBetType[]>({
+    queryKey: ['oddsBet', fixtureId],
+    queryFn: () => getOddsBet(),
+    enabled: !!fixtureId,
+  })
+
+  const { data: fixtureData } = useQuery({
+    queryKey: ['bet', fixtureId],
     queryFn: () => getOddsByFixture(fixtureId as string),
     enabled: !!fixtureId,
   })
 
-  const [bet365Data, setBet365Data] = useState<Bets[] | null>(null)
-  const [fixture, setFixture] = useState<FixtureTypeResponse | null>(null)
+  const [oddsBet, setOddsBet] = useState<OddsBetType[] | null>(null)
+  const [fixture, setFixture] = useState<fixtureType | null>(null)
 
   useEffect(() => {
     if (data) {
-      setFixture(data.fixture[0])
-      setBet365Data(data?.odds[0].bookmakers[0].bets)
+      setOddsBet(data)
     }
   }, [data])
 
+  useEffect(() => {
+    if (fixtureData) {
+      setFixture(fixtureData.fixture[0].teams)
+    }
+  }, [fixtureData])
+
   return (
     <FootballLayout>
-      <FootballBetHorizontalMenu bets={bet365Data} fixture={fixture} />
+      <FootballBetHorizontalMenu oddsBet={oddsBet} fixture={fixture} />
       <h1>teste</h1>
-      {bet365Data &&
+      {/* {bet365Data &&
         bet365Data.map((bet) => (
           <TableContainer
             component={Paper}
@@ -78,7 +85,7 @@ export default function LeaguePage() {
               </TableBody>
             </Table>
           </TableContainer>
-        ))}
+        ))} */}
     </FootballLayout>
   )
 }

@@ -11,11 +11,11 @@ import Image, { ImageProps } from 'next/image'
 
 export const AppBarContainer = styled(Box)<BoxProps>(({ theme }) => ({
   width: '100%',
-  height: '200px',
+  maxHeight: '400px',
   padding: theme.spacing(5),
   display: 'flex',
   flexDirection: 'column',
-  alignItems: 'flex-end',
+  alignItems: 'flex-start',
   justifyContent: 'flex-end',
   position: 'relative',
   backgroundColor: theme.palette.background.paper,
@@ -23,18 +23,17 @@ export const AppBarContainer = styled(Box)<BoxProps>(({ theme }) => ({
 }))
 
 export const FixtureContainer = styled(Box)<BoxProps>(({ theme }) => ({
-  position: 'absolute',
-  top: '20px',
-  left: '20px',
   display: 'flex',
   alignItems: 'center',
+  marginBottom: '40px',
   gap: theme.spacing(10),
 }))
 
-export const FixtureTeamContainer = styled(Box)<BoxProps>(() => ({
+export const FixtureTeamContainer = styled(Box)<BoxProps>(({ theme }) => ({
   display: 'flex',
   justifyContent: 'space-between',
   alignItems: 'center',
+  gap: theme.spacing(1),
 }))
 
 export const AppBoxContainer = styled(Box)<BoxProps>(({ theme }) => ({
@@ -57,18 +56,18 @@ export const AppBoxContainer = styled(Box)<BoxProps>(({ theme }) => ({
   },
 }))
 
-export const TeamLogo = styled(Image)<ImageProps>(() => ({
+export const TeamLogo = styled(Image)<ImageProps>(({ theme }) => ({
   width: '50px',
   height: '50px',
   objectFit: 'contain',
-  marginRight: '6px',
+  margin: theme.spacing(3),
 }))
 
 export const ButtonLink = styled(Button)<ButtonProps>(({ theme }) => ({
-  marginRight: '20px',
+  marginRight: theme.spacing(3),
   display: 'flex',
   alignItems: 'center',
-  justifyContent: 'center',
+  justifyContent: 'space-between',
   gap: theme.spacing(2),
   padding: theme.spacing(3),
   borderRadius: theme.shape.borderRadius,
@@ -77,11 +76,12 @@ export const ButtonLink = styled(Button)<ButtonProps>(({ theme }) => ({
 }))
 
 export const Search = styled(Paper)<PaperProps>(({ theme }) => ({
-  padding: '2px 8px',
   display: 'flex',
   alignItems: 'center',
   width: '100%',
   maxWidth: '100%',
+  height: '40px',
+  padding: theme.spacing(1),
   boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
   my: 2,
   backgroundColor: theme.palette.background.default,
@@ -121,10 +121,21 @@ export const ModalContentContainer = styled(Box)<BoxProps>(({ theme }) => ({
   },
 }))
 
-export const ModalButtonContainer = styled(Box)<BoxProps>(() => ({
+export const ContainerProgress = styled(Box)<BoxProps>(() => ({
+  width: '100%',
   display: 'flex',
-  flexWrap: 'wrap',
-  gap: '10px',
+  flexDirection: 'column',
   justifyContent: 'center',
+  alignItems: 'center',
+  height: '100vh',
+  paddingBottom: '300px',
+}))
+
+export const ModalButtonContainer = styled(Box)<BoxProps>(() => ({
+  display: 'grid',
+  gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+  gap: '15px',
+  justifyContent: 'center',
+  alignItems: 'center',
   marginTop: '20px',
 }))

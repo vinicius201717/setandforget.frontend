@@ -21,3 +21,16 @@ export interface BetsData {
   bookmakers: Bookmakers[]
   name: string
 }
+
+export interface OddsBetType {
+  id: number
+  name: string
+}
+
+export interface UserFavoriteOddsBetType {
+  id: string
+  betId: number
+  userId: string
+  name: string
+  createdAt: string
+}
