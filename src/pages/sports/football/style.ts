@@ -74,6 +74,31 @@ export const ContainerFixture = styled(Box)<BoxProps>(() => ({
   width: '100%',
 }))
 
+export const TeamLogo = styled(Image)<ImageProps>(({ theme }) => ({
+  width: '30px',
+  height: '30px',
+  objectFit: 'contain',
+  margin: theme.spacing(3),
+}))
+
+export const BetTeamContainer = styled(Box)<BoxProps>(({ theme }) => ({
+  maxWidth: '400px',
+  height: '50px',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'flex-start',
+  gap: theme.spacing(3),
+  borderRadius: theme.shape.borderRadius,
+  padding: theme.spacing(2),
+  backgroundColor: theme.palette.background.default,
+  cursor: 'pointer',
+  transition: 'background-color 0.3s ease',
+
+  '&:hover': {
+    backgroundColor: theme.palette.action.hover,
+  },
+}))
+
 export const ModalProdiction = styled(Modal)<ModalProps>(() => ({
   display: 'flex',
   alignItems: 'center',

@@ -7,7 +7,7 @@ export interface BetsValues {
 export interface Bets {
   id: number
   name: string
-  values: BetsValues
+  values: BetsValues[]
 }
 
 export interface Bookmakers {

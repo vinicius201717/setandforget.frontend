@@ -21,7 +21,7 @@ interface InfoItemProps extends BoxProps {
 }
 
 interface ButtonCProps extends ButtonProps {
-  bg: boolean
+  bg?: boolean
 }
 
 export const LeagueCard = styled(Card)(({ theme }) => ({

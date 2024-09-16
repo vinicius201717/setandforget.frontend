@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react'
 import {
   IconButton,
@@ -22,6 +24,7 @@ import {
   ContainerProgress,
 } from './style'
 import {
+  Bets,
   OddsBetType,
   UserFavoriteOddsBetType,
 } from 'src/types/apps/footballType/oddsType'
@@ -30,16 +33,26 @@ import StarIcon from '@mui/icons-material/Star'
 import StarBorderIcon from '@mui/icons-material/StarBorder'
 import toast from 'react-hot-toast'
 import { postOddsBet } from 'src/pages/api/football/odds/postOddsBet'
-import { getUserFavoriteOddsBet } from 'src/pages/api/football/odds/getUserFavoriteOddsBet'
 import { deleteFavoriteOddsBet } from 'src/pages/api/football/odds/deleteFavoriteOddsBet'
 import { useQuery } from '@tanstack/react-query'
 import { fixtureType } from 'src/types/apps/footballType/fixtureType'
 interface MenuBetProps {
   oddsBet: OddsBetType[] | null
   fixture: fixtureType | null
+  favoriteOddsBet: UserFavoriteOddsBetType[] | null
+  favorites: Bets | null
+  identifyFavorite: OddsBetType | null
+  handleGetBet: (betId: number) => void
 }
 
-const FootballBetHorizontalMenu = ({ oddsBet, fixture }: MenuBetProps) => {
+const FootballBetHorizontalMenu = ({
+  oddsBet,
+  fixture,
+  favoriteOddsBet,
+  favorites,
+  identifyFavorite,
+  handleGetBet,
+}: MenuBetProps) => {
   const [modalOpen, setModalOpen] = useState(false)
   const [selectedBet, setSelectedBet] = useState<OddsBetType | null>(null)
   const [favoriteBets, setFavoriteBets] = useState<UserFavoriteOddsBetType[]>(
@@ -47,11 +60,7 @@ const FootballBetHorizontalMenu = ({ oddsBet, fixture }: MenuBetProps) => {
   )
   const [searchQuery, setSearchQuery] = useState('')
   const [filteredBets, setFilteredBets] = useState<OddsBetType[] | null>(null)
-
-  const { data, isLoading } = useQuery<UserFavoriteOddsBetType[]>({
-    queryKey: ['userFavoriteOddsBet'],
-    queryFn: () => getUserFavoriteOddsBet(),
-  })
+  const [focusedBetId, setFocusedBetId] = useState<number | null>(null)
 
   const { refetch } = useQuery<UserFavoriteOddsBetType>({
     queryKey: ['postUserFavoriteOddsBet', selectedBet?.id],
@@ -93,6 +102,12 @@ const FootballBetHorizontalMenu = ({ oddsBet, fixture }: MenuBetProps) => {
   }
 
   useEffect(() => {
+    if (identifyFavorite) {
+      setFocusedBetId(identifyFavorite.id)
+    }
+  }, [identifyFavorite])
+
+  useEffect(() => {
     if (selectedBet) {
       const favorite = favoriteBets.find(
         (favBet) => favBet.betId === selectedBet.id,
@@ -111,10 +126,15 @@ const FootballBetHorizontalMenu = ({ oddsBet, fixture }: MenuBetProps) => {
   }
 
   useEffect(() => {
-    if (data) {
-      setFavoriteBets(data)
+    if (favoriteOddsBet) {
+      setFavoriteBets(favoriteOddsBet)
     }
-  }, [data])
+  }, [favoriteOddsBet])
+
+  const handleFocusBet = (betId: number) => {
+    handleGetBet(betId)
+    setFocusedBetId(betId)
+  }
 
   useEffect(() => {
     if (oddsBet) {
@@ -191,7 +211,7 @@ const FootballBetHorizontalMenu = ({ oddsBet, fixture }: MenuBetProps) => {
           </SearchContainer>
 
           <AppBoxContainer>
-            {isLoading ? (
+            {!favoriteOddsBet ? (
               <CircularProgress size={24} />
             ) : searchQuery && filteredBets && filteredBets.length > 0 ? (
               filteredBets.map((bet: OddsBetType) => {
@@ -199,7 +219,11 @@ const FootballBetHorizontalMenu = ({ oddsBet, fixture }: MenuBetProps) => {
                   (favBet) => favBet.betId === bet.id,
                 )
                 return (
-                  <ButtonLink key={bet.id} sx={{ flexShrink: 0 }}>
+                  <ButtonLink
+                    onClick={() => handleGetBet(bet.id)}
+                    key={bet.id}
+                    sx={{ flexShrink: 0 }}
+                  >
                     {bet.name}
                     <IconButton onClick={() => toggleFavorite(bet)}>
                       {isFavorite ? (
@@ -211,12 +235,24 @@ const FootballBetHorizontalMenu = ({ oddsBet, fixture }: MenuBetProps) => {
                   </ButtonLink>
                 )
               })
-            ) : favoriteBets.length > 0 ? (
-              favoriteBets.map((bet: UserFavoriteOddsBetType) => (
-                <ButtonLink key={bet.id} sx={{ flexShrink: 0 }}>
-                  {bet.name}
-                </ButtonLink>
-              ))
+            ) : favoriteOddsBet.length > 0 ? (
+              favoriteOddsBet.map((bet: UserFavoriteOddsBetType) => {
+                const isHighlighted = bet.betId === focusedBetId
+
+                return (
+                  <ButtonLink
+                    onClick={() => handleFocusBet(bet.betId)}
+                    key={bet.id}
+                    sx={{
+                      backgroundColor: isHighlighted
+                        ? 'primary.main'
+                        : 'secondary.main',
+                    }}
+                  >
+                    {bet.name}
+                  </ButtonLink>
+                )
+              })
             ) : (
               <Typography variant='body2'>No favorite bets found</Typography>
             )}
@@ -256,7 +292,10 @@ const FootballBetHorizontalMenu = ({ oddsBet, fixture }: MenuBetProps) => {
                   )
 
                   return (
-                    <ButtonLink key={bet.id}>
+                    <ButtonLink
+                      key={bet.id}
+                      onClick={() => handleGetBet(bet.id)}
+                    >
                       {bet.name}
                       <IconButton onClick={() => toggleFavorite(bet)}>
                         {isFavorite ? (
