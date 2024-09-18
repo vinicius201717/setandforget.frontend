@@ -27,7 +27,7 @@ import {
   FixtureTypeResponse,
 } from 'src/types/apps/footballType/fixtureType'
 import { getOddsBetFixture } from 'src/pages/api/football/odds/getOddsBetFixture'
-import { BetTeamContainer, ContainerProgress, TeamLogo } from '../style'
+import { BetTeamContainer, ContainerProgress } from '../style'
 
 interface OddsBetInterface {
   oddsBet: OddsBetType[]
@@ -82,6 +82,47 @@ export default function LeaguePage() {
   const handleGetBet = (betId: number) => {
     setSelectedBetId(betId)
   }
+  const handleFavoritOddsBet = (betId: number, rm: boolean) => {
+    setFavoritOddsBet((prevFavorites) => {
+      if (!prevFavorites)
+        return rm
+          ? [
+              {
+                id: 'new_id',
+                betId,
+                userId: 'user123',
+                name: 'Bet Name',
+                createdAt: new Date().toISOString(),
+              },
+            ]
+          : []
+
+      const isAlreadyFavorite = prevFavorites.some(
+        (favorite) => favorite.betId === betId,
+      )
+
+      if (rm) {
+        if (!isAlreadyFavorite) {
+          return [
+            ...prevFavorites,
+            {
+              id: 'new_id',
+              betId,
+              userId: 'user123',
+              name: 'Bet Name',
+              createdAt: new Date().toISOString(),
+            },
+          ]
+        }
+      } else {
+        if (isAlreadyFavorite) {
+          return prevFavorites.filter((favorite) => favorite.betId !== betId)
+        }
+      }
+
+      return prevFavorites
+    })
+  }
 
   useEffect(() => {
     if (selectedBetId) {
@@ -122,12 +163,13 @@ export default function LeaguePage() {
             favorites={favorites}
             identifyFavorite={identifyFavorite}
             handleGetBet={handleGetBet}
+            handleFavoritOddsBet={handleFavoritOddsBet}
           />
           {isBetLoading ? (
             <ContainerProgress>
               <CircularProgress />
             </ContainerProgress>
-          ) : favorites && favorites.values ? (
+          ) : favorites && favorites.values && favorites.values.length > 0 ? (
             <TableContainer
               component={Paper}
               style={{ marginBottom: '20px', padding: '2px' }}
@@ -135,96 +177,31 @@ export default function LeaguePage() {
               <Table>
                 <TableHead>
                   <TableRow>
-                    {favorites && favorites.values && fixture ? (
-                      <TableCell
-                        align='center'
-                        colSpan={favorites.values.length}
+                    <TableCell align='center' colSpan={2}>
+                      <Typography
+                        variant='body2'
+                        align='left'
+                        style={{ paddingTop: '10px' }}
                       >
-                        <Typography
-                          variant='body2'
-                          align='left'
-                          style={{ paddingTop: '10px' }}
-                        >
-                          {favorites.name}
-                        </Typography>
-                      </TableCell>
-                    ) : (
-                      <TableCell align='center'>
-                        <Alert severity='error' sx={{ mt: '10px' }}>
-                          No pre-match bets available for{' '}
-                          {identifyFavorite?.name} —{' '}
-                          <strong>please try again later!</strong>
-                        </Alert>
-                      </TableCell>
-                    )}
+                        {favorites.name}
+                      </Typography>
+                    </TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {favorites && favorites.values && fixture ? (
-                    <TableRow>
-                      {favorites.values.map(
-                        (value: BetsValues, index: number) => (
-                          <TableCell
-                            key={index}
-                            align='right'
-                            sx={{
-                              maxWidth: '500px',
-                              width: 'auto',
-                              whiteSpace: 'normal',
-                              wordWrap: 'break-word',
-                            }}
-                          >
-                            {value.value === 'Home' ? (
-                              <BetTeamContainer>
-                                <TeamLogo
-                                  src={fixture?.home?.logo}
-                                  alt={fixture?.home?.name}
-                                  width={20}
-                                  height={20}
-                                  style={{ marginRight: '10px' }}
-                                />
-                                <Typography variant='body2'>
-                                  {fixture?.home?.name} / home
-                                </Typography>
-                                <Typography variant='body2' color='primary'>
-                                  {value.odd}
-                                </Typography>
-                              </BetTeamContainer>
-                            ) : value.value === 'Away' ? (
-                              <BetTeamContainer>
-                                <TeamLogo
-                                  src={fixture?.away?.logo}
-                                  alt={fixture?.away?.name}
-                                  width={20}
-                                  height={20}
-                                  style={{ marginRight: '10px' }}
-                                />
-                                <Typography variant='body2'>
-                                  {fixture?.away?.name}
-                                </Typography>
-                                <Typography variant='body2' color='primary'>
-                                  {value.odd}
-                                </Typography>
-                              </BetTeamContainer>
-                            ) : null}
-                          </TableCell>
-                        ),
-                      )}
-                    </TableRow>
-                  ) : (
-                    <TableRow>
-                      <TableCell
-                        align='center'
-                        colSpan={favorites ? favorites.values.length : 1}
-                      >
-                        <Alert severity='error' sx={{ mt: '10px' }}>
-                          No pre-match bets available for{' '}
-                          {identifyFavorite?.name} —{' '}
-                          <strong>please try again later!</strong>
-                        </Alert>
+                  {favorites.values.map((value: BetsValues, index: number) => (
+                    <TableRow key={index}>
+                      <TableCell align='left'>
+                        <BetTeamContainer>
+                          <Typography variant='body2'>{value.value}</Typography>
+                          <Typography variant='body2' color='primary'>
+                            {value.odd}
+                          </Typography>
+                        </BetTeamContainer>
                       </TableCell>
+                      <TableCell align='right'></TableCell>
                     </TableRow>
-                  )}
+                  ))}
                 </TableBody>
               </Table>
             </TableContainer>

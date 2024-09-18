@@ -42,7 +42,7 @@ export const AppBoxContainer = styled(Box)<BoxProps>(({ theme }) => ({
   width: '100%',
   padding: '10px 0',
   whiteSpace: 'nowrap',
-
+  gap: theme.spacing(2),
   '&::-webkit-scrollbar': {
     height: '8px',
   },
@@ -73,6 +73,9 @@ export const ButtonLink = styled(Button)<ButtonProps>(({ theme }) => ({
   borderRadius: theme.shape.borderRadius,
   backgroundColor: theme.palette.background.default,
   color: theme.palette.getContrastText(theme.palette.background.default),
+  minWidth: '150px',
+  flexShrink: 0,
+  textAlign: 'center',
 }))
 
 export const Search = styled(Paper)<PaperProps>(({ theme }) => ({

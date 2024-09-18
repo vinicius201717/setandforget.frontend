@@ -42,6 +42,7 @@ interface MenuBetProps {
   favoriteOddsBet: UserFavoriteOddsBetType[] | null
   favorites: Bets | null
   identifyFavorite: OddsBetType | null
+  handleFavoritOddsBet: (betId: number, rm: boolean) => void
   handleGetBet: (betId: number) => void
 }
 
@@ -49,8 +50,8 @@ const FootballBetHorizontalMenu = ({
   oddsBet,
   fixture,
   favoriteOddsBet,
-  favorites,
   identifyFavorite,
+  handleFavoritOddsBet,
   handleGetBet,
 }: MenuBetProps) => {
   const [modalOpen, setModalOpen] = useState(false)
@@ -69,6 +70,7 @@ const FootballBetHorizontalMenu = ({
         const response = await postOddsBet(selectedBet)
         if (response) {
           setFavoriteBets([...favoriteBets, response])
+          handleFavoritOddsBet(selectedBet?.id, true)
           toast.success(`${selectedBet.name} added to favorites`, {
             position: 'bottom-right',
           })
@@ -84,14 +86,15 @@ const FootballBetHorizontalMenu = ({
     enabled: false,
   })
 
-  const handleDeleteUserFavoriteOddsBet = (betId: string) => {
-    deleteFavoriteOddsBet(betId).then((response: OddsBetType | unknown) => {
+  const handleDeleteUserFavoriteOddsBet = (id: string, betId: number) => {
+    deleteFavoriteOddsBet(id).then((response: OddsBetType | unknown) => {
       if (response) {
         toast.success(`Bet successfully removed!`, {
           position: 'bottom-right',
         })
+        handleFavoritOddsBet(betId, false)
         setFavoriteBets((prevFavorites) =>
-          prevFavorites.filter((favBet) => favBet.id !== betId),
+          prevFavorites.filter((favBet) => favBet.betId !== betId),
         )
       } else {
         toast.error('Failed to remove bet', {
@@ -114,7 +117,7 @@ const FootballBetHorizontalMenu = ({
       )
 
       if (favorite) {
-        handleDeleteUserFavoriteOddsBet(favorite.id.toString())
+        handleDeleteUserFavoriteOddsBet(favorite.id, favorite.betId)
       } else {
         refetch()
       }
@@ -220,9 +223,11 @@ const FootballBetHorizontalMenu = ({
                 )
                 return (
                   <ButtonLink
-                    onClick={() => handleGetBet(bet.id)}
                     key={bet.id}
-                    sx={{ flexShrink: 0 }}
+                    sx={{
+                      flexShrink: 0,
+                      minWidth: '150px',
+                    }}
                   >
                     {bet.name}
                     <IconButton onClick={() => toggleFavorite(bet)}>

@@ -86,7 +86,7 @@ export const BetTeamContainer = styled(Box)<BoxProps>(({ theme }) => ({
   height: '50px',
   display: 'flex',
   alignItems: 'center',
-  justifyContent: 'flex-start',
+  justifyContent: 'space-between',
   gap: theme.spacing(3),
   borderRadius: theme.shape.borderRadius,
   padding: theme.spacing(2),
