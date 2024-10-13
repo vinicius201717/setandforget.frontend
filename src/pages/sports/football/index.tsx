@@ -14,10 +14,7 @@ import FootballLayout from 'src/layouts/components/footballLayout'
 import { useState, useEffect, useRef } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { getFixture } from 'src/pages/api/football/fixture/getFixture'
-import {
-  FixtureTypeResponse,
-  PredictionsResponse,
-} from 'src/types/apps/footballType'
+import { PredictionsResponse } from 'src/types/apps/footballType'
 import Image from 'next/image'
 import CloseIcon from '@mui/icons-material/Close'
 import timeoutImage from 'public/images/pages/misc-under-maintenance.png'
@@ -37,7 +34,7 @@ export default function Football() {
     data: fixturesGroups,
     isLoading,
     isError,
-  } = useQuery<FixtureTypeResponse[][]>({
+  } = useQuery<any[][]>({
     queryKey: ['fixtures'],
     queryFn: getFixture,
     refetchOnWindowFocus: false,
@@ -93,7 +90,7 @@ export default function Football() {
     }
   }, [isLoading, fixturesGroups])
 
-  const sortFixturesByDate = (fixtures: FixtureTypeResponse[]) => {
+  const sortFixturesByDate = (fixtures: any[]) => {
     return fixtures.sort((a, b) => {
       const dateA = new Date(a.fixture.date).getTime()
       const dateB = new Date(b.fixture.date).getTime()
@@ -122,7 +119,7 @@ export default function Football() {
                 leagueName={fixtures[0]?.league.name || ''}
               >
                 {sortFixturesByDate(fixtures).map(
-                  (fixture: FixtureTypeResponse, fixtureIndex: number) => (
+                  (fixture: any, fixtureIndex: number) => (
                     <Fixture
                       handlePrediction={handleFetchPredictions}
                       key={fixtureIndex}

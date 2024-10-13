@@ -91,6 +91,11 @@ export const Search = styled(Paper)<PaperProps>(({ theme }) => ({
   borderRadius: '4px',
 }))
 
+export const TeamNameHomeAway = styled(Box)<BoxProps>(() => ({
+  display: 'flex',
+  flexDirection: 'column',
+}))
+
 export const SearchContainer = styled(Box)<BoxProps>(() => ({
   display: 'flex',
   alignItems: 'center',

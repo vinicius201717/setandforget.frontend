@@ -82,41 +82,26 @@ export default function LeaguePage() {
   const handleGetBet = (betId: number) => {
     setSelectedBetId(betId)
   }
-  const handleFavoritOddsBet = (betId: number, rm: boolean) => {
+  const handleFavoritOddsBet = (
+    betFavorite: UserFavoriteOddsBetType,
+    rm: boolean,
+  ) => {
     setFavoritOddsBet((prevFavorites) => {
-      if (!prevFavorites)
-        return rm
-          ? [
-              {
-                id: 'new_id',
-                betId,
-                userId: 'user123',
-                name: 'Bet Name',
-                createdAt: new Date().toISOString(),
-              },
-            ]
-          : []
+      if (!prevFavorites) return rm ? [betFavorite] : []
 
       const isAlreadyFavorite = prevFavorites.some(
-        (favorite) => favorite.betId === betId,
+        (favorite) => favorite.betId === betFavorite.betId,
       )
 
       if (rm) {
         if (!isAlreadyFavorite) {
-          return [
-            ...prevFavorites,
-            {
-              id: 'new_id',
-              betId,
-              userId: 'user123',
-              name: 'Bet Name',
-              createdAt: new Date().toISOString(),
-            },
-          ]
+          return [...prevFavorites, betFavorite]
         }
       } else {
         if (isAlreadyFavorite) {
-          return prevFavorites.filter((favorite) => favorite.betId !== betId)
+          return prevFavorites.filter(
+            (favorite) => favorite.betId !== betFavorite.betId,
+          )
         }
       }
 
@@ -133,6 +118,8 @@ export default function LeaguePage() {
   useEffect(() => {
     if (betData && betData.length > 0) {
       setFavorites(betData[0].bookmakers[0].bets[0])
+    } else {
+      setFavorites(null)
     }
   }, [betData])
 

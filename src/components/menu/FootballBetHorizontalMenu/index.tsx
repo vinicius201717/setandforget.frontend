@@ -22,6 +22,7 @@ import {
   FixtureTeamContainer,
   TeamLogo,
   ContainerProgress,
+  TeamNameHomeAway,
 } from './style'
 import {
   Bets,
@@ -42,7 +43,10 @@ interface MenuBetProps {
   favoriteOddsBet: UserFavoriteOddsBetType[] | null
   favorites: Bets | null
   identifyFavorite: OddsBetType | null
-  handleFavoritOddsBet: (betId: number, rm: boolean) => void
+  handleFavoritOddsBet: (
+    betFavorite: UserFavoriteOddsBetType,
+    rm: boolean,
+  ) => void
   handleGetBet: (betId: number) => void
 }
 
@@ -70,7 +74,7 @@ const FootballBetHorizontalMenu = ({
         const response = await postOddsBet(selectedBet)
         if (response) {
           setFavoriteBets([...favoriteBets, response])
-          handleFavoritOddsBet(selectedBet?.id, true)
+          handleFavoritOddsBet(response, true)
           toast.success(`${selectedBet.name} added to favorites`, {
             position: 'bottom-right',
           })
@@ -87,12 +91,12 @@ const FootballBetHorizontalMenu = ({
   })
 
   const handleDeleteUserFavoriteOddsBet = (id: string, betId: number) => {
-    deleteFavoriteOddsBet(id).then((response: OddsBetType | unknown) => {
+    deleteFavoriteOddsBet(id).then((response: UserFavoriteOddsBetType) => {
       if (response) {
         toast.success(`Bet successfully removed!`, {
           position: 'bottom-right',
         })
-        handleFavoritOddsBet(betId, false)
+        handleFavoritOddsBet(response, false)
         setFavoriteBets((prevFavorites) =>
           prevFavorites.filter((favBet) => favBet.betId !== betId),
         )
@@ -165,7 +169,10 @@ const FootballBetHorizontalMenu = ({
                     height={100}
                     alt={fixture.home.name}
                   />
-                  <Typography>{fixture.home.name}</Typography>
+                  <TeamNameHomeAway>
+                    <Typography>{fixture.home.name}</Typography>
+                    <Typography variant='body2'>home</Typography>
+                  </TeamNameHomeAway>
                 </>
               )}
             </FixtureTeamContainer>
@@ -173,7 +180,10 @@ const FootballBetHorizontalMenu = ({
             <FixtureTeamContainer>
               {fixture && (
                 <>
-                  <Typography>{fixture.away.name}</Typography>
+                  <TeamNameHomeAway>
+                    <Typography>{fixture.away.name}</Typography>
+                    <Typography variant='body2'>away</Typography>
+                  </TeamNameHomeAway>
                   <TeamLogo
                     src={fixture.away.logo}
                     width={100}
