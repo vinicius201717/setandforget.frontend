@@ -26,7 +26,11 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import ExpandLessIcon from '@mui/icons-material/ExpandLess'
 import toast from 'react-hot-toast'
 
-const FootballVerticalMenu = () => {
+type FootballVerticalMenuType = {
+  type: string
+}
+
+const FootballVerticalMenu = ({ type }: FootballVerticalMenuType) => {
   const router = useRouter()
   const [year, setYear] = useState(new Date().getFullYear())
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
@@ -67,10 +71,21 @@ const FootballVerticalMenu = () => {
   return (
     <AppBarContainer position='static'>
       <ToolbarContainer>
-        <ButtonLink href={'/sports/football'}>
+        <ButtonLink href={'/sports/football'} isSelected={type === 'home'}>
           <HomeIcon />
         </ButtonLink>
-        <ButtonLink href={'/sports/football/leagues'}>Leagues</ButtonLink>
+        <ButtonLink
+          href={'/sports/football/odds/live'}
+          isSelected={type === 'live'}
+        >
+          Live
+        </ButtonLink>
+        <ButtonLink
+          href={'/sports/football/leagues'}
+          isSelected={type === 'leagues'}
+        >
+          Leagues
+        </ButtonLink>
         {data && data.length > 0 && (
           <>
             <List component='nav'>

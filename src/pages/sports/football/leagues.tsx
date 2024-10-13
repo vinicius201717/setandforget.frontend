@@ -131,7 +131,7 @@ export default function Football() {
   }
 
   return (
-    <FootballLayout>
+    <FootballLayout type='leagues'>
       <Container>
         <PageHeader
           title={

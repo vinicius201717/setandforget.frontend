@@ -138,7 +138,7 @@ export default function DetailsPage() {
   }
 
   return (
-    <FootballLayout>
+    <FootballLayout type='leagues'>
       <LeagueProvider leagueId={leagueId as number} season={season as number}>
         <LeagueLayout>
           {isLoading && !league ? (

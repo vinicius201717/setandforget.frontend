@@ -29,18 +29,24 @@ export const ToolbarContainer = styled(Box)<BoxProps>(({ theme }) => ({
   position: 'relative',
 }))
 
-export const ButtonLink = styled(Link)<LinkProps>(({ theme }) => ({
-  textDecoration: 'none',
-  marginRight: '20px',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  gap: theme.spacing(2),
-  padding: theme.spacing(3),
-  borderRadius: theme.shape.borderRadius,
-  backgroundColor: theme.palette.background.paper,
-  color: theme.palette.getContrastText(theme.palette.background.paper),
-}))
+export const ButtonLink = styled(Link)<LinkProps & { isSelected?: boolean }>(
+  ({ theme, isSelected }) => ({
+    textDecoration: 'none',
+    marginRight: '20px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: theme.spacing(2),
+    padding: theme.spacing(3),
+    borderRadius: theme.shape.borderRadius,
+    backgroundColor: isSelected
+      ? theme.palette.primary.main
+      : theme.palette.background.paper,
+    color: isSelected
+      ? theme.palette.getContrastText(theme.palette.primary.main)
+      : theme.palette.getContrastText(theme.palette.background.paper),
+  }),
+)
 
 export const ButtonBack = styled(Button)<ButtonProps>(({ theme }) => ({
   textDecoration: 'none',

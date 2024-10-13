@@ -129,7 +129,7 @@ export default function TeamDetails() {
   }
 
   return (
-    <FootballLayout>
+    <FootballLayout type='league'>
       <Container>
         <Grid container alignItems='center' spacing={2}>
           <Grid item>

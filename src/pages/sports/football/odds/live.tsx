@@ -4,40 +4,43 @@ import {
   IconButton,
   Typography,
 } from '@mui/material'
+
+import FootballLayout from 'src/layouts/components/footballLayout'
+import { useState, useEffect, useRef } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import Image from 'next/image'
+import CloseIcon from '@mui/icons-material/Close'
+import timeoutImage from 'public/images/pages/misc-under-maintenance.png'
+import PredictionsComponent from 'src/components/football/footballPrediction'
+import { getFixturePredictions } from 'src/pages/api/football/fixture/getFixturePredictions'
+import toast from 'react-hot-toast'
 import {
   ContainerFixture,
   ContainerProgress,
   ModalContent,
   ModalProdiction,
-} from './style'
-import FootballLayout from 'src/layouts/components/footballLayout'
-import { useState, useEffect, useRef } from 'react'
-import { useQuery } from '@tanstack/react-query'
-import { getFixture } from 'src/pages/api/football/fixture/getFixture'
+} from '../style'
+import { getOddsBetLive } from 'src/pages/api/football/odds/getOddsLive'
+import { MatchData } from 'src/types/apps/footballType/oddsLiveType'
 import { PredictionsResponse } from 'src/types/apps/footballType'
-import Image from 'next/image'
-import CloseIcon from '@mui/icons-material/Close'
-import timeoutImage from 'public/images/pages/misc-under-maintenance.png'
-import LeagueFixture from 'src/components/football/footballFixture/LeagueFixture'
-import Fixture from 'src/components/football/footballFixture/Fixture'
-import PredictionsComponent from 'src/components/football/footballPrediction'
-import { getFixturePredictions } from 'src/pages/api/football/fixture/getFixturePredictions'
-import toast from 'react-hot-toast'
-import { FixtureTypeResponse } from 'src/types/apps/footballType/fixtureType'
+import { useWebSocket } from 'src/pages/api/football/odds/oddsLive.websocket'
 
 export default function Football() {
   const [isTimeout, setIsTimeout] = useState(false)
   const [fixtureId, setFixtureId] = useState<number | null>(null)
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
   const timerRef = useRef<NodeJS.Timeout | null>(null)
+  const { message, sendMessage } = useWebSocket({
+    url: 'http://localhost:3000',
+  })
 
   const {
-    data: fixturesGroups,
+    data: fixtureLive,
     isLoading,
     isError,
-  } = useQuery<FixtureTypeResponse[][]>({
-    queryKey: ['fixtures'],
-    queryFn: getFixture,
+  } = useQuery<MatchData[][]>({
+    queryKey: ['oddsBetLive'],
+    queryFn: getOddsBetLive,
     refetchOnWindowFocus: false,
     staleTime: 600000,
   })
@@ -53,16 +56,20 @@ export default function Football() {
     enabled: false,
   })
 
-  const handleFetchPredictions = (id: number) => {
-    setFixtureId(id)
-    setIsModalOpen(true)
-  }
+  // const handleFetchPredictions = (id: number) => {
+  //   setFixtureId(id)
+  //   setIsModalOpen(true)
+  // }
 
   useEffect(() => {
     if (fixtureId) {
       refetchFixturePredictions()
     }
   }, [fixtureId, refetchFixturePredictions])
+
+  useEffect(() => {
+    console.log(message)
+  }, [message])
 
   useEffect(() => {
     timerRef.current = setTimeout(() => {
@@ -82,25 +89,9 @@ export default function Football() {
     }
   }, [fpError, isError])
 
-  useEffect(() => {
-    if (!isLoading && fixturesGroups && fixturesGroups.flat().length > 0) {
-      if (timerRef.current) {
-        clearTimeout(timerRef.current)
-        setIsTimeout(false)
-      }
-    }
-  }, [isLoading, fixturesGroups])
-
-  const sortFixturesByDate = (fixtures: FixtureTypeResponse[]) => {
-    return fixtures.sort((a, b) => {
-      const dateA = new Date(a.fixture.date).getTime()
-      const dateB = new Date(b.fixture.date).getTime()
-      return dateA - dateB
-    })
-  }
-
   return (
-    <FootballLayout type={'home'}>
+    <FootballLayout type='live'>
+      <h1>Football Live Odds</h1>
       <Container>
         <ContainerFixture>
           {isLoading ? (
@@ -112,28 +103,26 @@ export default function Football() {
               <Typography variant='h6'>No signal</Typography>
               <Image src={timeoutImage} alt='Timeout' width={400} />
             </ContainerProgress>
-          ) : (
-            fixturesGroups &&
-            fixturesGroups.map((fixtures, groupIndex) => (
-              <LeagueFixture
-                key={groupIndex}
-                leagueName={fixtures[0]?.league.name || ''}
-              >
-                {sortFixturesByDate(fixtures).map(
-                  (fixture: any, fixtureIndex: number) => (
-                    <Fixture
-                      handlePrediction={handleFetchPredictions}
-                      key={fixtureIndex}
-                      data={fixture}
-                      prediction={false}
-                    />
-                  ),
-                )}
-              </LeagueFixture>
+          ) : fixtureLive && fixtureLive.length > 0 ? (
+            fixtureLive.map((fixtures, groupIndex) => (
+              <pre key={groupIndex}>{JSON.stringify(fixtures)}</pre>
+              // <div key={groupIndex}>
+              //   {fixtures.map((fixture: MatchData, fixtureIndex: number) => (
+              //     <Fixture
+              //       handlePrediction={handleFetchPredictions}
+              //       key={fixtureIndex}
+              //       data={fixture}
+              //       prediction={false}
+              //     />
+              //   ))}
+              // </div>
             ))
+          ) : (
+            <Typography variant='body2'>No live odds available</Typography>
           )}
         </ContainerFixture>
       </Container>
+
       <ModalProdiction
         open={isModalOpen}
         onClose={() => setIsModalOpen(false)}
@@ -153,7 +142,9 @@ export default function Football() {
             </ContainerProgress>
           ) : fixturePredictions && fixturePredictions.length > 0 ? (
             <PredictionsComponent data={fixturePredictions[0]} />
-          ) : null}
+          ) : (
+            <Typography variant='body2'>No predictions available</Typography>
+          )}
         </ModalContent>
       </ModalProdiction>
     </FootballLayout>

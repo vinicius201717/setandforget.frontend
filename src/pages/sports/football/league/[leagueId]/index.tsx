@@ -25,7 +25,7 @@ export default function LeaguePage() {
     enabled: !!leagueId,
   })
   return (
-    <FootballLayout>
+    <FootballLayout type={'leagues'}>
       <Container>
         {leagueData ? (
           <>
