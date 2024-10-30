@@ -106,7 +106,7 @@ const LoginPage = () => {
     mode: 'onBlur',
     defaultValues: {
       email: 'vcsousa414@gmail.com',
-      password: 'a22k4f99',
+      password: 'a22k4f99e@@caeAA',
     },
     resolver: zodResolver(formSchema),
   })

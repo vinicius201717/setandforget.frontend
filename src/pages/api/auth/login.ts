@@ -23,6 +23,7 @@ export async function login({
 }: LoginProps): Promise<LoginReturnValuesType | void | string> {
   try {
     const response = await api.post('/auth/login', params)
+
     if (response.data.status === 102) {
       return { status: 'pending', userId: response.data.userId }
     } else if (response.status === 204) {
