@@ -4,10 +4,8 @@ import {
   IconButton,
   Typography,
 } from '@mui/material'
-
 import FootballLayout from 'src/layouts/components/footballLayout'
 import { useState, useEffect, useRef } from 'react'
-import { useQuery } from '@tanstack/react-query'
 import Image from 'next/image'
 import CloseIcon from '@mui/icons-material/Close'
 import timeoutImage from 'public/images/pages/misc-under-maintenance.png'
@@ -20,30 +18,21 @@ import {
   ModalContent,
   ModalProdiction,
 } from '../style'
-import { getOddsBetLive } from 'src/pages/api/football/odds/getOddsLive'
 import { MatchData } from 'src/types/apps/footballType/oddsLiveType'
 import { PredictionsResponse } from 'src/types/apps/footballType'
-import { useWebSocket } from 'src/pages/api/football/odds/oddsLive.websocket'
+import { useQuery } from '@tanstack/react-query'
+import {
+  connectOddsSocket,
+  disconnectOddsSocket,
+} from 'src/pages/api/odds-live/odds-live-websocket'
 
 export default function Football() {
   const [isTimeout, setIsTimeout] = useState(false)
   const [fixtureId, setFixtureId] = useState<number | null>(null)
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
+  const [fixtureLive, setFixtureLive] = useState<MatchData[][] | null>(null)
+  const [isError, setIsError] = useState(false)
   const timerRef = useRef<NodeJS.Timeout | null>(null)
-  const { message, sendMessage } = useWebSocket({
-    url: 'http://localhost:3000',
-  })
-
-  const {
-    data: fixtureLive,
-    isLoading,
-    isError,
-  } = useQuery<MatchData[][]>({
-    queryKey: ['oddsBetLive'],
-    queryFn: getOddsBetLive,
-    refetchOnWindowFocus: false,
-    staleTime: 600000,
-  })
 
   const {
     data: fixturePredictions,
@@ -56,21 +45,31 @@ export default function Football() {
     enabled: false,
   })
 
-  // const handleFetchPredictions = (id: number) => {
-  //   setFixtureId(id)
-  //   setIsModalOpen(true)
-  // }
+  // Conectar ao WebSocket para receber odds ao vivo
+  useEffect(() => {
+    connectOddsSocket(
+      (data) => {
+        setFixtureLive(data)
+        setIsTimeout(false)
+        setIsError(false)
+      },
+      () => console.log('WebSocket connected'),
+      () => console.log('WebSocket disconnected'),
+    )
 
+    return () => {
+      disconnectOddsSocket()
+    }
+  }, [])
+
+  // Atualiza o componente de previsões quando o ID do fixture muda
   useEffect(() => {
     if (fixtureId) {
       refetchFixturePredictions()
     }
   }, [fixtureId, refetchFixturePredictions])
 
-  useEffect(() => {
-    console.log(message)
-  }, [message])
-
+  // Define um timeout caso não cheguem dados via WebSocket
   useEffect(() => {
     timerRef.current = setTimeout(() => {
       setIsTimeout(true)
@@ -89,16 +88,16 @@ export default function Football() {
     }
   }, [fpError, isError])
 
+  useEffect(() => {
+    console.log(fixtureLive)
+  }, [fixtureLive])
+
   return (
     <FootballLayout type='live'>
       <h1>Football Live Odds</h1>
       <Container>
         <ContainerFixture>
-          {isLoading ? (
-            <ContainerProgress>
-              <CircularProgress />
-            </ContainerProgress>
-          ) : isTimeout || isError ? (
+          {!fixtureLive && isTimeout ? (
             <ContainerProgress>
               <Typography variant='h6'>No signal</Typography>
               <Image src={timeoutImage} alt='Timeout' width={400} />
