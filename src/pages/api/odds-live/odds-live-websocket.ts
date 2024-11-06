@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable no-unused-vars */
 import { io, Socket } from 'socket.io-client'
 
 let socket: Socket | null = null
@@ -30,7 +32,7 @@ export const connectOddsSocket = (
   // Evento para atualizar odds ao vivo
   socket.on('updateData', (data) => {
     console.log('Received odds update:', data)
-    onOddsUpdate(data)
+    onOddsUpdate(data.response)
   })
 
   // Evento para lidar com a finalização das odds ou tempo esgotado

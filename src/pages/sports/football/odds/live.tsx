@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import {
   CircularProgress,
   Container,
@@ -30,7 +31,8 @@ export default function Football() {
   const [isTimeout, setIsTimeout] = useState(false)
   const [fixtureId, setFixtureId] = useState<number | null>(null)
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
-  const [fixtureLive, setFixtureLive] = useState<MatchData[][] | null>(null)
+  const [fixtureLive, setFixtureLive] = useState<MatchData[]>([]) // Define fixtureLive como um array vazio por padrão
+  const [isLoading, setIsLoading] = useState(true)
   const [isError, setIsError] = useState(false)
   const timerRef = useRef<NodeJS.Timeout | null>(null)
 
@@ -45,13 +47,13 @@ export default function Football() {
     enabled: false,
   })
 
-  // Conectar ao WebSocket para receber odds ao vivo
   useEffect(() => {
     connectOddsSocket(
-      (data) => {
-        setFixtureLive(data)
+      (data: MatchData[]) => {
+        setFixtureLive(data || [])
         setIsTimeout(false)
         setIsError(false)
+        setIsLoading(false)
       },
       () => console.log('WebSocket connected'),
       () => console.log('WebSocket disconnected'),
@@ -62,17 +64,20 @@ export default function Football() {
     }
   }, [])
 
-  // Atualiza o componente de previsões quando o ID do fixture muda
   useEffect(() => {
     if (fixtureId) {
       refetchFixturePredictions()
     }
   }, [fixtureId, refetchFixturePredictions])
 
-  // Define um timeout caso não cheguem dados via WebSocket
   useEffect(() => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current)
+    }
+
     timerRef.current = setTimeout(() => {
       setIsTimeout(true)
+      setIsLoading(false)
     }, 10000)
 
     return () => {
@@ -80,7 +85,7 @@ export default function Football() {
         clearTimeout(timerRef.current)
       }
     }
-  }, [])
+  }, [fixtureLive])
 
   useEffect(() => {
     if (fpError || isError) {
@@ -88,36 +93,26 @@ export default function Football() {
     }
   }, [fpError, isError])
 
-  useEffect(() => {
-    console.log(fixtureLive)
-  }, [fixtureLive])
-
   return (
     <FootballLayout type='live'>
       <h1>Football Live Odds</h1>
       <Container>
         <ContainerFixture>
-          {!fixtureLive && isTimeout ? (
+          {isLoading ? (
+            <ContainerProgress>
+              <CircularProgress />
+            </ContainerProgress>
+          ) : fixtureLive.length === 0 ? (
             <ContainerProgress>
               <Typography variant='h6'>No signal</Typography>
               <Image src={timeoutImage} alt='Timeout' width={400} />
             </ContainerProgress>
-          ) : fixtureLive && fixtureLive.length > 0 ? (
-            fixtureLive.map((fixtures, groupIndex) => (
-              <pre key={groupIndex}>{JSON.stringify(fixtures)}</pre>
-              // <div key={groupIndex}>
-              //   {fixtures.map((fixture: MatchData, fixtureIndex: number) => (
-              //     <Fixture
-              //       handlePrediction={handleFetchPredictions}
-              //       key={fixtureIndex}
-              //       data={fixture}
-              //       prediction={false}
-              //     />
-              //   ))}
-              // </div>
-            ))
           ) : (
-            <Typography variant='body2'>No live odds available</Typography>
+            fixtureLive.map((fixtures, groupIndex) => (
+              <div key={groupIndex}>
+                <pre>{JSON.stringify(fixtures)}</pre>
+              </div>
+            ))
           )}
         </ContainerFixture>
       </Container>
