@@ -32,7 +32,7 @@ export const connectOddsSocket = (
   // Evento para atualizar odds ao vivo
   socket.on('updateData', (data) => {
     console.log('Received odds update:', data)
-    onOddsUpdate(data.response)
+    onOddsUpdate(data)
   })
 
   // Evento para lidar com a finalização das odds ou tempo esgotado

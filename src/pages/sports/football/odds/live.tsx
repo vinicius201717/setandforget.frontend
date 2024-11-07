@@ -26,12 +26,14 @@ import {
   connectOddsSocket,
   disconnectOddsSocket,
 } from 'src/pages/api/odds-live/odds-live-websocket'
+import FixtureLive from 'src/components/football/footballFixture/FixtureLive'
+import { ContainerFixtureLive } from './style'
 
 export default function Football() {
   const [isTimeout, setIsTimeout] = useState(false)
   const [fixtureId, setFixtureId] = useState<number | null>(null)
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
-  const [fixtureLive, setFixtureLive] = useState<MatchData[]>([]) // Define fixtureLive como um array vazio por padrão
+  const [fixtureLive, setFixtureLive] = useState<MatchData[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [isError, setIsError] = useState(false)
   const timerRef = useRef<NodeJS.Timeout | null>(null)
@@ -46,6 +48,11 @@ export default function Football() {
     queryFn: () => getFixturePredictions(fixtureId as number),
     enabled: false,
   })
+
+  const handleFetchPredictions = (id: number) => {
+    setFixtureId(id)
+    setIsModalOpen(true)
+  }
 
   useEffect(() => {
     connectOddsSocket(
@@ -108,11 +115,16 @@ export default function Football() {
               <Image src={timeoutImage} alt='Timeout' width={400} />
             </ContainerProgress>
           ) : (
-            fixtureLive.map((fixtures, groupIndex) => (
-              <div key={groupIndex}>
-                <pre>{JSON.stringify(fixtures)}</pre>
-              </div>
-            ))
+            <ContainerFixtureLive>
+              {fixtureLive.map((fixture, groupIndex) => (
+                <FixtureLive
+                  handlePrediction={handleFetchPredictions}
+                  key={groupIndex}
+                  data={fixture}
+                  prediction={false}
+                />
+              ))}
+            </ContainerFixtureLive>
           )}
         </ContainerFixture>
       </Container>

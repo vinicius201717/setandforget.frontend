@@ -76,6 +76,14 @@ export const DateContainerDate = styled(Typography)<TypographyProps>(() => ({
   fontSize: '0.8rem',
 }))
 
+export const LDateContainerDate = styled(Typography)<TypographyProps>(() => ({
+  position: 'absolute',
+  left: '5px',
+  top: '5px',
+  color: 'green',
+  fontSize: '1rem',
+}))
+
 export const ViewContainer = styled(Box)<BoxProps>(({ theme }) => ({
   position: 'absolute',
   right: '5px',

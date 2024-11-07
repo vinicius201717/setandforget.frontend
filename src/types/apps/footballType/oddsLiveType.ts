@@ -44,11 +44,29 @@ interface Teams {
   away: Team
 }
 
+interface TeamInfo {
+  id: string
+  teamId: number
+  name: string
+  code: string | null
+  country: string | null
+  founded: number | null
+  national: boolean | null
+  logo: string
+  createdAt: Date
+}
+
+interface TeamsInfo {
+  home: TeamInfo
+  away: TeamInfo
+}
+
 export interface MatchData {
   fixture: Fixture
   league: League
   odds: Odds[]
   status: Status
   teams: Teams
+  teamsInfo: TeamsInfo
   update: string
 }

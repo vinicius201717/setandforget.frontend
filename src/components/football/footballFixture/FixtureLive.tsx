@@ -1,9 +1,10 @@
 /* eslint-disable no-unused-vars */
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   DateContainerDate,
   FixtureContainer,
   FixtureTeamsContainer,
+  LDateContainerDate,
   LinkButtom,
   LogoNameContainer,
   OddsContainer,
@@ -12,37 +13,36 @@ import {
 } from './style'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import { Divider, Typography } from '@mui/material'
-import { formatFixtureDate } from 'src/utils/format-date-local'
-import { formatHour } from 'src/utils/format-hours'
-import { formatDate } from 'src/utils/format-data'
-import { FixtureTypeResponse } from 'src/types/apps/footballType/fixtureType'
+import { MatchData } from 'src/types/apps/footballType/oddsLiveType'
+import useGameTimer from 'src/hooks/useOddsLiveTimer'
 
-interface FixtureProps {
-  data: FixtureTypeResponse
+interface FixtureLiveProps {
+  data: MatchData
   prediction?: boolean
   handlePrediction: (id: number) => void
 }
 
-const Fixture: React.FC<FixtureProps> = ({
+const FixtureLive: React.FC<FixtureLiveProps> = ({
   data,
   prediction = false,
   handlePrediction,
 }) => {
-  const isActive =
-    data.fixture.status.short === 'NS' ||
-    data.fixture.status.short === '1H' ||
-    data.fixture.status.short === '2H'
+  const [serverTime, setServerTime] = useState<string>('00:00')
 
-  if (!isActive) {
-    return null
-  }
+  const gameTime = useGameTimer(serverTime)
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      const updatedServerTime = data.fixture.status.seconds
+      setServerTime(updatedServerTime)
+    }, 1000)
+
+    return () => clearInterval(intervalId)
+  }, [])
 
   return (
     <FixtureContainer prediction={prediction}>
-      <DateContainerDate>
-        {formatDate(formatFixtureDate(data.fixture.date).date)} -{' '}
-        {formatHour(formatFixtureDate(data.fixture.date).time)}
-      </DateContainerDate>
+      <LDateContainerDate>{gameTime}</LDateContainerDate>
       <ViewContainer>
         <LinkButtom href={`/sports/football/fixture/${data.fixture.id}`}>
           <Typography variant='body2'> View more</Typography>
@@ -53,22 +53,22 @@ const Fixture: React.FC<FixtureProps> = ({
       <FixtureTeamsContainer>
         <LogoNameContainer>
           <TeamImage
-            src={data.teams.home.logo}
+            src={data.teamsInfo.home.logo}
             height={30}
             width={30}
-            alt={data.teams.home.name}
+            alt={data.teamsInfo.home.name}
           />
-          <Typography>{data.teams.home.name}</Typography>
+          <Typography>{data.teamsInfo.home.name}</Typography>
         </LogoNameContainer>
         <Typography>X</Typography>
         <LogoNameContainer>
           <TeamImage
-            src={data.teams.away.logo}
+            src={data.teamsInfo.away.logo}
             height={30}
             width={30}
-            alt={data.teams.away.name}
+            alt={data.teamsInfo.away.name}
           />
-          <Typography>{data.teams.away.name}</Typography>
+          <Typography>{data.teamsInfo.away.name}</Typography>
         </LogoNameContainer>
         <Divider sx={{ marginTop: '10px' }} />
       </FixtureTeamsContainer>
@@ -77,4 +77,4 @@ const Fixture: React.FC<FixtureProps> = ({
   )
 }
 
-export default Fixture
+export default FixtureLive
