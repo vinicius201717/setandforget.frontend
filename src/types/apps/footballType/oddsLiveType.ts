@@ -22,7 +22,7 @@ interface OddsValue {
   value: string
 }
 
-interface Odds {
+export interface Odds {
   id: number
   name: string
   values: OddsValue[]

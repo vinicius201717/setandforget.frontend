@@ -136,7 +136,7 @@ export default function LeaguePage() {
   }, [data])
 
   return (
-    <FootballLayout>
+    <FootballLayout type='odds'>
       {isOddsLoading ? (
         <ContainerProgress>
           <CircularProgress />

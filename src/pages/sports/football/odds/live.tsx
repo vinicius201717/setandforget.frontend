@@ -2,11 +2,12 @@
 import {
   CircularProgress,
   Container,
+  Divider,
   IconButton,
   Typography,
 } from '@mui/material'
 import FootballLayout from 'src/layouts/components/footballLayout'
-import { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import CloseIcon from '@mui/icons-material/Close'
 import timeoutImage from 'public/images/pages/misc-under-maintenance.png'
@@ -117,12 +118,21 @@ export default function Football() {
           ) : (
             <ContainerFixtureLive>
               {fixtureLive.map((fixture, groupIndex) => (
-                <FixtureLive
-                  handlePrediction={handleFetchPredictions}
-                  key={groupIndex}
-                  data={fixture}
-                  prediction={false}
-                />
+                <React.Fragment key={groupIndex}>
+                  <FixtureLive
+                    handlePrediction={handleFetchPredictions}
+                    data={fixture}
+                    prediction={false}
+                  />
+
+                  {groupIndex < fixtureLive.length - 1 && (
+                    <Divider
+                      orientation='vertical'
+                      flexItem
+                      sx={{ marginX: 2 }}
+                    />
+                  )}
+                </React.Fragment>
               ))}
             </ContainerFixtureLive>
           )}

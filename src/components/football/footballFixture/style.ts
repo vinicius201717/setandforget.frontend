@@ -76,12 +76,51 @@ export const DateContainerDate = styled(Typography)<TypographyProps>(() => ({
   fontSize: '0.8rem',
 }))
 
+export const ContainerTimerAndResultsInfo = styled(Box)<BoxProps>(() => ({
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'center',
+  alignItems: 'center',
+}))
+
 export const LDateContainerDate = styled(Typography)<TypographyProps>(() => ({
-  position: 'absolute',
-  left: '5px',
-  top: '5px',
   color: 'green',
   fontSize: '1rem',
+}))
+
+export const Vs = styled(Typography)<TypographyProps>(() => ({
+  fontSize: '0.29rem',
+}))
+
+export const TypographyTeamName = styled(Typography)<TypographyProps>(() => ({
+  whiteSpace: 'nowrap',
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  maxWidth: '120px',
+}))
+
+export const ContainerResult = styled(Box)<BoxProps>(({ theme }) => ({
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  width: '50px',
+  backgroundColor: theme.palette.background.default,
+  borderRadius: theme.shape.borderRadius,
+  padding: theme.spacing(1),
+}))
+
+export const ItemResult = styled(Box)<BoxProps>(({ theme }) => ({
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  padding: theme.spacing(1),
+}))
+
+export const OddsValues = styled(Box)<BoxProps>(({ theme }) => ({
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  padding: theme.spacing(1),
 }))
 
 export const ViewContainer = styled(Box)<BoxProps>(({ theme }) => ({
@@ -129,9 +168,17 @@ export const OddsContainer = styled(Box)<BoxProps>(({ theme }) => ({
   width: '100%',
   height: '40px',
   display: 'flex',
-  flexDirection: 'column',
   alignItems: 'center',
-  justifyContent: 'center',
+  justifyContent: 'space-around',
   borderRadius: theme.shape.borderRadius,
   backgroundColor: theme.palette.background.default,
+}))
+
+export const OddValue = styled(Box)<BoxProps>(() => ({
+  width: '33%',
+  height: '100%',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  cursor: 'pointer',
 }))
