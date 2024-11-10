@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import {
   ContainerResult,
   ContainerTimerAndResultsInfo,
-  FixtureContainer,
+  FixtureContainerLive,
   FixtureTeamsContainer,
   ItemResult,
   LDateContainerDate,
@@ -59,7 +59,7 @@ const FixtureLive: React.FC<FixtureLiveProps> = ({
   }, [])
 
   return (
-    <FixtureContainer prediction={prediction}>
+    <FixtureContainerLive prediction={prediction}>
       <ViewContainer>
         <LinkButtom href={`/sports/football/fixture/${data.fixture.id}`}>
           <Typography variant='body2'> View more</Typography>
@@ -115,7 +115,7 @@ const FixtureLive: React.FC<FixtureLiveProps> = ({
           </React.Fragment>
         ))}
       </OddsContainer>
-    </FixtureContainer>
+    </FixtureContainerLive>
   )
 }
 

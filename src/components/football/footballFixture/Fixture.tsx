@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-vars */
 import React from 'react'
 import {
+  ButtonOdds,
   DateContainerDate,
   FixtureContainer,
   FixtureTeamsContainer,
@@ -28,6 +29,8 @@ const Fixture: React.FC<FixtureProps> = ({
   prediction = false,
   handlePrediction,
 }) => {
+  console.log(data)
+
   const isActive =
     data.fixture.status.short === 'NS' ||
     data.fixture.status.short === '1H' ||
@@ -44,10 +47,6 @@ const Fixture: React.FC<FixtureProps> = ({
         {formatHour(formatFixtureDate(data.fixture.date).time)}
       </DateContainerDate>
       <ViewContainer>
-        <LinkButtom href={`/sports/football/fixture/${data.fixture.id}`}>
-          <Typography variant='body2'> View more</Typography>
-        </LinkButtom>
-
         <VisibilityIcon onClick={() => handlePrediction(data.fixture.id)} />
       </ViewContainer>
       <FixtureTeamsContainer>
@@ -72,7 +71,12 @@ const Fixture: React.FC<FixtureProps> = ({
         </LogoNameContainer>
         <Divider sx={{ marginTop: '10px' }} />
       </FixtureTeamsContainer>
-      <OddsContainer />
+      <ButtonOdds>
+        {' '}
+        <LinkButtom href={`/sports/football/fixture/${data.fixture.id}`}>
+          View odds{' '}
+        </LinkButtom>
+      </ButtonOdds>
     </FixtureContainer>
   )
 }

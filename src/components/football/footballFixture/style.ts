@@ -4,6 +4,8 @@ import {
   BoxProps,
   Typography,
   TypographyProps,
+  Button,
+  ButtonProps,
 } from '@mui/material'
 import Image from 'next/image'
 import Link, { LinkProps } from 'next/link'
@@ -36,9 +38,26 @@ export const FixtureContainer = styled(Box)<FixtureContainerProps>(
     backgroundColor: theme.palette.background.paper,
     paddingTop: theme.spacing(9),
     position: 'relative',
+    flexBasis: '30%',
+    minWidth: '300px',
+    maxWidth: '100%',
+    flexGrow: 1,
   }),
 )
 
+export const FixtureContainerLive = styled(Box)<FixtureContainerProps>(
+  ({ theme, prediction }) => ({
+    padding: !prediction ? theme.spacing(2) : theme.spacing(1),
+    width: '30%',
+    minWidth: '300px',
+    borderRadius: theme.shape.borderRadius,
+    backgroundColor: theme.palette.background.paper,
+    paddingTop: theme.spacing(9),
+    position: 'relative',
+    flexBasis: '33%',
+    flexGrow: 1,
+  }),
+)
 export const FixtureTeamsContainer = styled(Box)<BoxProps>(({ theme }) => ({
   flex: '0 0 350px',
   display: 'flex',
@@ -159,12 +178,24 @@ export const TeamImage = styled(Image)(({ theme }) => ({
   objectFit: 'contain',
 }))
 
-export const LinkButtom = styled(Link)<LinkProps>(() => ({
+export const LinkButtom = styled(Link)<LinkProps>(({ theme }) => ({
   cursor: 'pointer',
   textDecoration: 'none',
+  fontSize: '0.7rem',
+  color: theme.palette.getContrastText(theme.palette.background.default),
 }))
 
 export const OddsContainer = styled(Box)<BoxProps>(({ theme }) => ({
+  width: '100%',
+  height: '40px',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-around',
+  borderRadius: theme.shape.borderRadius,
+  backgroundColor: theme.palette.background.default,
+}))
+
+export const ButtonOdds = styled(Button)<ButtonProps>(({ theme }) => ({
   width: '100%',
   height: '40px',
   display: 'flex',

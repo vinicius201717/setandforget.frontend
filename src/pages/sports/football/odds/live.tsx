@@ -2,7 +2,6 @@
 import {
   CircularProgress,
   Container,
-  Divider,
   IconButton,
   Typography,
 } from '@mui/material'
@@ -124,14 +123,6 @@ export default function Football() {
                     data={fixture}
                     prediction={false}
                   />
-
-                  {groupIndex < fixtureLive.length - 1 && (
-                    <Divider
-                      orientation='vertical'
-                      flexItem
-                      sx={{ marginX: 2 }}
-                    />
-                  )}
                 </React.Fragment>
               ))}
             </ContainerFixtureLive>

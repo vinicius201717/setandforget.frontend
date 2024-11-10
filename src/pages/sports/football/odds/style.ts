@@ -5,6 +5,6 @@ export const ContainerFixtureLive = styled(Box)<BoxProps>(({ theme }) => ({
   display: 'flex',
   flexWrap: 'wrap',
   justifyContent: 'flex-start',
-  gap: theme.spacing(2),
+  gap: theme.spacing(1),
   borderRadius: theme.shape.borderRadius,
 }))
