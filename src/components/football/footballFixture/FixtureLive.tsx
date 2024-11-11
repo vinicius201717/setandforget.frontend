@@ -20,6 +20,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility'
 import { Divider, Typography } from '@mui/material'
 import { MatchData, Odds } from 'src/types/apps/footballType/oddsLiveType'
 import useGameTimer from 'src/hooks/useOddsLiveTimer'
+import { useCart } from 'src/context/CartOddsContext'
 
 interface FixtureLiveProps {
   data: MatchData
@@ -34,6 +35,14 @@ const FixtureLive: React.FC<FixtureLiveProps> = ({
 }) => {
   const [odds, setOdds] = useState<Odds | undefined>(undefined)
   const [serverTime, setServerTime] = useState<string>('00:00')
+  const { addItem } = useCart()
+
+  const produto = {
+    id: '1',
+    name: 'Produto Exemplo',
+    price: 100.0,
+    quantity: 1,
+  }
 
   const gameTime = useGameTimer(serverTime)
 
@@ -82,7 +91,9 @@ const FixtureLive: React.FC<FixtureLiveProps> = ({
 
           <ContainerResult>
             <ItemResult>{data.teams.home.goals}</ItemResult>
-            <Vs variant='body2'>X</Vs>
+            <Vs onClick={() => addItem(produto)} variant='body2'>
+              X
+            </Vs>
             <ItemResult>{data.teams.away.goals}</ItemResult>
           </ContainerResult>
         </ContainerTimerAndResultsInfo>

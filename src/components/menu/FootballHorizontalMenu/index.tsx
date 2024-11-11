@@ -81,6 +81,12 @@ const FootballVerticalMenu = ({ type }: FootballVerticalMenuType) => {
           Live
         </ButtonLink>
         <ButtonLink
+          href={'/sports/football/odds/my-bets'}
+          isSelected={type === 'live'}
+        >
+          My bets
+        </ButtonLink>
+        <ButtonLink
           href={'/sports/football/leagues'}
           isSelected={type === 'leagues'}
         >

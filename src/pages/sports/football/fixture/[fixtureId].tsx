@@ -28,6 +28,7 @@ import {
 } from 'src/types/apps/footballType/fixtureType'
 import { getOddsBetFixture } from 'src/pages/api/football/odds/getOddsBetFixture'
 import { BetTeamContainer, ContainerProgress } from '../style'
+import { useCart } from 'src/context/CartOddsContext'
 
 interface OddsBetInterface {
   oddsBet: OddsBetType[]
@@ -135,6 +136,15 @@ export default function LeaguePage() {
     }
   }, [data])
 
+  const { addItem } = useCart()
+
+  const produto = {
+    id: '1',
+    name: 'Produto Exemplo',
+    price: 100.0,
+    quantity: 1,
+  }
+
   return (
     <FootballLayout type='odds'>
       {isOddsLoading ? (
@@ -179,7 +189,7 @@ export default function LeaguePage() {
                   {favorites.values.map((value: BetsValues, index: number) => (
                     <TableRow key={index}>
                       <TableCell align='left'>
-                        <BetTeamContainer>
+                        <BetTeamContainer onClick={() => addItem(produto)}>
                           <Typography variant='body2'>{value.value}</Typography>
                           <Typography variant='body2' color='primary'>
                             {value.odd}
