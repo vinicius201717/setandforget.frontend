@@ -28,10 +28,14 @@ const CartContext = createContext<CartContextType | undefined>(undefined)
 
 export const CartOddsProvider = ({ children }: { children: ReactNode }) => {
   const [items, setItems] = useState<CartItem[]>([])
+  const [isCardOpen, setIsCardOpen] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
 
-  const handleOpen = () => setIsModalOpen(true)
-  const handleClose = () => setIsModalOpen(false)
+  const handleModalOpen = () => setIsModalOpen(true)
+  const handleModalClose = () => setIsModalOpen(false)
+
+  const handleCardOpen = () => setIsCardOpen(true)
+  const handleCardClose = () => setIsCardOpen(false)
 
   const addItem = (item: CartItem) => {
     setItems((prevItems) => {
@@ -51,7 +55,10 @@ export const CartOddsProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     if (items) {
-      handleOpen()
+      handleCardOpen()
+    } else {
+      handleModalClose()
+      handleCardClose()
     }
   }, [items])
 
@@ -74,12 +81,11 @@ export const CartOddsProvider = ({ children }: { children: ReactNode }) => {
     >
       {children}
       <CartModal
-        open={isModalOpen}
-        onClose={handleClose}
-        title='Título do Modal'
-      >
-        <h2>teste</h2>
-      </CartModal>
+        open={isCardOpen}
+        modalOpen={isModalOpen}
+        onOpenCardOdds={handleModalOpen}
+        onCloseCardOdds={handleModalClose}
+      ></CartModal>
     </CartContext.Provider>
   )
 }

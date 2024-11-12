@@ -41,7 +41,8 @@ export const FixtureContainer = styled(Box)<FixtureContainerProps>(
     flexBasis: '30%',
     minWidth: '300px',
     maxWidth: '100%',
-    flexGrow: 1,
+    flexGrow: 0,
+    flexShrink: 0,
   }),
 )
 
@@ -55,7 +56,8 @@ export const FixtureContainerLive = styled(Box)<FixtureContainerProps>(
     paddingTop: theme.spacing(9),
     position: 'relative',
     flexBasis: '33%',
-    flexGrow: 1,
+    flexGrow: 0,
+    flexShrink: 0,
   }),
 )
 export const FixtureTeamsContainer = styled(Box)<BoxProps>(({ theme }) => ({

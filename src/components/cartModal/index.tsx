@@ -1,49 +1,39 @@
 // src/components/CustomModal.tsx
 
 import React from 'react'
-import { Modal, Box, Typography, IconButton } from '@mui/material'
-import CloseIcon from '@mui/icons-material/Close'
 import { BoxContainer } from './style'
+import Cart from '../cartOdds'
+import { Badge, IconButton, useTheme } from '@mui/material'
+import ReceiptIcon from '@mui/icons-material/Receipt'
 
 type CartModalProps = {
   open: boolean
-  onClose: () => void
-  title?: string
-  children: React.ReactNode
+  modalOpen: boolean
+  onCloseCardOdds: () => void
+  onOpenCardOdds: () => void
 }
 
 const CartModal: React.FC<CartModalProps> = ({
   open,
-  onClose,
-  title,
-  children,
+  modalOpen,
+  onCloseCardOdds,
+  onOpenCardOdds,
 }) => {
+  const theme = useTheme()
+
   return (
-    <Modal
-      open={open}
-      onClose={onClose}
-      aria-labelledby='modal-title'
-      aria-describedby='modal-description'
-    >
-      <BoxContainer>
-        <Box
-          display='flex'
-          justifyContent='space-between'
-          alignItems='center'
-          mb={2}
-        >
-          {title && (
-            <Typography id='modal-title' variant='h6' component='h2'>
-              {title}
-            </Typography>
-          )}
-          <IconButton onClick={onClose}>
-            <CloseIcon />
-          </IconButton>
-        </Box>
-        <Box id='modal-description'>{children}</Box>
+    <>
+      <BoxContainer open={open} onClick={() => onOpenCardOdds()}>
+        <IconButton aria-label='bet cart'>
+          <Badge badgeContent={3} color='secondary'>
+            <ReceiptIcon
+              sx={{ fontSize: '4rem', color: theme.palette.primary.main }}
+            />
+          </Badge>
+        </IconButton>
       </BoxContainer>
-    </Modal>
+      <Cart open={modalOpen} onClose={onCloseCardOdds} />
+    </>
   )
 }
 

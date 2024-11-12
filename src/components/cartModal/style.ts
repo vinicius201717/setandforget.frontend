@@ -1,12 +1,16 @@
 import { Button, styled } from '@mui/material'
 
-export const BoxContainer = styled(Button)(({ theme }) => ({
-  position: 'absolute',
-  bottom: '0',
-  right: '0',
-  height: '100vh',
-  width: 400,
-  backgroundColor: theme.palette.background.paper,
-  boxShadow: theme.shadows[24],
-  padding: theme.spacing(4),
+interface BoxContainerProps {
+  open: boolean
+}
+
+export const BoxContainer = styled(Button)<BoxContainerProps>(({ open }) => ({
+  position: 'fixed',
+  bottom: '40px',
+  right: '40px',
+  height: '30px',
+  width: '30px',
+  borderRadius: '50%',
+
+  display: open ? 'flex' : 'none',
 }))
