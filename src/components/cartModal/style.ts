@@ -1,5 +1,7 @@
 import { Button, styled } from '@mui/material'
 
+import ReceiptIcon from '@mui/icons-material/Receipt'
+
 interface BoxContainerProps {
   open: boolean
 }
@@ -13,4 +15,9 @@ export const BoxContainer = styled(Button)<BoxContainerProps>(({ open }) => ({
   borderRadius: '50%',
 
   display: open ? 'flex' : 'none',
+}))
+
+export const IconeTicket = styled(ReceiptIcon)(({ theme }) => ({
+  backgroundColor: theme.palette.background.paper,
+  fontSize: '2rem',
 }))

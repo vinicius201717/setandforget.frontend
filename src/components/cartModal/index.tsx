@@ -1,10 +1,10 @@
 // src/components/CustomModal.tsx
 
 import React from 'react'
-import { BoxContainer } from './style'
+import { BoxContainer, IconeTicket } from './style'
 import Cart from '../cartOdds'
-import { Badge, IconButton, useTheme } from '@mui/material'
-import ReceiptIcon from '@mui/icons-material/Receipt'
+import { Badge, IconButton } from '@mui/material'
+import { useCart } from 'src/context/CartOddsContext'
 
 type CartModalProps = {
   open: boolean
@@ -19,16 +19,13 @@ const CartModal: React.FC<CartModalProps> = ({
   onCloseCardOdds,
   onOpenCardOdds,
 }) => {
-  const theme = useTheme()
-
+  const { items } = useCart()
   return (
     <>
       <BoxContainer open={open} onClick={() => onOpenCardOdds()}>
         <IconButton aria-label='bet cart'>
-          <Badge badgeContent={3} color='secondary'>
-            <ReceiptIcon
-              sx={{ fontSize: '4rem', color: theme.palette.primary.main }}
-            />
+          <Badge badgeContent={items.length} color='secondary'>
+            <IconeTicket />
           </Badge>
         </IconButton>
       </BoxContainer>

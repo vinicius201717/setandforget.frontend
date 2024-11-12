@@ -39,7 +39,7 @@ interface Team {
   goals: number
 }
 
-interface Teams {
+export interface Teams {
   home: Team
   away: Team
 }

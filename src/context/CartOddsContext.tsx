@@ -1,5 +1,4 @@
 /* eslint-disable no-unused-vars */
-
 import React, {
   createContext,
   useContext,
@@ -8,18 +7,13 @@ import React, {
   useEffect,
 } from 'react'
 import CartModal from 'src/components/cartModal'
-
-type CartItem = {
-  id: string
-  name: string
-  price: number
-  quantity: number
-}
+import { BetItemType } from 'src/types/apps/footballType/fixtureType'
+import { Teams } from 'src/types/apps/footballType/oddsLiveType'
 
 type CartContextType = {
-  items: CartItem[]
-  addItem: (item: CartItem) => void
-  removeItem: (id: string) => void
+  items: BetItemType[]
+  addItem: (item: BetItemType) => void
+  removeItem: (id: number) => void
   clearCart: () => void
   totalAmount: number
 }
@@ -27,9 +21,13 @@ type CartContextType = {
 const CartContext = createContext<CartContextType | undefined>(undefined)
 
 export const CartOddsProvider = ({ children }: { children: ReactNode }) => {
-  const [items, setItems] = useState<CartItem[]>([])
+  const [items, setItems] = useState<BetItemType[]>([])
   const [isCardOpen, setIsCardOpen] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isClient, setIsClient] = useState(false)
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
 
   const handleModalOpen = () => setIsModalOpen(true)
   const handleModalClose = () => setIsModalOpen(false)
@@ -37,24 +35,24 @@ export const CartOddsProvider = ({ children }: { children: ReactNode }) => {
   const handleCardOpen = () => setIsCardOpen(true)
   const handleCardClose = () => setIsCardOpen(false)
 
-  const addItem = (item: CartItem) => {
+  const addItem = (item: BetItemType) => {
     setItems((prevItems) => {
-      const existingItem = prevItems.find((prevItem) => prevItem.id === item.id)
+      // const existingItem = prevItems.find((prevItem) => prevItem.id === item.id)
 
-      if (existingItem) {
-        return prevItems.map((prevItem) =>
-          prevItem.id === item.id
-            ? { ...prevItem, quantity: prevItem.quantity + item.quantity }
-            : prevItem,
-        )
-      }
+      // if (existingItem) {
+      //   return prevItems.map((prevItem) =>
+      //     prevItem.oddsId === item.oddsId
+      //       ? { ...prevItem, quantity: prevItem.quantity + item.quantity }
+      //       : prevItem,
+      //   )
+      // }
 
       return [...prevItems, item]
     })
   }
 
   useEffect(() => {
-    if (items) {
+    if (items.length > 0) {
       handleCardOpen()
     } else {
       handleModalClose()
@@ -62,18 +60,23 @@ export const CartOddsProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [items])
 
-  const removeItem = (id: string) => {
-    setItems((prevItems) => prevItems.filter((item) => item.id !== id))
+  const removeItem = (id: number) => {
+    setItems((prevItems) => prevItems.filter((item) => item.oddsId !== id))
   }
 
   const clearCart = () => {
     setItems([])
   }
 
-  const totalAmount = items.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0,
-  )
+  // const totalAmount = items.reduce(
+  //   (sum, item) => sum + item.price * item.quantity,
+  //   0,
+  // )
+
+  // variavel temporaria
+  const totalAmount = 10
+
+  if (!isClient) return null
 
   return (
     <CartContext.Provider
@@ -85,7 +88,7 @@ export const CartOddsProvider = ({ children }: { children: ReactNode }) => {
         modalOpen={isModalOpen}
         onOpenCardOdds={handleModalOpen}
         onCloseCardOdds={handleModalClose}
-      ></CartModal>
+      />
     </CartContext.Provider>
   )
 }

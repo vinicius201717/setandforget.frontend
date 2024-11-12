@@ -12,7 +12,7 @@ type CartModalProps = {
 }
 
 const Cart: React.FC<CartModalProps> = ({ open, onClose }) => {
-  const { items, removeItem, clearCart, totalAmount } = useCart()
+  const { clearCart, totalAmount } = useCart()
 
   return (
     <Modal open={open} onClose={onClose} aria-labelledby='cart-modal-title'>
@@ -26,7 +26,7 @@ const Cart: React.FC<CartModalProps> = ({ open, onClose }) => {
           </IconButton>
         </BoxContainer>
         <ul>
-          {items.map((item) => (
+          {/* {items.map((item) => (
             <li key={item.id}>
               {item.name} - R$ {item.price.toFixed(2)} x {item.quantity}
               <Button
@@ -38,7 +38,7 @@ const Cart: React.FC<CartModalProps> = ({ open, onClose }) => {
                 Remover
               </Button>
             </li>
-          ))}
+          ))} */}
         </ul>
         <Typography variant='body1' mt={2}>
           Total: R$ {totalAmount.toFixed(2)}

@@ -38,7 +38,7 @@ interface OddsBetInterface {
   identifyFavorite: OddsBetType
 }
 
-export default function LeaguePage() {
+export default function FixtureOddPage() {
   const router = useRouter()
   const { fixtureId } = router.query
 
@@ -138,13 +138,6 @@ export default function LeaguePage() {
 
   const { addItem } = useCart()
 
-  const produto = {
-    id: '1',
-    name: 'Produto Exemplo',
-    price: 100.0,
-    quantity: 1,
-  }
-
   return (
     <FootballLayout type='odds'>
       {isOddsLoading ? (
@@ -189,7 +182,7 @@ export default function LeaguePage() {
                   {favorites.values.map((value: BetsValues, index: number) => (
                     <TableRow key={index}>
                       <TableCell align='left'>
-                        <BetTeamContainer onClick={() => addItem(produto)}>
+                        <BetTeamContainer>
                           <Typography variant='body2'>{value.value}</Typography>
                           <Typography variant='body2' color='primary'>
                             {value.odd}
