@@ -10,9 +10,20 @@ import {
   TypographyProps,
   Modal,
   ModalProps,
+  alpha,
+  TableRow,
+  TableRowProps,
+  FormControl,
+  FormControlProps,
+  ButtonProps,
+  Button,
 } from '@mui/material'
 import Image, { ImageProps } from 'next/image'
 import Link from 'next/link'
+
+interface BetTeamContainerProps extends BoxProps {
+  selected?: boolean
+}
 
 export const StyledCard = styled(Card)<CardProps>(({ theme }) => ({
   height: '50px',
@@ -81,23 +92,30 @@ export const TeamLogo = styled(Image)<ImageProps>(({ theme }) => ({
   margin: theme.spacing(3),
 }))
 
-export const BetTeamContainer = styled(Box)<BoxProps>(({ theme }) => ({
-  maxWidth: '400px',
-  height: '50px',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  gap: theme.spacing(3),
-  borderRadius: theme.shape.borderRadius,
-  padding: theme.spacing(2),
-  backgroundColor: theme.palette.background.default,
-  cursor: 'pointer',
-  transition: 'background-color 0.3s ease',
+export const BetTeamContainer = styled(Box)<BetTeamContainerProps>(
+  ({ theme, selected }) => ({
+    maxWidth: '400px',
+    height: '50px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: theme.spacing(3),
+    borderRadius: theme.shape.borderRadius,
+    padding: theme.spacing(2),
+    backgroundColor: selected
+      ? alpha(theme.palette.primary.main, 0.2)
+      : theme.palette.background.default,
+    cursor: 'pointer',
+    transition: 'background-color 0.3s ease',
 
-  '&:hover': {
-    backgroundColor: theme.palette.action.hover,
-  },
-}))
+    '&:hover': {
+      backgroundColor: alpha(
+        theme.palette.background.default,
+        selected ? 0.8 : 0.5,
+      ),
+    },
+  }),
+)
 
 export const ModalProdiction = styled(Modal)<ModalProps>(() => ({
   display: 'flex',
@@ -132,4 +150,21 @@ export const ModalContent = styled(Box)(({ theme }) => ({
     backgroundColor: theme.palette.background.default,
     borderRadius: theme.shape.borderRadius,
   },
+}))
+
+export const FormControlStyle = styled(FormControl)<FormControlProps>(() => ({
+  margin: 1,
+  display: 'flex',
+  flexDirection: 'row',
+  maxWidth: '400px',
+}))
+
+export const BoxContainer = styled(Box)<BoxProps>(({ theme }) => ({
+  backgroundColor: theme.palette.background.default,
+  flexGrow: 1,
+  marginRight: 10,
+}))
+
+export const ButtonCard = styled(Button)<ButtonProps>(() => ({
+  padding: '0',
 }))

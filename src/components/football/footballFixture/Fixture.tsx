@@ -29,8 +29,6 @@ const Fixture: React.FC<FixtureProps> = ({
   prediction = false,
   handlePrediction,
 }) => {
-  console.log(data)
-
   const isActive =
     data.fixture.status.short === 'NS' ||
     data.fixture.status.short === '1H' ||
@@ -70,13 +68,10 @@ const Fixture: React.FC<FixtureProps> = ({
           <Typography>{data.teams.away.name}</Typography>
         </LogoNameContainer>
         <Divider sx={{ marginTop: '10px' }} />
-      </FixtureTeamsContainer>
-      <ButtonOdds>
-        {' '}
-        <LinkButtom href={`/sports/football/fixture/${data.fixture.id}`}>
-          View odds{' '}
-        </LinkButtom>
-      </ButtonOdds>
+      </FixtureTeamsContainer>{' '}
+      <LinkButtom href={`/sports/football/fixture/${data.fixture.id}`}>
+        <ButtonOdds>View odds </ButtonOdds>
+      </LinkButtom>
     </FixtureContainer>
   )
 }

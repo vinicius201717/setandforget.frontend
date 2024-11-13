@@ -204,6 +204,8 @@ export const ButtonOdds = styled(Button)<ButtonProps>(({ theme }) => ({
   alignItems: 'center',
   justifyContent: 'space-around',
   borderRadius: theme.shape.borderRadius,
+  color: theme.palette.getContrastText(theme.palette.background.default),
+  fontSize: '0.8rem',
   backgroundColor: theme.palette.background.default,
 }))
 

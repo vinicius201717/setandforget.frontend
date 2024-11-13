@@ -70,3 +70,11 @@ export interface MatchData {
   teamsInfo: TeamsInfo
   update: string
 }
+
+export interface CartBetType {
+  betId: number
+  fixtureId: number
+  nameBet: string
+  value: number
+  amount: number
+}

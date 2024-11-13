@@ -2,7 +2,11 @@ import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import {
   Alert,
+  Button,
   CircularProgress,
+  InputAdornment,
+  InputLabel,
+  OutlinedInput,
   Paper,
   Table,
   TableBody,
@@ -27,8 +31,15 @@ import {
   FixtureTypeResponse,
 } from 'src/types/apps/footballType/fixtureType'
 import { getOddsBetFixture } from 'src/pages/api/football/odds/getOddsBetFixture'
-import { BetTeamContainer, ContainerProgress } from '../style'
+import {
+  BetTeamContainer,
+  BoxContainer,
+  ButtonCard,
+  ContainerProgress,
+  FormControlStyle,
+} from '../style'
 import { useCart } from 'src/context/CartOddsContext'
+import { Box } from '@mui/system'
 
 interface OddsBetInterface {
   oddsBet: OddsBetType[]
@@ -36,6 +47,11 @@ interface OddsBetInterface {
   fixture: FixtureTypeResponse[]
   favoriteOddsBet: UserFavoriteOddsBetType[]
   identifyFavorite: OddsBetType
+}
+
+interface SelectedOddType {
+  odd: string
+  name: string
 }
 
 export default function FixtureOddPage() {
@@ -52,6 +68,8 @@ export default function FixtureOddPage() {
     UserFavoriteOddsBetType[] | null
   >(null)
   const [favorites, setFavorites] = useState<Bets | null>(null)
+
+  const [selectedOdd, setSelectedOdd] = useState<SelectedOddType | null>(null)
 
   const { data, isLoading: isOddsLoading } = useQuery<OddsBetInterface>({
     queryKey: ['oddsBet', fixtureId],
@@ -83,6 +101,7 @@ export default function FixtureOddPage() {
   const handleGetBet = (betId: number) => {
     setSelectedBetId(betId)
   }
+
   const handleFavoritOddsBet = (
     betFavorite: UserFavoriteOddsBetType,
     rm: boolean,
@@ -110,6 +129,16 @@ export default function FixtureOddPage() {
     })
   }
 
+  const handleOddSelect = ({ name, odd }: SelectedOddType) => {
+    setSelectedOdd((prev) => (prev && prev.odd === odd ? null : { name, odd }))
+  }
+
+  useEffect(() => {
+    console.log(selectedBetId)
+
+    console.log(selectedOdd)
+  }, [selectedOdd])
+
   useEffect(() => {
     if (selectedBetId) {
       refetch()
@@ -131,6 +160,7 @@ export default function FixtureOddPage() {
       setIdentifyFavorite(data.identifyFavorite)
       setFavoritOddsBet(data.favoriteOddsBet)
       if (data.favorites && data.favorites.length > 0) {
+        setSelectedBetId(data.identifyFavorite.id)
         setFavorites(data.favorites[0])
       }
     }
@@ -182,7 +212,18 @@ export default function FixtureOddPage() {
                   {favorites.values.map((value: BetsValues, index: number) => (
                     <TableRow key={index}>
                       <TableCell align='left'>
-                        <BetTeamContainer>
+                        <BetTeamContainer
+                          selected={
+                            selectedOdd !== null &&
+                            selectedOdd.odd === value.odd
+                          }
+                          onClick={() =>
+                            handleOddSelect({
+                              name: value.value,
+                              odd: value.odd,
+                            })
+                          }
+                        >
                           <Typography variant='body2'>{value.value}</Typography>
                           <Typography variant='body2' color='primary'>
                             {value.odd}
@@ -192,6 +233,30 @@ export default function FixtureOddPage() {
                       <TableCell align='right'></TableCell>
                     </TableRow>
                   ))}
+                  <TableRow>
+                    <TableCell align='left'>
+                      <FormControlStyle variant='outlined'>
+                        <BoxContainer>
+                          <InputLabel htmlFor='outlined-adornment-amount'>
+                            Amount
+                          </InputLabel>
+                          <OutlinedInput
+                            id='outlined-adornment-amount'
+                            startAdornment={
+                              <InputAdornment position='start'>
+                                $
+                              </InputAdornment>
+                            }
+                            label='Amount'
+                            fullWidth
+                          />
+                        </BoxContainer>
+                        <ButtonCard variant='contained' color='primary'>
+                          bet
+                        </ButtonCard>
+                      </FormControlStyle>
+                    </TableCell>
+                  </TableRow>
                 </TableBody>
               </Table>
             </TableContainer>
