@@ -11,8 +11,6 @@ import {
   Modal,
   ModalProps,
   alpha,
-  TableRow,
-  TableRowProps,
   FormControl,
   FormControlProps,
   ButtonProps,

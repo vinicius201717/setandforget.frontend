@@ -78,3 +78,12 @@ export interface FixtureTypeResponse {
     }
   }
 }
+
+export type BetItemType = {
+  fixtureId: number
+  oddId: number
+  name: string
+  odd: number
+  price: number
+  quantity: number
+}

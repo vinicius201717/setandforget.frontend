@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import {
   Alert,
-  Button,
   CircularProgress,
   InputAdornment,
   InputLabel,
@@ -39,8 +38,9 @@ import {
   FormControlStyle,
 } from '../style'
 import { useCart } from 'src/context/CartOddsContext'
-import { Box } from '@mui/system'
-
+import { z } from 'zod'
+import { Controller, useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 interface OddsBetInterface {
   oddsBet: OddsBetType[]
   favorites: Bets[]
@@ -52,6 +52,17 @@ interface OddsBetInterface {
 interface SelectedOddType {
   odd: string
   name: string
+}
+
+const schema = z.object({
+  amount: z
+    .number()
+    .min(1, 'Amount is required')
+    .positive('Amount must be positive'),
+})
+
+type FormValues = {
+  amount: number
 }
 
 export default function FixtureOddPage() {
@@ -134,12 +145,6 @@ export default function FixtureOddPage() {
   }
 
   useEffect(() => {
-    console.log(selectedBetId)
-
-    console.log(selectedOdd)
-  }, [selectedOdd])
-
-  useEffect(() => {
     if (selectedBetId) {
       refetch()
     }
@@ -166,7 +171,33 @@ export default function FixtureOddPage() {
     }
   }, [data])
 
-  const { addItem } = useCart()
+  const { items, addItem } = useCart()
+
+  const {
+    handleSubmit,
+    control,
+    formState: { errors, isValid },
+  } = useForm<FormValues>({
+    resolver: zodResolver(schema),
+    mode: 'onChange',
+  })
+
+  const onSubmit = (data: FormValues) => {
+    if (selectedOdd) {
+      const fixtureId = Array.isArray(router.query.fixtureId)
+        ? parseInt(router.query.fixtureId[0], 10)
+        : parseInt(router.query.fixtureId as string, 10)
+
+      addItem({
+        fixtureId,
+        oddId: selectedBetId as number,
+        name: selectedOdd.name,
+        odd: parseFloat(selectedOdd.odd),
+        price: data.amount,
+        quantity: 1,
+      })
+    }
+  }
 
   return (
     <FootballLayout type='odds'>
@@ -235,26 +266,50 @@ export default function FixtureOddPage() {
                   ))}
                   <TableRow>
                     <TableCell align='left'>
-                      <FormControlStyle variant='outlined'>
-                        <BoxContainer>
-                          <InputLabel htmlFor='outlined-adornment-amount'>
-                            Amount
-                          </InputLabel>
-                          <OutlinedInput
-                            id='outlined-adornment-amount'
-                            startAdornment={
-                              <InputAdornment position='start'>
-                                $
-                              </InputAdornment>
-                            }
-                            label='Amount'
-                            fullWidth
-                          />
-                        </BoxContainer>
-                        <ButtonCard variant='contained' color='primary'>
-                          bet
-                        </ButtonCard>
-                      </FormControlStyle>
+                      <form onSubmit={handleSubmit(onSubmit)}>
+                        <FormControlStyle variant='outlined'>
+                          <BoxContainer>
+                            <InputLabel htmlFor='outlined-adornment-amount'>
+                              Amount
+                            </InputLabel>
+                            <Controller
+                              name='amount'
+                              control={control}
+                              render={({ field }) => (
+                                <OutlinedInput
+                                  {...field}
+                                  id='outlined-adornment-amount'
+                                  startAdornment={
+                                    <InputAdornment position='start'>
+                                      $
+                                    </InputAdornment>
+                                  }
+                                  label='Amount'
+                                  fullWidth
+                                  error={!!errors.amount}
+                                  onChange={(e) =>
+                                    field.onChange(Number(e.target.value) || 0)
+                                  }
+                                />
+                              )}
+                            />
+
+                            {errors.amount && (
+                              <Typography variant='body2' color='error'>
+                                {errors.amount.message}
+                              </Typography>
+                            )}
+                          </BoxContainer>
+                          <ButtonCard
+                            variant='contained'
+                            color='primary'
+                            type='submit'
+                            disabled={!selectedOdd || !isValid}
+                          >
+                            Bet
+                          </ButtonCard>
+                        </FormControlStyle>
+                      </form>
                     </TableCell>
                   </TableRow>
                 </TableBody>
