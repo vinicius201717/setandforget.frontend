@@ -8,7 +8,6 @@ import React, {
 } from 'react'
 import CartModal from 'src/components/cartModal'
 import { BetItemType } from 'src/types/apps/footballType/fixtureType'
-import { Teams } from 'src/types/apps/footballType/oddsLiveType'
 
 type CartContextType = {
   items: BetItemType[]
@@ -61,7 +60,7 @@ export const CartOddsProvider = ({ children }: { children: ReactNode }) => {
   }, [items])
 
   const removeItem = (id: number) => {
-    setItems((prevItems) => prevItems.filter((item) => item.oddsId !== id))
+    setItems((prevItems) => prevItems.filter((item) => item.oddId !== id))
   }
 
   const clearCart = () => {

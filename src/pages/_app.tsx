@@ -147,15 +147,15 @@ const App = (props: ExtendedAppProps) => {
           openDialogSecurityCode={() => {}}
           onSetUserId={(id: string) => {}}
         >
-          <CartOddsProvider>
-            <QueryClientProvider client={queryClient}>
-              <SettingsProvider
-                {...(setConfig ? { pageSettings: setConfig() } : {})}
-              >
-                <SettingsConsumer>
-                  {({ settings }) => {
-                    return (
-                      <ThemeComponent settings={settings}>
+          <QueryClientProvider client={queryClient}>
+            <SettingsProvider
+              {...(setConfig ? { pageSettings: setConfig() } : {})}
+            >
+              <SettingsConsumer>
+                {({ settings }) => {
+                  return (
+                    <ThemeComponent settings={settings}>
+                      <CartOddsProvider>
                         <Guard authGuard={authGuard} guestGuard={guestGuard}>
                           <AclGuard
                             aclAbilities={aclAbilities}
@@ -171,13 +171,13 @@ const App = (props: ExtendedAppProps) => {
                             toastOptions={{ className: 'react-hot-toast' }}
                           />
                         </ReactHotToast>
-                      </ThemeComponent>
-                    )
-                  }}
-                </SettingsConsumer>
-              </SettingsProvider>
-            </QueryClientProvider>
-          </CartOddsProvider>
+                      </CartOddsProvider>
+                    </ThemeComponent>
+                  )
+                }}
+              </SettingsConsumer>
+            </SettingsProvider>
+          </QueryClientProvider>
         </AuthProvider>
       </CacheProvider>
     </Provider>

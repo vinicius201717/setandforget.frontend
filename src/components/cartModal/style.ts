@@ -10,8 +10,8 @@ export const BoxContainer = styled(Button)<BoxContainerProps>(({ open }) => ({
   position: 'fixed',
   bottom: '40px',
   right: '40px',
-  height: '30px',
-  width: '30px',
+  height: '50px',
+  width: '50px',
   borderRadius: '50%',
 
   display: open ? 'flex' : 'none',
@@ -33,7 +33,7 @@ const pulse = keyframes`
 `
 
 export const IconeTicket = styled(ReceiptIcon)(({ theme }) => ({
-  fontSize: '2.4rem',
+  fontSize: '2.9rem',
   backgroundColor: theme.palette.background.paper,
   borderRadius: '50%',
   padding: '6px',

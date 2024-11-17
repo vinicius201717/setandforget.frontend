@@ -171,7 +171,7 @@ export default function FixtureOddPage() {
     }
   }, [data])
 
-  const { items, addItem } = useCart()
+  const { addItem } = useCart()
 
   const {
     handleSubmit,
@@ -192,6 +192,7 @@ export default function FixtureOddPage() {
         fixtureId,
         oddId: selectedBetId as number,
         name: selectedOdd.name,
+        fixture,
         odd: parseFloat(selectedOdd.odd),
         price: data.amount,
         quantity: 1,

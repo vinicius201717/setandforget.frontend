@@ -82,6 +82,7 @@ export interface FixtureTypeResponse {
 export type BetItemType = {
   fixtureId: number
   oddId: number
+  fixture: fixtureType | null
   name: string
   odd: number
   price: number
