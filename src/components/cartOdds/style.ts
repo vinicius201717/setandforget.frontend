@@ -1,4 +1,10 @@
-import { Box, BoxProps, styled } from '@mui/material'
+import {
+  Box,
+  BoxProps,
+  styled,
+  Typography,
+  TypographyProps,
+} from '@mui/material'
 
 export const BoxContainer = styled(Box)<BoxProps>(({ theme }) => ({
   position: 'absolute',
@@ -16,9 +22,10 @@ export const BoxContainer = styled(Box)<BoxProps>(({ theme }) => ({
 
 export const BoxTicket = styled(Box)<BoxProps>(({ theme }) => ({
   width: '100%',
-  height: '50px',
+  height: '70px',
   marginTop: ' 10px',
   backgroundColor: theme.palette.background.default,
+  display: 'flex',
 }))
 
 export const TicketContainer = styled(Box)<BoxProps>(() => ({
@@ -26,14 +33,30 @@ export const TicketContainer = styled(Box)<BoxProps>(() => ({
   height: '90vh',
 }))
 
-export const FixtureOddTeams = styled(Box)<BoxProps>(() => ({
+export const FixtureOdd = styled(Box)<BoxProps>(() => ({
   width: '50%',
   height: '100%',
   display: 'flex',
   justifyContent: 'space-around',
+  alignItems: 'center',
+  position: 'relative',
 }))
 
-export const Teams = styled(Box)<BoxProps>(() => ({
+export const Team = styled(Box)<BoxProps>(() => ({
   display: 'flex',
-  justifyContent: 'space-around',
+  flexDirection: 'column',
+  alignItems: 'center',
+}))
+
+export const InfoOdd = styled(Typography)<TypographyProps>(() => ({
+  position: 'absolute',
+  bottom: '2px',
+  right: '5px',
+}))
+
+export const Odd = styled(Typography)<TypographyProps>(({ theme }) => ({
+  fontSize: '0.7rem',
+  padding: theme.spacing(2),
+  borderRadius: theme.shape.borderRadius,
+  backgroundColor: theme.palette.background.paper,
 }))

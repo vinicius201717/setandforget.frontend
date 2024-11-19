@@ -29,6 +29,7 @@ const Cart: React.FC<CartModalProps> = ({ open, onClose }) => {
               name={item.name}
               price={item.price}
               quantity={item.quantity}
+              bet={item.bet}
               fixture={item.fixture}
               oddId={item.oddId}
               fixtureId={item.fixtureId}

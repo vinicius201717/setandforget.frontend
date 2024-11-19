@@ -70,6 +70,7 @@ export default function FixtureOddPage() {
   const { fixtureId } = router.query
 
   const [selectedBetId, setSelectedBetId] = useState<number | null>(null)
+  const [selectedBetName, setSelectedBetName] = useState<string | null>(null)
   const [oddsBet, setOddsBet] = useState<OddsBetType[] | null>(null)
   const [fixture, setFixture] = useState<fixtureType | null>(null)
   const [identifyFavorite, setIdentifyFavorite] = useState<OddsBetType | null>(
@@ -112,6 +113,10 @@ export default function FixtureOddPage() {
   const handleGetBet = (betId: number) => {
     setSelectedBetId(betId)
   }
+
+  useEffect(() => {
+    console.log(betData)
+  }, [betData])
 
   const handleFavoritOddsBet = (
     betFavorite: UserFavoriteOddsBetType,
@@ -166,6 +171,7 @@ export default function FixtureOddPage() {
       setFavoritOddsBet(data.favoriteOddsBet)
       if (data.favorites && data.favorites.length > 0) {
         setSelectedBetId(data.identifyFavorite.id)
+        setSelectedBetName(data.identifyFavorite.name)
         setFavorites(data.favorites[0])
       }
     }
@@ -193,6 +199,7 @@ export default function FixtureOddPage() {
         oddId: selectedBetId as number,
         name: selectedOdd.name,
         fixture,
+        bet: selectedBetName as string,
         odd: parseFloat(selectedOdd.odd),
         price: data.amount,
         quantity: 1,
