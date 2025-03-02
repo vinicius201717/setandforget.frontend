@@ -1,3 +1,5 @@
+import { TeamInfo } from './oddsLiveType'
+
 interface team {
   id: number
   name: string
@@ -8,6 +10,17 @@ interface team {
 export interface fixtureType {
   home: team
   away: team
+}
+
+export interface fixtureTeamInfo {
+  home: TeamInfo
+  away: TeamInfo
+}
+
+export interface fixtureStatus {
+  elapsed: number
+  long: string
+  seconds: string
 }
 
 export interface FixtureTypeResponse {
@@ -83,9 +96,9 @@ export type BetItemType = {
   fixtureId: number
   oddId: number
   bet: string
-  fixture: fixtureType | null
-  name: string
-  odd: number
+  fixtureStatus: fixtureStatus | null
+  fixture: fixtureTeamInfo
+  odd: string
   price: number
   quantity: number
 }

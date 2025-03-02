@@ -44,7 +44,7 @@ export interface Teams {
   away: Team
 }
 
-interface TeamInfo {
+export interface TeamInfo {
   id: string
   teamId: number
   name: string

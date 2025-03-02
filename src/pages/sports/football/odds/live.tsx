@@ -1,8 +1,10 @@
 /* eslint-disable no-unused-vars */
 import {
+  Box,
   CircularProgress,
   Container,
   IconButton,
+  Modal,
   Typography,
 } from '@mui/material'
 import FootballLayout from 'src/layouts/components/footballLayout'
@@ -130,30 +132,39 @@ export default function Football() {
         </ContainerFixture>
       </Container>
 
-      <ModalProdiction
+      <Modal
         open={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         aria-labelledby='modal-title'
         aria-describedby='modal-description'
       >
-        <ModalContent>
-          <IconButton
-            onClick={() => setIsModalOpen(false)}
-            sx={{ position: 'absolute', top: 16, right: 16, zIndex: 1300 }}
-          >
-            <CloseIcon />
-          </IconButton>
-          {fpIsLoading ? (
-            <ContainerProgress>
-              <CircularProgress />
-            </ContainerProgress>
-          ) : fixturePredictions && fixturePredictions.length > 0 ? (
-            <PredictionsComponent data={fixturePredictions[0]} />
-          ) : (
-            <Typography variant='body2'>No predictions available</Typography>
-          )}
-        </ModalContent>
-      </ModalProdiction>
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '100vh',
+          }}
+        >
+          <ModalContent>
+            <IconButton
+              onClick={() => setIsModalOpen(false)}
+              sx={{ position: 'absolute', top: 16, right: 16, zIndex: 1300 }}
+            >
+              <CloseIcon />
+            </IconButton>
+            {fpIsLoading ? (
+              <ContainerProgress>
+                <CircularProgress />
+              </ContainerProgress>
+            ) : fixturePredictions && fixturePredictions.length > 0 ? (
+              <PredictionsComponent data={fixturePredictions[0]} />
+            ) : (
+              <Typography variant='body2'>No predictions available</Typography>
+            )}
+          </ModalContent>
+        </Box>
+      </Modal>
     </FootballLayout>
   )
 }

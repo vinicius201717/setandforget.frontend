@@ -30,11 +30,13 @@ const LastResults = ({ form }: FormProps) => {
         </Typography>
         <Divider sx={{ marginBottom: 2 }} />
         <LastResultsContainer>
-          {form.split('').map((result, index) => (
-            <Box key={index} sx={{ margin: '0 4px' }}>
-              {renderIcon(result)}
-            </Box>
-          ))}
+          {form
+            ? form.split('').map((result, index) => (
+                <Box key={index} sx={{ margin: '0 4px' }}>
+                  {renderIcon(result)}
+                </Box>
+              ))
+            : null}
         </LastResultsContainer>
       </CardContent>
     </Card>

@@ -5,7 +5,6 @@ import Image from 'next/image'
 import { Typography } from '@mui/material'
 
 const CartOddsTicket: React.FC<BetItemType> = ({
-  name,
   price,
   quantity,
   fixture,
@@ -15,7 +14,7 @@ const CartOddsTicket: React.FC<BetItemType> = ({
   oddId,
 }) => {
   useEffect(() => {
-    console.log(bet)
+    console.log(bet, price, quantity, fixtureId, oddId)
   }, [bet])
 
   return (

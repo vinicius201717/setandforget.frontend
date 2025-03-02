@@ -6,19 +6,23 @@ import {
   TypographyProps,
 } from '@mui/material'
 
-export const BoxContainer = styled(Box)<BoxProps>(({ theme }) => ({
+export const BoxContainer = styled(Box)(({ theme }) => ({
   position: 'absolute',
-  right: '0',
-  top: '0',
+  top: '0%',
+  right: '0%',
   height: '100vh',
-  width: '400px',
+  width: '90%',
+  maxWidth: '400px',
   backgroundColor: theme.palette.background.paper,
   boxShadow: theme.shadows[24],
-  padding: theme.spacing(2),
-  pointerEvents: 'none',
-  display: 'flex',
-  flexDirection: 'column',
+  padding: theme.spacing(4),
+  outline: 'none',
 }))
+
+export const TicketContainer = styled(Box)({
+  maxHeight: '60vh',
+  overflowY: 'auto',
+})
 
 export const BoxTicket = styled(Box)<BoxProps>(({ theme }) => ({
   width: '100%',
@@ -28,11 +32,6 @@ export const BoxTicket = styled(Box)<BoxProps>(({ theme }) => ({
   display: 'flex',
 }))
 
-export const TicketContainer = styled(Box)<BoxProps>(() => ({
-  width: '100%',
-  height: '90vh',
-}))
-
 export const FixtureOdd = styled(Box)<BoxProps>(() => ({
   width: '50%',
   height: '100%',
@@ -40,6 +39,11 @@ export const FixtureOdd = styled(Box)<BoxProps>(() => ({
   justifyContent: 'space-around',
   alignItems: 'center',
   position: 'relative',
+}))
+
+export const EndTextCard = styled(Box)<BoxProps>(() => ({
+  position: 'absolute',
+  bottom: '10px',
 }))
 
 export const Team = styled(Box)<BoxProps>(() => ({

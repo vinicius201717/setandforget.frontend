@@ -36,15 +36,15 @@ export const CartOddsProvider = ({ children }: { children: ReactNode }) => {
 
   const addItem = (item: BetItemType) => {
     setItems((prevItems) => {
-      // const existingItem = prevItems.find((prevItem) => prevItem.id === item.id)
+      const existingItem = prevItems.find((prevItem) => prevItem.id === item.id)
 
-      // if (existingItem) {
-      //   return prevItems.map((prevItem) =>
-      //     prevItem.oddsId === item.oddsId
-      //       ? { ...prevItem, quantity: prevItem.quantity + item.quantity }
-      //       : prevItem,
-      //   )
-      // }
+      if (existingItem) {
+        return prevItems.map((prevItem) =>
+          prevItem.oddsId === item.oddsId
+            ? { ...prevItem, quantity: prevItem.quantity + item.quantity }
+            : prevItem,
+        )
+      }
 
       return [...prevItems, item]
     })
@@ -67,13 +67,13 @@ export const CartOddsProvider = ({ children }: { children: ReactNode }) => {
     setItems([])
   }
 
-  // const totalAmount = items.reduce(
-  //   (sum, item) => sum + item.price * item.quantity,
-  //   0,
-  // )
+  const totalAmount = items.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0,
+  )
 
   // variavel temporaria
-  const totalAmount = 10
+  // const totalAmount = 10
 
   if (!isClient) return null
 

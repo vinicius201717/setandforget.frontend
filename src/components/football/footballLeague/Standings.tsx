@@ -138,13 +138,15 @@ export default function LeagueStandings() {
                   <TableCell align='right'>
                     <BoxForm>
                       {standing.form
-                        .split('')
-                        .reverse()
-                        .map((result, i) =>
-                          i === standing.form.length - 1
-                            ? getIcon(result, true)
-                            : getIcon(result, false),
-                        )}
+                        ? standing.form
+                            .split('')
+                            .reverse()
+                            .map((result, i) =>
+                              i === standing.form.length - 1
+                                ? getIcon(result, true)
+                                : getIcon(result, false),
+                            )
+                        : null}
                     </BoxForm>
                   </TableCell>
                 </TableRow>

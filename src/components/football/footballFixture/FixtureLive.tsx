@@ -37,13 +37,6 @@ const FixtureLive: React.FC<FixtureLiveProps> = ({
   const [serverTime, setServerTime] = useState<string>('00:00')
   const { addItem } = useCart()
 
-  const produto = {
-    id: '1',
-    name: 'Produto Exemplo',
-    price: 100.0,
-    quantity: 1,
-  }
-
   const gameTime = useGameTimer(serverTime)
 
   useEffect(() => {
@@ -91,9 +84,7 @@ const FixtureLive: React.FC<FixtureLiveProps> = ({
 
           <ContainerResult>
             <ItemResult>{data.teams.home.goals}</ItemResult>
-            <Vs onClick={() => addItem(produto)} variant='body2'>
-              X
-            </Vs>
+            <Vs variant='body2'>X</Vs>
             <ItemResult>{data.teams.away.goals}</ItemResult>
           </ContainerResult>
         </ContainerTimerAndResultsInfo>
@@ -116,7 +107,23 @@ const FixtureLive: React.FC<FixtureLiveProps> = ({
       <OddsContainer>
         {odds?.values.map((value, index) => (
           <React.Fragment key={index}>
-            <OddValue>
+            <OddValue
+              onClick={() =>
+                addItem({
+                  fixtureId: data.fixture.id,
+                  oddId: odds.id,
+                  bet: odds.name,
+                  fixtureStatus: data.fixture.status,
+                  fixture: {
+                    home: data.teamsInfo.home,
+                    away: data.teamsInfo.away,
+                  },
+                  odd: value.odd,
+                  price: 0,
+                  quantity: 0,
+                })
+              }
+            >
               <p>{Number(value.odd).toFixed(2)}</p>
             </OddValue>
 

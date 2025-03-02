@@ -4,7 +4,7 @@ import React from 'react'
 import { useCart } from 'src/context/CartOddsContext'
 import { Modal, Box, Typography, Button, IconButton } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
-import { BoxContainer, TicketContainer } from './style'
+import { BoxContainer, EndTextCard, TicketContainer } from './style'
 import CartOddsTicket from './CartOddsTickt'
 
 type CartModalProps = {
@@ -17,19 +17,25 @@ const Cart: React.FC<CartModalProps> = ({ open, onClose }) => {
 
   return (
     <Modal open={open} onClose={onClose} aria-labelledby='cart-modal-title'>
+      {/* BoxContainer para impedir a propagação do clique */}
       <BoxContainer onClick={(event) => event.stopPropagation()}>
-        <IconButton onClick={onClose}>
+        {/* Botão para fechar o modal */}
+        <IconButton
+          onClick={onClose}
+          sx={{ position: 'absolute', top: 8, right: 8 }}
+        >
           <CloseIcon />
         </IconButton>
 
+        {/* Lista de itens no carrinho */}
         <TicketContainer>
           {items.map((item, key) => (
             <CartOddsTicket
               key={key}
-              name={item.name}
               price={item.price}
               quantity={item.quantity}
               bet={item.bet}
+              fixtureStatus={item.fixtureStatus}
               fixture={item.fixture}
               oddId={item.oddId}
               fixtureId={item.fixtureId}
@@ -37,14 +43,20 @@ const Cart: React.FC<CartModalProps> = ({ open, onClose }) => {
             />
           ))}
         </TicketContainer>
-        <Typography variant='body1' mt={2}>
-          Total: R$ {totalAmount.toFixed(2)}
-        </Typography>
-        <Box display='flex' justifyContent='space-between' mt={3}>
-          <Button variant='outlined' color='primary' onClick={clearCart}>
-            Limpar Carrinho
-          </Button>
-        </Box>
+
+        {/* Total do carrinho */}
+        <EndTextCard>
+          <Typography variant='body1' mt={2}>
+            Total: R$ {totalAmount.toFixed(2)}
+          </Typography>
+
+          {/* Botão para limpar o carrinho */}
+          <Box display='flex' justifyContent='space-between' mt={3}>
+            <Button variant='outlined' color='primary' onClick={clearCart}>
+              Limpar Carrinho
+            </Button>
+          </Box>
+        </EndTextCard>
       </BoxContainer>
     </Modal>
   )
