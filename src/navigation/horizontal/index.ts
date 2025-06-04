@@ -13,10 +13,10 @@ const navigation = (): HorizontalNavItemsType => {
       icon: 'mdi:chart-box-outline',
       path: '/assessment',
     },
-    {
-      title: 'Football',
-      path: '/sports/football',
-    },
+    // {
+    //   title: 'Football',
+    //   path: '/sports/football',
+    // },
     {
       title: 'Chess',
       icon: 'streamline:chess-knight',

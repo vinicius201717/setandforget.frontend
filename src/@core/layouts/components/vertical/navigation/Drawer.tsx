@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 // ** MUI Imports
 import { styled, useTheme } from '@mui/material/styles'
 import MuiSwipeableDrawer, {

@@ -19,11 +19,11 @@ const navigation = (): VerticalNavItemsType => {
     {
       sectionTitle: 'Jogos',
     },
-    {
-      title: 'Football',
-      icon: 'ph:soccer-ball-thin',
-      path: '/sports/football',
-    },
+    // {
+    //   title: 'Football',
+    //   icon: 'ph:soccer-ball-thin',
+    //   path: '/sports/football',
+    // },
     {
       title: 'Chess',
       icon: 'streamline:chess-knight',
