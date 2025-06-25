@@ -71,6 +71,7 @@
     "nprogress": "0.2.0",
     "payment": "2.4.6",
     "prismjs": "1.29.0",
+    "qrcode.react": "^4.2.0",
     "query": "github:tanstack/react-query",
     "react": "18.2.0",
     "react-apexcharts": "1.4.0",
