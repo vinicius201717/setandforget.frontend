@@ -188,20 +188,6 @@ export function DepositMethod() {
     }
   }
 
-  // Estilização do modal
-  const modalStyle = {
-    position: 'absolute' as const,
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: 400,
-    bgcolor: 'background.paper',
-    border: '2px solid #000',
-    boxShadow: 24,
-    p: 4,
-    textAlign: 'center',
-  }
-
   return (
     <Paper elevation={3} sx={{ p: 4, mt: 5 }}>
       <Typography variant='h6'>Deposit</Typography>
@@ -474,7 +460,11 @@ export function DepositMethod() {
               }}
               underline='none'
             >
-              Transactions
+              <Grid item>
+                <Button size='small' variant='text' color='secondary'>
+                  Transactions
+                </Button>
+              </Grid>
             </MUILink>
           </NextLink>
         </Grid>

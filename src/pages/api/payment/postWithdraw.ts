@@ -1,8 +1,12 @@
 import { api } from 'src/lib/axios'
 import authConfig from 'src/configs/auth'
 
-interface PostWithdrawProps {
+export interface PostWithdrawProps {
   amount: number
+  accountHolderName: string
+  accountNumber: string
+  routingNumber: string
+  withdrawalMethod: string
   currency: string
   selectedBank: string
 }
