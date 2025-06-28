@@ -110,45 +110,24 @@ interface Account {
   id: string
   userId: string
   amount: number
-  transactions: Transaction[] | null
+  transactions: Deposit[] | null
 }
 
-export interface Transaction {
-  id: string
-  accountId: string
+export interface Deposit {
+  id: string | null
+  status: 'PENDING' | 'COMPLETED' | 'FAILED' | 'UNKNOWN'
+  paymentType: string
   amount: number
-  chargeId: string
-  checkoutSessionId: string
-  currency: string
-  paymentIntentId: string
-  paymentMethod: string
-  receiptUrl: string
-  type: string
-  updatedAt: Date
   createdAt: Date
-  status: 'PENDING' | 'COMPLETED' | 'FAILED'
-  account: Account
 }
 
-export interface TransfersTransaction {
+export interface Withdraw {
   id: string
-  userId: string
   amount: number
-  amountReversed: number
-  balanceTransaction: string
-  currency: string
-  description: string
-  destination: string
-  destinationPayment: string
-  livemode: boolean
-  reversed: boolean
-  sourceTransaction: string
-  sourceType: string
-  transferGroup: string
-  stripeTransferId: string
+  status: 'PENDING' | 'PAID' | 'FAILED'
+  pixKey: string
+  pixKeyType: string
   createdAt: Date
-  reversalsUrl: string
-  status: 'PENDING' | 'COMPLETED' | 'FAILED'
 }
 
 export type AuthValuesType = {

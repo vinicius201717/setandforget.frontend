@@ -1,22 +1,23 @@
+/* eslint-disable no-unused-vars */
 // ** MUI Imports
 import Paper from '@mui/material/Paper'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableContainer from '@mui/material/TableContainer'
 import TableRow from '@mui/material/TableRow'
-import ReceiptIcon from '@mui/icons-material/Receipt'
+import Button from '@mui/material/Button'
+import Typography from '@mui/material/Typography'
 
 import { format } from 'date-fns'
 import { StyledTableCell, StyledTableRow } from './style'
-import { Badge, useTheme } from '@mui/material'
-import { Transaction } from 'src/context/types'
-import Link from 'next/link'
+import { Badge, Box } from '@mui/material'
+import { Deposit } from 'src/context/types'
 import { formatMoney } from 'src/utils/format-money'
-
 interface TableCustomizedProps {
-  transactions: Transaction[] | undefined
+  deposit: Deposit[] | undefined
+  handlePageDeposit: (page: number) => void
+  currentPage: number
 }
-
 const TableRowStatus = (status: 'PENDING' | 'COMPLETED' | 'FAILED') => {
   switch (status) {
     case 'PENDING':
@@ -66,84 +67,116 @@ const TableRowStatus = (status: 'PENDING' | 'COMPLETED' | 'FAILED') => {
   }
 }
 
-const TableCustomizedDeposit = ({ transactions }: TableCustomizedProps) => {
-  const theme = useTheme()
+const TableCustomizedDeposit = ({
+  deposit,
+  handlePageDeposit,
+  currentPage,
+}: TableCustomizedProps) => {
+  const itemsPerPage = 10
+
+  const mappedTransactions =
+    deposit?.map((row) => ({
+      id: row.id || 'N/A',
+      amount: row.amount || 0,
+      paymentType: row.paymentType || 'Unknown',
+      status: row.status || 'PENDING',
+      createdAt: row.createdAt || new Date().toISOString(),
+    })) || []
+
+  const handlePrevious = () => {
+    if (currentPage > 1) {
+      handlePageDeposit(currentPage - 1)
+    }
+  }
+
+  const handleNext = () => {
+    if (mappedTransactions.length === itemsPerPage) {
+      handlePageDeposit(currentPage + 1)
+    }
+  }
+
   return (
-    <TableContainer component={Paper}>
-      <Table sx={{ minWidth: 700 }} aria-label='Transactions'>
-        <TableRow>
-          <StyledTableCell>Deposit ID</StyledTableCell>
-          <StyledTableCell>status</StyledTableCell>
-          <StyledTableCell align='left'>Method</StyledTableCell>
-          <StyledTableCell align='left'>Amount</StyledTableCell>
-          <StyledTableCell align='left'>Type</StyledTableCell>
-          <StyledTableCell align='left'>Date</StyledTableCell>
-          <StyledTableCell align='right'>Receipt</StyledTableCell>
-        </TableRow>
-        <TableBody>
-          {transactions ? (
-            transactions.map((row, index) => (
-              <StyledTableRow key={index}>
-                <StyledTableCell align='left'>
-                  {row.paymentIntentId}
-                </StyledTableCell>
-                <StyledTableCell
-                  component='td'
-                  scope='row'
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '20px',
-                  }}
-                >
-                  {TableRowStatus(
-                    row.status as 'PENDING' | 'COMPLETED' | 'FAILED',
-                  )}{' '}
-                  {row.status}
-                </StyledTableCell>
-                <StyledTableCell align='left'>
-                  {row.paymentMethod}
-                </StyledTableCell>
-                <StyledTableCell align='left'>
-                  {formatMoney(row.amount / 100)}
-                </StyledTableCell>
-                <StyledTableCell align='left'>{row.type}</StyledTableCell>
-                <StyledTableCell align='left'>
-                  {' '}
-                  {row.createdAt
-                    ? format(new Date(row.createdAt), 'dd/MM/yyyy HH:mm:ss')
-                    : 'Data não disponível'}
-                </StyledTableCell>
-                {row.receiptUrl ? (
-                  <StyledTableCell align='right'>
-                    <Link
-                      href={row.receiptUrl as string}
-                      target='_blank'
-                      rel='noopener noreferrer'
-                      style={{
-                        textDecoration: 'none',
-                        color: theme.palette.text.primary,
-                        opacity: 0.5,
-                      }}
-                    >
-                      <ReceiptIcon />
-                    </Link>
+    <div>
+      <TableContainer component={Paper}>
+        <Table sx={{ minWidth: 700 }} aria-label='Transactions'>
+          <TableRow>
+            <StyledTableCell>ID</StyledTableCell>
+            <StyledTableCell>Status</StyledTableCell>
+            <StyledTableCell align='left'>Payment Type</StyledTableCell>
+            <StyledTableCell align='left'>Amount</StyledTableCell>
+            <StyledTableCell align='left'>Date</StyledTableCell>
+          </TableRow>
+          <TableBody>
+            {mappedTransactions.length > 0 ? (
+              mappedTransactions.map((row, index) => (
+                <StyledTableRow key={index}>
+                  <StyledTableCell align='left'>{row.id}</StyledTableCell>
+                  <StyledTableCell
+                    component='td'
+                    scope='row'
+                    sx={{ display: 'flex', alignItems: 'center', gap: '20px' }}
+                  >
+                    {TableRowStatus(
+                      row.status as 'PENDING' | 'COMPLETED' | 'FAILED',
+                    )}
+                    {row.status}
                   </StyledTableCell>
-                ) : (
-                  <StyledTableCell align='right'></StyledTableCell>
-                )}
+                  <StyledTableCell align='left'>
+                    {row.paymentType.toUpperCase()}
+                  </StyledTableCell>
+                  <StyledTableCell align='left'>
+                    {formatMoney(row.amount / 100)}
+                  </StyledTableCell>
+                  <StyledTableCell align='left'>
+                    {row.createdAt
+                      ? format(new Date(row.createdAt), 'dd/MM/yyyy HH:mm:ss')
+                      : 'No data available'}
+                  </StyledTableCell>
+                </StyledTableRow>
+              ))
+            ) : (
+              <StyledTableRow>
+                <StyledTableCell colSpan={5} align='center'>
+                  No deposit transactions available.
+                </StyledTableCell>
               </StyledTableRow>
-            ))
-          ) : (
-            <StyledTableRow>
-              <StyledTableCell colSpan={6} align='center'>
-                None available transactions
-              </StyledTableCell>
-            </StyledTableRow>
-          )}
-        </TableBody>
-      </Table>
-    </TableContainer>
+            )}
+          </TableBody>
+        </Table>
+      </TableContainer>
+
+      {/* Controles de Paginação */}
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center', // centraliza os botões e texto
+          alignItems: 'center',
+          marginTop: '16px',
+          gap: '16px', // espaço entre botões e texto
+          padding: '0 16px',
+        }}
+      >
+        <Button
+          variant='outlined'
+          onClick={handlePrevious}
+          disabled={currentPage === 1}
+          sx={{ mb: 2 }}
+        >
+          Previous
+        </Button>
+        <Typography variant='body2'>
+          Page {currentPage} ({mappedTransactions.length} items)
+        </Typography>
+        <Button
+          variant='outlined'
+          onClick={handleNext}
+          disabled={mappedTransactions.length < itemsPerPage}
+          sx={{ mb: 2 }} // margem horizontal
+        >
+          Next
+        </Button>
+      </Box>
+    </div>
   )
 }
 

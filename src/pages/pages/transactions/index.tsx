@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/exhaustive-deps */
 // ** MUI Imports
 import Grid from '@mui/material/Grid'
@@ -7,21 +8,20 @@ import Typography from '@mui/material/Typography'
 // ** Custom Components Imports
 import PageHeader from 'src/@core/components/page-header'
 import { useEffect, useState } from 'react'
-import { Transaction, TransfersTransaction } from 'src/context/types'
+import { Deposit, Withdraw } from 'src/context/types'
 import TableCustomizedDeposit from 'src/views/pages/transaction/TableCustomizedDeposit'
 import TableCustomizedWithdraw from 'src/views/pages/transaction/TableCustomizedWithdraw'
 import CircularProgress from '@mui/material/CircularProgress'
 import { AlterButton, HeaderContainer, HeaderContainerBottom } from './style'
 import SwapVertIcon from '@mui/icons-material/SwapVert'
-import { getTransfersTransaction } from 'src/pages/api/transaction/getWithdrawTransaction'
-
-import { getTransaction } from 'src/pages/api/transaction/getDepositTransaction'
+import { getDeposit } from 'src/pages/api/transaction/getDepositTransaction'
+import { getWithdraw } from 'src/pages/api/transaction/getWithdrawTransaction'
 
 const Transactions = () => {
-  const [transactions, setTransactions] = useState<Transaction[]>([])
-  const [transfersTransactions, setTransfersTransactions] = useState<
-    TransfersTransaction[]
-  >([])
+  const [deposit, setDeposit] = useState<Deposit[]>([])
+  const [pageDeposit, setPageDeposit] = useState<number>(1)
+
+  const [withdraw, setWithdraw] = useState<Withdraw[]>([])
   const [alter, setAlter] = useState<boolean>(true)
   const [loading, setLoading] = useState<boolean>(false)
 
@@ -29,18 +29,22 @@ const Transactions = () => {
     setAlter(!alter)
   }
 
+  const handlePageDeposit = (page: number) => {
+    setPageDeposit(page)
+  }
+
   useEffect(() => {
     if (!alter) {
       setLoading(true)
-      getTransfersTransaction()
-        .then((response: TransfersTransaction[] | null) => {
+      getWithdraw()
+        .then((response: Withdraw[] | null) => {
           if (response !== null) {
-            setTransfersTransactions(response)
+            setWithdraw(response)
           } else {
-            setTransfersTransactions([])
+            setWithdraw([])
           }
         })
-        .catch((error) => {
+        .catch((error: any) => {
           console.error('Failed to fetch transfers:', error)
         })
         .finally(() => {
@@ -50,12 +54,12 @@ const Transactions = () => {
   }, [alter])
 
   useEffect(() => {
-    getTransaction()
-      .then((response: Transaction[] | null) => {
+    getDeposit(1)
+      .then((response: Deposit[] | null) => {
         if (response !== null) {
-          setTransactions(response)
+          setDeposit(response)
         } else {
-          setTransactions([])
+          setDeposit([])
         }
       })
       .catch((error) => {
@@ -65,6 +69,23 @@ const Transactions = () => {
         setLoading(false)
       })
   }, [])
+
+  useEffect(() => {
+    getDeposit(pageDeposit)
+      .then((response: Deposit[] | null) => {
+        if (response !== null) {
+          setDeposit(response)
+        } else {
+          setDeposit([])
+        }
+      })
+      .catch((error) => {
+        console.error('Failed to fetch transfers:', error)
+      })
+      .finally(() => {
+        setLoading(false)
+      })
+  }, [pageDeposit])
 
   return (
     <Grid container spacing={6}>
@@ -91,14 +112,16 @@ const Transactions = () => {
             loading ? (
               <CircularProgress />
             ) : (
-              <TableCustomizedDeposit transactions={transactions} />
+              <TableCustomizedDeposit
+                deposit={deposit}
+                handlePageDeposit={handlePageDeposit}
+                currentPage={pageDeposit}
+              />
             )
           ) : loading ? (
             <CircularProgress />
           ) : (
-            <TableCustomizedWithdraw
-              transfersTransactions={transfersTransactions}
-            />
+            <TableCustomizedWithdraw withdraw={withdraw} />
           )}
         </Card>
       </Grid>

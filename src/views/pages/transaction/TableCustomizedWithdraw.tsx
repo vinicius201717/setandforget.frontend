@@ -9,13 +9,20 @@ import { format } from 'date-fns'
 import { StyledTableCell, StyledTableRow } from './style'
 import { Badge } from '@mui/material'
 import { formatMoney } from 'src/utils/format-money'
-import { TransfersTransaction } from 'src/context/types'
+import { Withdraw } from 'src/context/types'
 
 interface TableCustomizedProps {
-  transfersTransactions: TransfersTransaction[] | undefined
+  withdraw: Withdraw[] | undefined
 }
 
-const TableRowStatus = (status: 'PENDING' | 'COMPLETED' | 'FAILED') => {
+const pixKeyTypeMap: Record<string, string> = {
+  '296': 'CPF',
+  '297': 'Telefone',
+  '298': 'Email',
+  '299': 'CNPJ',
+}
+
+const TableRowStatus = (status: 'PENDING' | 'PAID' | 'FAILED') => {
   switch (status) {
     case 'PENDING':
       return (
@@ -31,7 +38,7 @@ const TableRowStatus = (status: 'PENDING' | 'COMPLETED' | 'FAILED') => {
           }}
         />
       )
-    case 'COMPLETED':
+    case 'PAID':
       return (
         <Badge
           color='success'
@@ -64,25 +71,24 @@ const TableRowStatus = (status: 'PENDING' | 'COMPLETED' | 'FAILED') => {
   }
 }
 
-const TableCustomizedWithdraw = ({
-  transfersTransactions,
-}: TableCustomizedProps) => {
+const TableCustomizedWithdraw = ({ withdraw }: TableCustomizedProps) => {
   return (
     <TableContainer component={Paper}>
-      <Table sx={{ minWidth: 700 }} aria-label='Transactions'>
+      <Table sx={{ minWidth: 700 }} aria-label='Withdrawals'>
         <TableRow>
-          <StyledTableCell>Transfer ID</StyledTableCell>
+          <StyledTableCell>Withdraw ID</StyledTableCell>
           <StyledTableCell align='left'>Status</StyledTableCell>
           <StyledTableCell align='left'>Amount</StyledTableCell>
+          <StyledTableCell align='left'>Pix Key</StyledTableCell>
+          <StyledTableCell align='left'>Pix Key Type</StyledTableCell>
           <StyledTableCell align='left'>Date</StyledTableCell>
-          <StyledTableCell align='left'>Description</StyledTableCell>
         </TableRow>
         <TableBody>
-          {transfersTransactions && transfersTransactions.length > 0 ? (
-            transfersTransactions.map((row, index) => (
+          {withdraw && withdraw.length > 0 ? (
+            withdraw.map((row, index) => (
               <StyledTableRow key={index}>
                 <StyledTableCell align='left'>
-                  {row.stripeTransferId || 'ID not available'}
+                  {row.id || 'ID not available'}
                 </StyledTableCell>
                 <StyledTableCell
                   component='td'
@@ -94,8 +100,7 @@ const TableCustomizedWithdraw = ({
                   }}
                 >
                   {TableRowStatus(
-                    (row.status as 'PENDING' | 'COMPLETED' | 'FAILED') ||
-                      'FAILED',
+                    (row.status as 'PENDING' | 'PAID' | 'FAILED') || 'FAILED',
                   )}
                   {row.status || 'FAILED'}
                 </StyledTableCell>
@@ -103,19 +108,23 @@ const TableCustomizedWithdraw = ({
                   {formatMoney(row.amount / 100)}
                 </StyledTableCell>
                 <StyledTableCell align='left'>
-                  {row.createdAt
-                    ? format(new Date(row.createdAt), 'dd/MM/yyyy HH:mm:ss')
-                    : 'None available data'}
+                  {row.pixKey || 'No pix key'}
                 </StyledTableCell>
                 <StyledTableCell align='left'>
-                  {row.description || 'No description'}
+                  {pixKeyTypeMap[row.pixKeyType] || 'No type'}
+                </StyledTableCell>
+
+                <StyledTableCell align='left'>
+                  {row.createdAt
+                    ? format(new Date(row.createdAt), 'dd/MM/yyyy HH:mm:ss')
+                    : 'No date available'}
                 </StyledTableCell>
               </StyledTableRow>
             ))
           ) : (
             <StyledTableRow>
               <StyledTableCell colSpan={6} align='center'>
-                None available transactions
+                No available withdrawals
               </StyledTableCell>
             </StyledTableRow>
           )}

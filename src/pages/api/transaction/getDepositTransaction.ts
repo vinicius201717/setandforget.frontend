@@ -1,17 +1,21 @@
 import { api } from 'src/lib/axios'
 import authConfig from 'src/configs/auth'
-import { Transaction } from 'src/context/types'
+import { Deposit } from 'src/context/types'
 
-export async function getTransaction(): Promise<Transaction[] | null> {
+export async function getDeposit(page: number): Promise<Deposit[] | null> {
   const storedToken = window.localStorage.getItem(
     authConfig.storageTokenKeyName,
   )
   try {
-    const response = await api.get<Transaction[]>(`/transaction`, {
+    const response = await api.get<Deposit[]>(`/payments`, {
       headers: {
         Authorization: `Bearer ${storedToken}`,
       },
+      params: {
+        page,
+      },
     })
+
     return response.data
   } catch (error) {
     console.error(error)
