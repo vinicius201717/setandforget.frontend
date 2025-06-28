@@ -117,8 +117,10 @@ export interface Deposit {
   id: string | null
   status: 'PENDING' | 'COMPLETED' | 'FAILED' | 'UNKNOWN'
   paymentType: string
+  pixCode: string
   amount: number
   createdAt: Date
+  updatedAt: Date
 }
 
 export interface Withdraw {

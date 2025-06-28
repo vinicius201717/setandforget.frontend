@@ -277,14 +277,14 @@ export function DepositMethod() {
           render={({ field }) => (
             <TextField
               {...field}
-              label='Phone (e.g., +5511999999999)'
+              label='Phone - 62 999999999'
               variant='outlined'
               fullWidth
               error={!!errors.customerPhone}
               helperText={
                 errors.customerPhone
                   ? errors.customerPhone.message
-                  : 'Include country code (e.g., +55)'
+                  : 'Do not include the country code (e.g., +55)'
               }
               sx={{ mb: 4 }}
               onChange={(e) => {

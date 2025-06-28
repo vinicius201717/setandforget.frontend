@@ -98,7 +98,7 @@ export default function DepositSuccessModal({
                 maxWidth: 360,
                 height: 40,
                 overflowY: 'auto',
-                bgcolor: '#f5f5f5',
+                bgcolor: 'default',
                 p: 1,
                 borderRadius: 1,
                 fontSize: '0.8rem',

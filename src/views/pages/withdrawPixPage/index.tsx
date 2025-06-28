@@ -10,10 +10,12 @@ import {
   TextField,
   Typography,
   InputAdornment,
-  Modal,
-  Box,
   CircularProgress,
   Link as MUILink,
+  InputLabel,
+  MenuItem,
+  FormControl,
+  Select,
 } from '@mui/material'
 import { useAuth } from 'src/hooks/useAuth'
 import toast from 'react-hot-toast'
@@ -36,10 +38,11 @@ const schema = z.object({
       (val) => val <= 5000,
       'The maximum withdrawal amount via PIX is R$ 5,000.00',
     ),
-  cpf: z
+  ownerTaxnumber: z
     .string()
     .regex(/^\d{11}$/, 'CPF must contain exactly 11 digits')
     .refine((val) => validateCPF(val), 'Invalid CPF'),
+  pixKeyType: z.number().min(296, 'Select a valid PIX key type'),
   pixKey: z
     .string()
     .min(1, 'PIX key is required')
@@ -65,13 +68,13 @@ function validateCPF(cpf: string): boolean {
 
 interface FormValues {
   amount: string
-  cpf: string
+  ownerTaxnumber: string
+  pixKeyType: number
   pixKey: string
 }
 
 const WithdrawPixPage = () => {
   const [loading, setLoading] = useState<boolean>(false)
-  const [modalOpen, setModalOpen] = useState(false)
   const { user, setUser } = useAuth()
 
   const accountBalance = user?.Account.amount as number
@@ -85,7 +88,8 @@ const WithdrawPixPage = () => {
     resolver: zodResolver(schema),
     defaultValues: {
       amount: '',
-      cpf: '',
+      ownerTaxnumber: '',
+      pixKeyType: 296, // Default to CPF
       pixKey: '',
     },
   })
@@ -105,6 +109,7 @@ const WithdrawPixPage = () => {
   }
 
   const onSubmit = async (data: FormValues) => {
+    console.log('Form Data:', data) // Depuração
     setLoading(true)
     const amountInCents = parseFloat(data.amount) * 100
 
@@ -112,17 +117,17 @@ const WithdrawPixPage = () => {
       try {
         const response = await postWithdrawPix({
           amount: amountInCents,
-          cpf: data.cpf,
+          ownerTaxnumber: data.ownerTaxnumber,
           pixKey: data.pixKey,
         })
 
+        console.log('API Response:', response) // Depuração
         if (response && response.response && response.response.success) {
           toast.success(
             response.response.message || 'Saque via PIX realizado com sucesso!',
             { position: 'bottom-right' },
           )
           updateBalance(parseFloat(data.amount))
-          setModalOpen(true)
         } else if (response && response.error) {
           toast.error(response.error, { position: 'bottom-right' })
         } else {
@@ -131,6 +136,7 @@ const WithdrawPixPage = () => {
           })
         }
       } catch (error) {
+        console.error('API Error:', error) // Depuração
         toast.error('Ocorreu um erro: ' + (error as Error).message, {
           position: 'bottom-right',
         })
@@ -141,24 +147,9 @@ const WithdrawPixPage = () => {
       setLoading(false)
       toast.error(
         `Saldo insuficiente. Seu saldo é R$ ${accountBalance / 100}`,
-        {
-          position: 'bottom-right',
-        },
+        { position: 'bottom-right' },
       )
     }
-  }
-
-  const modalStyle = {
-    position: 'absolute' as const,
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: 400,
-    bgcolor: 'background.paper',
-    border: '2px solid #000',
-    boxShadow: 24,
-    p: 4,
-    textAlign: 'center',
   }
 
   return (
@@ -203,7 +194,7 @@ const WithdrawPixPage = () => {
               </Grid>
               <Grid item xs={12}>
                 <Controller
-                  name='cpf'
+                  name='ownerTaxnumber'
                   control={control}
                   render={({ field }) => (
                     <TextField
@@ -211,15 +202,34 @@ const WithdrawPixPage = () => {
                       label='CPF do Titular'
                       variant='outlined'
                       {...field}
-                      error={!!errors.cpf}
+                      error={!!errors.ownerTaxnumber}
                       helperText={
-                        errors.cpf ? errors.cpf.message : '11 dígitos'
+                        errors.ownerTaxnumber
+                          ? errors.ownerTaxnumber.message
+                          : '11 dígitos'
                       }
                       onChange={(e) => {
                         field.onChange(e.target.value.replace(/[^\d]/g, ''))
-                        trigger('cpf')
+                        trigger('ownerTaxnumber')
                       }}
                     />
+                  )}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <Controller
+                  name='pixKeyType'
+                  control={control}
+                  render={({ field }) => (
+                    <FormControl fullWidth>
+                      <InputLabel>Tipo da Chave PIX</InputLabel>
+                      <Select label='Tipo da Chave PIX' {...field}>
+                        <MenuItem value={296}>CPF</MenuItem>
+                        <MenuItem value={297}>Telefone</MenuItem>
+                        <MenuItem value={298}>Email</MenuItem>
+                        <MenuItem value={299}>CNPJ</MenuItem>
+                      </Select>
+                    </FormControl>
                   )}
                 />
               </Grid>
@@ -290,31 +300,6 @@ const WithdrawPixPage = () => {
               </Grid>
             </Grid>
           </form>
-
-          <Modal
-            open={modalOpen}
-            onClose={() => setModalOpen(false)}
-            aria-labelledby='modal-title'
-            aria-describedby='modal-description'
-          >
-            <Box sx={modalStyle}>
-              <Typography id='modal-title' variant='h6' component='h2'>
-                Saque via PIX Realizado
-              </Typography>
-              <Typography id='modal-description' sx={{ mt: 2 }}>
-                Sua solicitação de saque via PIX foi enviada com sucesso. O
-                processamento pode levar até 1 dia útil.
-              </Typography>
-              <Button
-                onClick={() => setModalOpen(false)}
-                variant='contained'
-                color='primary'
-                sx={{ mt: 2 }}
-              >
-                Fechar
-              </Button>
-            </Box>
-          </Modal>
         </Paper>
       </Grid>
     </Grid>

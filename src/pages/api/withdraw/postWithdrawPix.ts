@@ -4,8 +4,10 @@ import authConfig from 'src/configs/auth'
 
 export interface WithdrawPixProps {
   amount: number
-  cpf: string
-  pixKey: string
+  pixKey?: string
+  pixKeyType?: number
+  ownerTaxnumber?: string
+  ownerNamePixKey?: string
 }
 
 export interface WithdrawPixResponse {
@@ -23,13 +25,13 @@ export class WithdrawPixError extends Error {
   }
 }
 
-const generateTransactionId = () => {
-  const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '')
-  const seq = Math.floor(Math.random() * 1000)
-    .toString()
-    .padStart(3, '0')
-  return `pix-${dateStr}-${seq}`
-}
+// const generateTransactionId = () => {
+//   const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '')
+//   const seq = Math.floor(Math.random() * 1000)
+//     .toString()
+//     .padStart(3, '0')
+//   return `pix-${dateStr}-${seq}`
+// }
 
 export async function postWithdrawPix(
   data: WithdrawPixProps,
@@ -42,16 +44,17 @@ export async function postWithdrawPix(
       throw new WithdrawPixError('Token de autenticação não encontrado')
     }
 
-    const transactionId = generateTransactionId()
+    // const transactionId = generateTransactionId()
 
     const payload = {
       amount: data.amount,
-      cpf: data.cpf,
+      ownerTaxnumber: data.ownerTaxnumber,
       pixKey: data.pixKey,
-      transactionId,
+      pixKeyType: data.pixKeyType,
+      // transactionId,
     }
 
-    const response = await api.post('/withdrawals/pix', payload, {
+    const response = await api.post('/withdrawals', payload, {
       headers: {
         Authorization: `Bearer ${storedToken}`,
       },

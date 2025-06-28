@@ -22,11 +22,17 @@ const Transactions = () => {
   const [pageDeposit, setPageDeposit] = useState<number>(1)
 
   const [withdraw, setWithdraw] = useState<Withdraw[]>([])
+  const [pageWithdraw, setPageWithdraw] = useState<number>(1)
+
   const [alter, setAlter] = useState<boolean>(true)
   const [loading, setLoading] = useState<boolean>(false)
 
   const handleAlter: React.MouseEventHandler<HTMLButtonElement> = () => {
     setAlter(!alter)
+  }
+
+  const handlePageWithdraw = (page: number) => {
+    setPageWithdraw(page)
   }
 
   const handlePageDeposit = (page: number) => {
@@ -36,7 +42,7 @@ const Transactions = () => {
   useEffect(() => {
     if (!alter) {
       setLoading(true)
-      getWithdraw()
+      getWithdraw(pageWithdraw)
         .then((response: Withdraw[] | null) => {
           if (response !== null) {
             setWithdraw(response)
@@ -51,7 +57,7 @@ const Transactions = () => {
           setLoading(false)
         })
     }
-  }, [alter])
+  }, [alter, pageWithdraw])
 
   useEffect(() => {
     getDeposit(1)
@@ -121,7 +127,11 @@ const Transactions = () => {
           ) : loading ? (
             <CircularProgress />
           ) : (
-            <TableCustomizedWithdraw withdraw={withdraw} />
+            <TableCustomizedWithdraw
+              withdraw={withdraw}
+              handlePageWithdraw={handlePageWithdraw}
+              currentPage={pageWithdraw}
+            />
           )}
         </Card>
       </Grid>
