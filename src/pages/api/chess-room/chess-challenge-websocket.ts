@@ -1,8 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-unused-vars */
 import toast from 'react-hot-toast'
 import { io, Socket } from 'socket.io-client'
-import { UserDataType } from 'src/context/types'
-import { Draw, GameStatus, Room } from 'src/types/apps/chessTypes'
+import { Draw, GameStatus, Revenge, Room } from 'src/types/apps/chessTypes'
 
 let socket: Socket | null = null
 
@@ -13,6 +13,7 @@ export const connectSocket = (
   userId: string | null,
   amount: string | null,
   setDraw: React.Dispatch<React.SetStateAction<Draw>> | null,
+  setRevenge: React.Dispatch<React.SetStateAction<Revenge>> | null,
   setGameStatus: React.Dispatch<React.SetStateAction<GameStatus>> | null,
   setChessRoom: React.Dispatch<React.SetStateAction<Room | null>> | null,
 
@@ -90,6 +91,16 @@ export const connectSocket = (
     }
   })
 
+  socket.on('revengeRequest', (data: Revenge) => {
+    if (setRevenge)
+      setRevenge({
+        name: data.name,
+        roomId: data.roomId,
+        userId: data.userId,
+        status: data.status,
+      })
+  })
+
   socket.on('endGame', (data) => {
     if (setGameStatus)
       setGameStatus({
@@ -162,6 +173,21 @@ export const acceptDraw = (roomId: string, userId: string, name: string) => {
   if (socket) {
     socket.emit('acceptDraw', query)
   }
+}
+
+export const revenge = (roomId: string, userId: string, name: string) => {
+  const query = { roomId, userId, name }
+  if (socket) socket.emit('revenge', query)
+}
+
+export const acceptRevenge = (roomId: string, userId: string, name: string) => {
+  const query = { roomId, userId, name }
+  if (socket) socket.emit('acceptRevenge', query)
+}
+
+export const refuseRevenge = (roomId: string, userId: string, name: string) => {
+  const query = { roomId, userId, name }
+  if (socket) socket.emit('refuseRevenge', query)
 }
 
 export const endGame = (

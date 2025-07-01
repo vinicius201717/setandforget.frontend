@@ -12,6 +12,7 @@ import {
   GameStatus,
   PieceType,
   PromotionProps,
+  Revenge,
   Room,
 } from 'src/types/apps/chessTypes'
 import { isGameOverChess } from '../utils/isGameOver'
@@ -41,6 +42,7 @@ import { UserDataType } from 'src/context/types'
 import { returnTheWinnerIsWinnengsInCaseOfWithdrawal } from '../utils/returnTheWinnerIsWinnengsInCaseOfWithdrawal'
 import { useClock } from '../utils/ChessTimer'
 import { returnAmountToAcceptDraw } from '../utils/returnAmountToAcceptDraw'
+import { ToastRevenge } from '../components/ToastRevenge'
 
 const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
   chessRoomId,
@@ -56,6 +58,12 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
     active: false,
     name: '',
     userId: '',
+  })
+  const [revenge, setRevenge] = useState<Revenge>({
+    roomId: '',
+    name: '',
+    userId: '',
+    status: false,
   })
   const [modalEndGameOpen, setModalEndGameOpen] = useState(false)
   const [fen, setFen] = useState<string>(game.fen())
@@ -309,7 +317,11 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
     if (draw.active) {
       setToastId(
         toast(
-          <ToastDraw toastId={toastId} name={draw.name} userId={draw.userId} />,
+          <ToastDraw
+            toastId={toastId}
+            name={draw.name}
+            userId={user?.id as string}
+          />,
           {
             position: 'bottom-right',
             duration: Infinity,
@@ -319,6 +331,25 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
       )
     }
   }, [draw])
+
+  useEffect(() => {
+    if (revenge.status) {
+      setToastId(
+        toast(
+          <ToastRevenge
+            toastId={toastId}
+            name={revenge.name}
+            userId={user?.id as string}
+          />,
+          {
+            position: 'bottom-right',
+            duration: Infinity,
+            id: 'chess-draw-loading-toast',
+          },
+        ),
+      )
+    }
+  }, [revenge])
 
   useEffect(() => {
     if (chessRoomId) {
@@ -342,6 +373,7 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
               userId,
               null,
               setDraw,
+              setRevenge,
               setGameStatus,
               setChessRoom,
               setLiveMove,
@@ -767,7 +799,7 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
                 <GamePlayTicketInfo
                   ticketId={chessRoom.challenge.id}
                   clock={chessRoom.challenge.duration / 60}
-                  value={chessRoom.challenge.amount * 2}
+                  value={chessRoom.challenge.amount}
                   payout={90}
                 />
               ) : (
@@ -806,7 +838,7 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
                 <GamePlayTicketInfo
                   ticketId={chessRoom.challenge.id}
                   clock={chessRoom.challenge.duration / 60}
-                  value={chessRoom.challenge.amount * 2}
+                  value={chessRoom.challenge.amount}
                   payout={90}
                 />
               ) : (

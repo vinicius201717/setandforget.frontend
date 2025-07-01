@@ -167,6 +167,13 @@ export interface Draw {
   userId: string
 }
 
+export interface Revenge {
+  name: string
+  userId: string
+  roomId: string
+  status: boolean
+}
+
 export interface GameStatus {
   status: boolean
   message: string

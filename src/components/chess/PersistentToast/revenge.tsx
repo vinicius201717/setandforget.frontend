@@ -1,17 +1,18 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-unused-vars */
 import toast from 'react-hot-toast'
 import { chessChallengeCancel } from 'src/pages/api/chess-challenge/chessChallengeCancel'
 
 interface CancelProps {
+  userName: string
   toastId: any
   amount: number
   updateAccountAmount: (amount: number, action: string) => void
 }
 
-export const CancelableToastContent = ({
+export const CancelableToastContentRevenge = ({
   toastId,
   amount,
+  userName,
   updateAccountAmount,
 }: CancelProps) => {
   const cancelToast = () => {
@@ -46,7 +47,7 @@ export const CancelableToastContent = ({
         width: '100%',
       }}
     >
-      <span>Looking for player...</span>
+      <span>Waiting for {userName}</span>
       <button
         onClick={() => cancelToast()}
         style={{

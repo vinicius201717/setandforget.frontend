@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
 // ** MUI Imports
 import Paper from '@mui/material/Paper'
@@ -13,12 +14,24 @@ import { StyledTableCell, StyledTableRow } from './style'
 import { Badge, Box } from '@mui/material'
 import { Deposit } from 'src/context/types'
 import { formatMoney } from 'src/utils/format-money'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
+import DepositSuccessModal from 'src/components/deposit/DepositSuccessModal'
+
 interface TableCustomizedProps {
   deposit: Deposit[] | undefined
   handlePageDeposit: (page: number) => void
   currentPage: number
 }
+
+interface DepositResponse {
+  response?: {
+    pixCode?: string
+    message?: string
+    expire?: number
+  }
+}
+
 const TableRowStatus = (status: 'PENDING' | 'COMPLETED' | 'FAILED') => {
   switch (status) {
     case 'PENDING':
@@ -74,21 +87,37 @@ const TableCustomizedDeposit = ({
   currentPage,
 }: TableCustomizedProps) => {
   const [openModal, setOpenModal] = useState(false)
-  const [selectedDeposit, setSelectedDeposit] = useState<Deposit | null>(null)
+  const [timeLeft, setTimeLeft] = useState(300) // Default 5 minutes
+  const [response, setResponse] = useState<DepositResponse | null>(null)
+  const [validButtons, setValidButtons] = useState<Set<string | number>>(
+    new Set(),
+  )
 
   const handleOpenModal = (deposit: Deposit) => {
-    setSelectedDeposit(deposit)
+    const secondsSinceUpdate = differenceInSeconds(
+      new Date(),
+      new Date(deposit.updatedAt),
+    )
+    const remainingTime = Math.max(300 - secondsSinceUpdate, 0)
+    setResponse({
+      response: {
+        pixCode: deposit.pixCode || 'No pix code available',
+        message: 'Transaction ready to be processed.',
+        expire: remainingTime,
+      },
+    })
+    setTimeLeft(remainingTime)
     setOpenModal(true)
   }
 
-  const actionButton = (row: Deposit) => {
-    const secondsSinceUpdate = differenceInSeconds(
-      new Date(),
-      new Date(row.updatedAt),
-    )
-    const stillValid = secondsSinceUpdate <= 300 // 5 min
+  const handleCloseModal = () => {
+    setOpenModal(false)
+    setResponse(null)
+    setTimeLeft(300)
+  }
 
-    if (stillValid && row.status === 'PENDING') {
+  const actionButton = (row: Deposit) => {
+    if (validButtons.has(row.id as string)) {
       return (
         <Button variant='contained' onClick={() => handleOpenModal(row)}>
           Pagar
@@ -99,7 +128,6 @@ const TableCustomizedDeposit = ({
   }
 
   const itemsPerPage = 10
-
   const mappedTransactions = deposit || []
 
   const handlePrevious = () => {
@@ -113,6 +141,45 @@ const TableCustomizedDeposit = ({
       handlePageDeposit(currentPage + 1)
     }
   }
+
+  // Timer para monitorar a validade dos botões
+  useEffect(() => {
+    const timer = setInterval(() => {
+      const now = new Date()
+      const newValidButtons = new Set<string | number>()
+      mappedTransactions.forEach((deposit) => {
+        const secondsSinceUpdate = differenceInSeconds(
+          now,
+          new Date(deposit.updatedAt),
+        )
+        if (secondsSinceUpdate <= 300 && deposit.status === 'PENDING') {
+          newValidButtons.add(deposit.id as string)
+        }
+      })
+      setValidButtons(newValidButtons)
+    }, 1000)
+
+    return () => clearInterval(timer) // Limpa o intervalo ao desmontar
+  }, [mappedTransactions])
+
+  // Timer para o modal
+  useEffect(() => {
+    let timer: NodeJS.Timeout
+    if (openModal && timeLeft > 0) {
+      timer = setInterval(() => {
+        setTimeLeft((prev) => {
+          if (prev <= 1) {
+            clearInterval(timer)
+            handleCloseModal()
+            toast.error('O tempo para pagamento expirou.')
+            return 0
+          }
+          return prev - 1
+        })
+      }, 1000)
+    }
+    return () => clearInterval(timer)
+  }, [openModal, timeLeft])
 
   return (
     <div>
@@ -201,6 +268,13 @@ const TableCustomizedDeposit = ({
           Next
         </Button>
       </Box>
+      {response && (
+        <DepositSuccessModal
+          onClose={handleCloseModal}
+          open={openModal}
+          response={response}
+        />
+      )}
     </div>
   )
 }
