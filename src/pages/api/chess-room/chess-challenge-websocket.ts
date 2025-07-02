@@ -58,6 +58,8 @@ export const connectSocket = (
   })
 
   socket.on('reconnected', (game) => {
+    console.log(game)
+
     if (setChessRoom) setChessRoom(game)
   })
 
@@ -99,6 +101,11 @@ export const connectSocket = (
         userId: data.userId,
         status: data.status,
       })
+  })
+
+  socket.on('revengeAccept', (roomId: string) => {
+    window.localStorage.setItem('chess-room-id', roomId)
+    window.location.href = `/chess/play/${roomId}`
   })
 
   socket.on('endGame', (data) => {
@@ -180,8 +187,15 @@ export const revenge = (roomId: string, userId: string, name: string) => {
   if (socket) socket.emit('revenge', query)
 }
 
-export const acceptRevenge = (roomId: string, userId: string, name: string) => {
-  const query = { roomId, userId, name }
+export const acceptRevenge = (
+  roomId: string,
+  userId: string,
+  name: string,
+  duration: number,
+  newRoomId: string,
+  newChallengeId: string,
+) => {
+  const query = { roomId, userId, name, duration, newRoomId, newChallengeId }
   if (socket) socket.emit('acceptRevenge', query)
 }
 

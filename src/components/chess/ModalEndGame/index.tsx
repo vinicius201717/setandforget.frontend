@@ -19,14 +19,11 @@ import { GridArrowDownwardIcon, GridArrowUpwardIcon } from '@mui/x-data-grid'
 import { formatClock } from 'src/utils/format-clock-ticket'
 import { translateGameOverMessage } from '../utils/verifyTitleInRelationMessage'
 import { useAuth } from 'src/hooks/useAuth'
-import { CreateChallengeReturn, Player } from 'src/types/apps/chessTypes'
-import { chessChallengeCreate } from 'src/pages/api/chess-challenge/chessChallengeCreate'
-import {
-  connectSocket,
-  revenge,
-} from 'src/pages/api/chess-room/chess-challenge-websocket'
+import { Player } from 'src/types/apps/chessTypes'
+import { revenge } from 'src/pages/api/chess-room/chess-challenge-websocket'
 import toast from 'react-hot-toast'
 import { CancelableToastContentRevenge } from '../PersistentToast/revenge'
+import { updateAccountAmount } from './utils'
 interface ConfirmModalProps {
   open: boolean
   roomId: string
@@ -58,79 +55,6 @@ function ModalEndGame({
     duration: number
   }
 
-  const updateAccountAmount = (amount: number, action: string) => {
-    if (user && user.Account) {
-      let newAmount: number
-      switch (action) {
-        case 'subtraction':
-          newAmount = (user.Account.amount / 100 - amount) * 100
-          break
-
-        case 'plus':
-          newAmount = user.Account.amount
-          break
-        default:
-          newAmount = user.Account.amount
-          break
-      }
-
-      const updatedUser = {
-        ...user,
-        Account: {
-          ...user.Account,
-          amount: newAmount,
-        },
-      }
-      setUser(updatedUser)
-    }
-  }
-
-  const handleAcceptRevenge = (data: RevengeType) => {
-    chessChallengeCreate(data)
-      .then((response: CreateChallengeReturn) => {
-        updateAccountAmount(data.amount, 'subtraction')
-        const roomId = response.room.id
-        const challengeId = response.challenge.id
-        const userId = response.challenge.userId
-        const amount = JSON.stringify(data.amount)
-        connectSocket(
-          challengeId,
-          roomId,
-          userId,
-          userId,
-          amount,
-          null,
-          null,
-          null,
-          null,
-          null,
-        )
-
-        window.localStorage.setItem('chess-room-id', roomId)
-        window.localStorage.setItem('chess-challenge-id', challengeId)
-        setToastId(
-          toast.loading(
-            <CancelableToastContentRevenge
-              toastId={toastId}
-              amount={data.amount}
-              userName={notAmI.name}
-              updateAccountAmount={updateAccountAmount}
-            />,
-            {
-              position: 'bottom-right',
-              duration: Infinity,
-              id: 'chess-loading-toast',
-            },
-          ),
-        )
-      })
-      .catch(() => {
-        toast.error('Failed to create the challenge: ', {
-          position: 'bottom-right',
-        })
-      })
-  }
-
   const handleRevenge = (data: RevengeType) => {
     if (user?.Account.amount && user.Account.amount / 100 >= data.amount) {
       revenge(roomId, user.id, user.name)
@@ -140,7 +64,7 @@ function ModalEndGame({
             toastId={toastId}
             amount={data.amount}
             userName={notAmI.name}
-            updateAccountAmount={updateAccountAmount}
+            updateAccountAmount={() => updateAccountAmount}
           />,
           {
             position: 'bottom-right',

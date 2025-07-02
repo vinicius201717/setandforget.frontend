@@ -340,6 +340,8 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
             toastId={toastId}
             name={revenge.name}
             userId={user?.id as string}
+            amount={chessRoom?.challenge.amount as number}
+            duration={chessRoom?.challenge.duration as number}
           />,
           {
             position: 'bottom-right',
