@@ -1,12 +1,13 @@
-import { Avatar, Box, Button, Card, IconButton, styled } from '@mui/material'
+import { Avatar, Box, Button, IconButton, styled } from '@mui/material'
 
-export const StyledCard = styled(Card)(({ theme }) => ({
-  backgroundColor: theme.palette.secondary.dark,
-  color: theme.palette.primary.contrastText,
-  borderRadius: '10px',
-  width: '300px',
-  padding: '20px',
+export const StyledCard = styled('div')(({ theme }) => ({
+  width: 360,
+  backgroundColor: theme.palette.background.default,
+  border: `1px solid ${theme.palette.divider}`,
+  borderRadius: 4,
+  padding: '24px 20px',
   position: 'relative',
+  boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
 }))
 
 export const CloseButton = styled(IconButton)(({ theme }) => ({

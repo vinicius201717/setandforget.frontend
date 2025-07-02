@@ -20,7 +20,10 @@ import { formatClock } from 'src/utils/format-clock-ticket'
 import { translateGameOverMessage } from '../utils/verifyTitleInRelationMessage'
 import { useAuth } from 'src/hooks/useAuth'
 import { Player } from 'src/types/apps/chessTypes'
-import { revenge } from 'src/pages/api/chess-room/chess-challenge-websocket'
+import {
+  isUserConnected,
+  revenge,
+} from 'src/pages/api/chess-room/chess-challenge-websocket'
 import toast from 'react-hot-toast'
 import { CancelableToastContentRevenge } from '../PersistentToast/revenge'
 import { updateAccountAmount } from './utils'
@@ -169,13 +172,15 @@ function ModalEndGame({
         <Button variant='contained' sx={{ margin: '5px' }}>
           <PersonAddIcon />
         </Button>
-        <Button
-          onClick={() => handleRevenge({ amount, duration })}
-          variant='contained'
-          sx={{ margin: '5px', width: '60%' }}
-        >
-          Revanche
-        </Button>
+        {isUserConnected() && (
+          <Button
+            onClick={() => handleRevenge({ amount, duration })}
+            variant='contained'
+            sx={{ margin: '5px', width: '60%' }}
+          >
+            Revanche
+          </Button>
+        )}
       </StyledCard>
     </Modal>
   )

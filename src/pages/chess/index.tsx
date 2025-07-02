@@ -6,6 +6,7 @@ import TravelExploreIcon from '@mui/icons-material/TravelExplore'
 import TuneIcon from '@mui/icons-material/Tune'
 import CurrencyExchangeSharpIcon from '@mui/icons-material/CurrencyExchangeSharp'
 import {
+  Box,
   Button,
   FormControl,
   FormHelperText,
@@ -317,39 +318,53 @@ function HomePage() {
           <LinkHistory href={'chess/history'}>History game</LinkHistory>
         </FormContainer>
       </ContainerChildren>
-      {globalChallenge && globalChallenge.length > 0 ? (
+      {globalChallenge && globalChallenge?.length > 0 && (
         <ContainerChildren isActive={screen === 2}>
-          <HeaderGlobalOptions>
-            <Typography variant='h6'>Players</Typography>
+          <HeaderGlobalOptions sx={{ mb: 2 }}>
+            <Typography variant='h6' fontWeight={700}>
+              Active Challenges
+            </Typography>
             <TuneIcon
-              onClick={() => handleOpenModalFilterGlobal()}
-              style={{ cursor: 'pointer' }}
+              onClick={handleOpenModalFilterGlobal}
+              sx={{ cursor: 'pointer', color: 'text.secondary' }}
             />
           </HeaderGlobalOptions>
 
           <ContainerGlobalPlayers>
-            {globalChallenge
-              ? globalChallenge.map((challenge, key) => {
-                  return (
-                    <div
-                      key={key}
-                      onClick={() => handleOpenModal(challenge.id)}
-                    >
-                      <GlobalPlayerProfile
-                        name={challenge.user.name}
-                        duration={challenge.duration}
-                        amount={challenge.amount}
-                        avatar={challenge.user.avatar}
-                      />
-                    </div>
-                  )
-                })
-              : ''}
+            {globalChallenge.map((challenge) => {
+              const { id, duration, amount, user } = challenge
+              return (
+                <Box
+                  key={id}
+                  onClick={() => handleOpenModal(id)}
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    borderRadius: 2,
+                    p: 2,
+                    mb: 1.5,
+                    transition: 'all 0.2s ease-in-out',
+                    cursor: 'pointer',
+                    '&:hover': {
+                      boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.06)',
+                      backgroundColor: '#f9fafb',
+                    },
+                  }}
+                >
+                  <GlobalPlayerProfile
+                    name={user.name}
+                    duration={duration}
+                    amount={amount}
+                    avatar={user.avatar}
+                  />
+                </Box>
+              )
+            })}
           </ContainerGlobalPlayers>
         </ContainerChildren>
-      ) : (
-        ''
       )}
+
       <OptionButtonChange>
         <ButtonIcon onClick={() => handleChange(1)} isActive={screen === 1}>
           <CurrencyExchangeSharpIcon sx={{ color: '#FFF' }} />

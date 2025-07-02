@@ -222,3 +222,7 @@ export const endGame = (
     socket.emit('endGame', query)
   }
 }
+
+export const isUserConnected = (): boolean => {
+  return !!socket?.connected
+}
