@@ -26,6 +26,7 @@ import {
 } from 'src/pages/api/chess-room/chess-challenge-websocket'
 import toast from 'react-hot-toast'
 import { CancelableToastContentRevenge } from '../PersistentToast/revenge'
+import { createFriendRequest } from 'src/pages/api/friendship/createFriend'
 interface ConfirmModalProps {
   open: boolean
   roomId: string
@@ -80,6 +81,19 @@ function ModalEndGame({
       toast.error('Insufficient funds.', {
         position: 'bottom-right',
       })
+    }
+  }
+
+  const handleCreateFriend = async () => {
+    console.log('ok')
+
+    try {
+      const addresseeId =
+        user?.id === playerOne.id ? playerTwo.id : playerOne.id
+      await createFriendRequest(user?.id as string, addresseeId)
+      toast.success('Friend request sent!')
+    } catch (err) {
+      toast.error('Failed to send friend request.')
     }
   }
 
@@ -169,7 +183,11 @@ function ModalEndGame({
             </TableBody>
           </Table>
         </TableContainer>
-        <Button variant='contained' sx={{ margin: '5px' }}>
+        <Button
+          variant='contained'
+          sx={{ margin: '5px' }}
+          onClick={() => handleCreateFriend()}
+        >
           <PersonAddIcon />
         </Button>
         {isUserConnected() && (
