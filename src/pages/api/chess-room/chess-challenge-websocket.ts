@@ -100,12 +100,35 @@ export const connectSocket = (
         roomId: data.roomId,
         userId: data.userId,
         status: data.status,
+        cancelled: data.cancelled,
       })
   })
 
   socket.on('revengeAccept', (roomId: string) => {
     window.localStorage.setItem('chess-room-id', roomId)
     window.location.href = `/chess/play/${roomId}`
+  })
+
+  socket.on('revengeRefuse', (data: Revenge) => {
+    if (setRevenge)
+      setRevenge({
+        name: data.name,
+        roomId: data.roomId,
+        userId: data.userId,
+        status: data.status,
+        cancelled: data.cancelled,
+      })
+  })
+
+  socket.on('revengeCancelRequest', (data: Revenge) => {
+    if (setRevenge)
+      setRevenge({
+        name: data.name,
+        roomId: data.roomId,
+        userId: data.userId,
+        status: data.status,
+        cancelled: data.cancelled,
+      })
   })
 
   socket.on('endGame', (data) => {
@@ -185,6 +208,16 @@ export const acceptDraw = (roomId: string, userId: string, name: string) => {
 export const revenge = (roomId: string, userId: string, name: string) => {
   const query = { roomId, userId, name }
   if (socket) socket.emit('revenge', query)
+}
+
+export const revengeCancel = (
+  roomId: string,
+  userId: string,
+  name: string,
+  status: boolean,
+) => {
+  const query = { roomId, userId, name, status }
+  if (socket) socket.emit('revengeCancel', query)
 }
 
 export const acceptRevenge = (

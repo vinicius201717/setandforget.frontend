@@ -2,7 +2,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-unused-vars */
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useRef } from 'react'
 import Chessboard from 'chessboardjsx'
 import { Chess, Square } from 'chess.js'
 import { formatTime } from 'src/utils/format-timer'
@@ -64,8 +64,9 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
     name: '',
     userId: '',
     status: false,
+    cancelled: false,
   })
-  const [modalEndGameOpen, setModalEndGameOpen] = useState(false)
+  const [modalEndGameOpen, setModalEndGameOpen] = useState<boolean>(false)
   const [fen, setFen] = useState<string>(game.fen())
   const [moves, setMoves] = useState<string[]>([])
   const [liveMove, setLiveMove] = useState<{
@@ -332,24 +333,49 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
     }
   }, [draw])
 
+  const isFirstRender = useRef(true)
+
   useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false
+      return
+    }
+
     if (revenge.status) {
-      setToastId(
-        toast(
-          <ToastRevenge
-            toastId={toastId}
-            name={revenge.name}
-            userId={user?.id as string}
-            amount={chessRoom?.challenge.amount as number}
-            duration={chessRoom?.challenge.duration as number}
-          />,
-          {
-            position: 'bottom-right',
-            duration: Infinity,
-            id: 'chess-draw-loading-toast',
-          },
-        ),
+      const id = toast(
+        <ToastRevenge
+          toastId={toastId}
+          name={revenge.name}
+          userId={user?.id as string}
+          amount={chessRoom?.challenge.amount as number}
+          duration={chessRoom?.challenge.duration as number}
+        />,
+        {
+          position: 'bottom-right',
+          duration: Infinity,
+          id: 'chess-draw-loading-toast',
+        },
       )
+      setToastId(id)
+    } else {
+      if (toastId) {
+        toast.dismiss(toastId)
+        setToastId('')
+      }
+
+      if (revenge.cancelled) {
+        toast(`${revenge.name} has cancelled the rematch request.`, {
+          position: 'bottom-right',
+          duration: 5000,
+          id: 'revenge-cancel-toast',
+        })
+      } else {
+        toast(`${revenge.name} has declined the rematch request.`, {
+          position: 'bottom-right',
+          duration: 5000,
+          id: 'revenge-refuse-toast',
+        })
+      }
     }
   }, [revenge])
 
@@ -704,6 +730,11 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
                     capturedPieces={capturedPieces}
                     orientation={orientation}
                     status={gameStatus.status}
+                    playerOne={chessRoom.playerOne}
+                    playerTwo={chessRoom.playerTwo}
+                    duration={chessRoom.challenge.duration}
+                    amount={chessRoom.challenge.amount}
+                    roomId={chessRoomId as string}
                   >
                     <ClockComponent isRunning={wClock.isRunning}>
                       {formatTime(wClock.time)}
@@ -719,6 +750,11 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
                     capturedPieces={capturedPieces}
                     orientation={orientation}
                     status={gameStatus.status}
+                    playerOne={chessRoom.playerOne}
+                    playerTwo={chessRoom.playerTwo}
+                    duration={chessRoom.challenge.duration}
+                    amount={chessRoom.challenge.amount}
+                    roomId={chessRoomId as string}
                   >
                     <ClockComponent isRunning={bClock.isRunning}>
                       {formatTime(bClock.time)}
@@ -756,6 +792,11 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
                     capturedPieces={capturedPieces}
                     orientation={orientation}
                     status={gameStatus.status}
+                    playerOne={chessRoom.playerOne}
+                    playerTwo={chessRoom.playerTwo}
+                    duration={chessRoom.challenge.duration}
+                    amount={chessRoom.challenge.amount}
+                    roomId={chessRoomId as string}
                   >
                     <ClockComponent isRunning={wClock.isRunning}>
                       {formatTime(wClock.time)}
@@ -773,6 +814,11 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
                     capturedPieces={capturedPieces}
                     orientation={orientation}
                     status={gameStatus.status}
+                    playerOne={chessRoom.playerOne}
+                    playerTwo={chessRoom.playerTwo}
+                    duration={chessRoom.challenge.duration}
+                    amount={chessRoom.challenge.amount}
+                    roomId={chessRoomId as string}
                   >
                     <ClockComponent isRunning={bClock.isRunning}>
                       {formatTime(bClock.time)}
@@ -792,6 +838,11 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
                 capturedPieces={capturedPieces}
                 orientation={orientation}
                 status={gameStatus.status}
+                playerOne={chessRoom.playerOne}
+                playerTwo={chessRoom.playerTwo}
+                duration={chessRoom.challenge.duration}
+                amount={chessRoom.challenge.amount}
+                roomId={chessRoomId as string}
               >
                 <ClockComponent isRunning={wClock.isRunning}>
                   {formatTime(wClock.time)}
@@ -816,6 +867,11 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
                 capturedPieces={capturedPieces}
                 orientation={orientation}
                 status={gameStatus.status}
+                playerOne={chessRoom.playerOne}
+                playerTwo={chessRoom.playerTwo}
+                duration={chessRoom.challenge.duration}
+                amount={chessRoom.challenge.amount}
+                roomId={chessRoomId as string}
               >
                 <ClockComponent isRunning={bClock.isRunning}>
                   {formatTime(bClock.time)}
@@ -831,6 +887,11 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
                 capturedPieces={capturedPieces}
                 orientation={orientation}
                 status={gameStatus.status}
+                playerOne={chessRoom.playerOne}
+                playerTwo={chessRoom.playerTwo}
+                duration={chessRoom.challenge.duration}
+                amount={chessRoom.challenge.amount}
+                roomId={chessRoomId as string}
               >
                 <ClockComponent isRunning={bClock.isRunning}>
                   {formatTime(bClock.time)}
@@ -855,6 +916,11 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
                 capturedPieces={capturedPieces}
                 orientation={orientation}
                 status={gameStatus.status}
+                playerOne={chessRoom.playerOne}
+                playerTwo={chessRoom.playerTwo}
+                duration={chessRoom.challenge.duration}
+                amount={chessRoom.challenge.amount}
+                roomId={chessRoomId as string}
               >
                 <ClockComponent isRunning={wClock.isRunning}>
                   {formatTime(wClock.time)}

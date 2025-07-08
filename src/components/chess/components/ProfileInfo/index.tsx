@@ -12,10 +12,13 @@ import {
 } from './style'
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz'
 import { useEffect, useState } from 'react'
+import { Player } from 'src/types/apps/chessTypes'
 import { getPieceImages } from '../../utils/formatNameToImagePieces'
 import {
   draw,
   giveUp,
+  isUserConnected,
+  revenge,
 } from 'src/pages/api/chess-room/chess-challenge-websocket'
 import { useAuth } from 'src/hooks/useAuth'
 import {
@@ -26,6 +29,8 @@ import {
   DialogTitle,
   Button,
 } from '@mui/material'
+import { CancelableToastContentRevenge } from '../../PersistentToast/revenge'
+import toast from 'react-hot-toast'
 
 interface ProfileInfoProps {
   children: React.ReactNode
@@ -37,6 +42,16 @@ interface ProfileInfoProps {
   capturedPieces: string[]
   orientation: 'w' | 'b'
   status: boolean
+  playerOne: Player
+  playerTwo: Player
+  amount: number
+  duration: number
+  roomId: string
+}
+
+type RevengeType = {
+  amount: number
+  duration: number
 }
 
 export function ProfileInfo({
@@ -49,12 +64,19 @@ export function ProfileInfo({
   capturedPieces,
   orientation,
   status,
+  playerOne,
+  playerTwo,
+  amount,
+  duration,
+  roomId,
 }: ProfileInfoProps) {
   const [capturedPiecesW, setCapturedPiecesW] = useState<string[]>([])
   const [capturedPiecesB, setCapturedPiecesB] = useState<string[]>([])
   const [open, setOpen] = useState(false)
 
-  const { user } = useAuth()
+  const { user, toastId, setToastId } = useAuth()
+
+  const notAmI: Player = user?.id === playerOne.id ? playerTwo : playerOne
 
   const inverte = () => {
     if (setTicketOrMoves) {
@@ -63,7 +85,6 @@ export function ProfileInfo({
   }
 
   const handleGiveUp = () => {
-    const roomId = window.localStorage.getItem('chess-room-id')
     const userId = user?.id as string
     if (roomId && userId) {
       giveUp(roomId, userId)
@@ -72,8 +93,33 @@ export function ProfileInfo({
     setOpen(false)
   }
 
+  const handleRevenge = (data: RevengeType) => {
+    if (user?.Account.amount && user.Account.amount / 100 >= data.amount) {
+      revenge(roomId, user.id, user.name)
+      setToastId(
+        toast.loading(
+          <CancelableToastContentRevenge
+            toastId={toastId}
+            userName={notAmI.name}
+            roomId={roomId}
+            userId={user.id}
+            status={false}
+          />,
+          {
+            position: 'bottom-right',
+            duration: Infinity,
+            id: 'chess-loading-toast',
+          },
+        ),
+      )
+    } else {
+      toast.error('Insufficient funds.', {
+        position: 'bottom-right',
+      })
+    }
+  }
+
   const handleDraw = () => {
-    const roomId = window.localStorage.getItem('chess-room-id')
     const userId = user?.id as string
     const name = user?.name as string
     if (roomId && userId) {
@@ -124,6 +170,14 @@ export function ProfileInfo({
             <ActionButton onClick={inverte} isMobile={true}>
               <SwapHorizIcon />
             </ActionButton>
+            {isUserConnected() && !status && (
+              <Button
+                onClick={() => handleRevenge({ amount, duration })}
+                variant='contained'
+              >
+                Revanche
+              </Button>
+            )}
             <ActionButton disabled={!status} onClick={handleClickOpen}>
               Give up
             </ActionButton>

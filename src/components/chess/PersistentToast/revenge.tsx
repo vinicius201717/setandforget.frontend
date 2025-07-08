@@ -1,41 +1,29 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-unused-vars */
 import toast from 'react-hot-toast'
-import { chessChallengeCancel } from 'src/pages/api/chess-challenge/chessChallengeCancel'
+import { revengeCancel } from 'src/pages/api/chess-room/chess-challenge-websocket'
 
 interface CancelProps {
   userName: string
   toastId: any
-  amount: number
-  updateAccountAmount: (amount: number, action: string) => void
+  roomId: string
+  userId: string
+  status: boolean
 }
 
 export const CancelableToastContentRevenge = ({
   toastId,
-  amount,
+  roomId,
   userName,
-  updateAccountAmount,
+  userId,
+  status,
 }: CancelProps) => {
   const cancelToast = () => {
-    const challengeId = window.localStorage.getItem('chess-challenge-id')
-    const roomId = window.localStorage.getItem('chess-room-id')
-    if (challengeId && roomId) {
-      chessChallengeCancel(challengeId, roomId, JSON.stringify(amount))
-        .then(() => {
-          window.localStorage.removeItem('chess-challenge-id')
-          window.localStorage.removeItem('chess-room-id')
-          updateAccountAmount(amount, 'plus')
-          toast.dismiss(toastId)
-          toast.success('Cancellation successful.', {
-            position: 'bottom-right',
-          })
-        })
-        .catch((error) => {
-          console.error('Error during deletion:', error)
-          toast.error('Failed to cancel the request.', {
-            position: 'bottom-right',
-          })
-        })
-    }
+    revengeCancel(roomId, userId, userName, status)
+    toast.dismiss(toastId)
+    toast.success('Cancellation successful.', {
+      position: 'bottom-right',
+    })
   }
 
   return (

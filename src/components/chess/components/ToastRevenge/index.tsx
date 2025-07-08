@@ -72,6 +72,11 @@ export const ToastRevenge = ({
       const userRefuseName = user?.name as string
       refuseRevenge(roomId, userId, userRefuseName)
       toast.dismiss(toastId)
+
+      toast(`You have declined the rematch request.`, {
+        position: 'bottom-right',
+        id: 'revenge-self-refuse-toast',
+      })
     }
   }
 

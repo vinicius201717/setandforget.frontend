@@ -26,7 +26,6 @@ import {
 } from 'src/pages/api/chess-room/chess-challenge-websocket'
 import toast from 'react-hot-toast'
 import { CancelableToastContentRevenge } from '../PersistentToast/revenge'
-import { updateAccountAmount } from './utils'
 interface ConfirmModalProps {
   open: boolean
   roomId: string
@@ -50,7 +49,7 @@ function ModalEndGame({
   playerTwo,
   loserId,
 }: ConfirmModalProps) {
-  const { user, toastId, setToastId, setUser } = useAuth()
+  const { user, toastId, setToastId } = useAuth()
   const notAmI: Player = user?.id === playerOne.id ? playerTwo : playerOne
 
   type RevengeType = {
@@ -65,9 +64,10 @@ function ModalEndGame({
         toast.loading(
           <CancelableToastContentRevenge
             toastId={toastId}
-            amount={data.amount}
             userName={notAmI.name}
-            updateAccountAmount={() => updateAccountAmount}
+            roomId={roomId}
+            userId={user.id}
+            status={false}
           />,
           {
             position: 'bottom-right',

@@ -172,6 +172,7 @@ export interface Revenge {
   userId: string
   roomId: string
   status: boolean
+  cancelled: boolean
 }
 
 export interface GameStatus {
