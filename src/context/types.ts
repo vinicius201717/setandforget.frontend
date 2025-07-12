@@ -85,9 +85,11 @@ export type NotificationsType = {
   subtitle: string
   content: string
   userId: string
+  name: string
   createdAt: Date
   updatedAt: Date
-  status: boolean
+  read: boolean
+  action: boolean
 }
 
 export type RegisterCreateType = {

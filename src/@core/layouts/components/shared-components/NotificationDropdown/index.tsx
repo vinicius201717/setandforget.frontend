@@ -21,14 +21,7 @@ import CustomChip from 'src/@core/components/mui/chip'
 
 // ** Util Import
 import { getInitials } from 'src/@core/utils/get-initials'
-import {
-  Avatar,
-  Menu,
-  MenuItem,
-  MenuItemSubtitle,
-  MenuItemTitle,
-  PerfectScrollbar,
-} from './style'
+import { Avatar, Menu, MenuItem, PerfectScrollbar } from './style'
 import { NotificationsType } from 'src/context/types'
 import { readAllNotifications } from 'src/pages/api/notification/readAllNotifications'
 import toast from 'react-hot-toast'
@@ -121,14 +114,14 @@ const NotificationDropdown = (props: Props) => {
   }: {
     notification: NotificationsType
   }) => {
-    const { avatarAlt, avatarImg } = notification
+    const { avatarAlt, avatarImg, name } = notification
 
     if (avatarImg) {
       return <Avatar alt={avatarAlt} src={avatarImg} />
     } else {
       return (
         <Avatar skin='light' color='secondary'>
-          {getInitials(avatarAlt as string)}
+          {getInitials(name as string)}
         </Avatar>
       )
     }
@@ -145,7 +138,7 @@ const NotificationDropdown = (props: Props) => {
         <Badge
           color='error'
           variant='dot'
-          invisible={!notifications?.[0]?.status ?? false}
+          invisible={!(notifications && notifications[0]?.read === false)}
           sx={{
             '& .MuiBadge-badge': {
               top: 4,
@@ -195,7 +188,7 @@ const NotificationDropdown = (props: Props) => {
               skin='light'
               size='small'
               color='primary'
-              label={`${notifications?.filter((notif) => notif.status).length} New`}
+              label={`${notifications?.filter((notif) => !notif.read).length} New`}
               sx={{
                 height: 20,
                 fontSize: '0.75rem',
@@ -206,67 +199,93 @@ const NotificationDropdown = (props: Props) => {
           </Box>
         </MenuItem>
         <ScrollWrapper hidden={hidden}>
-          {notifications?.map(
-            (notification: NotificationsType, index: number) => (
-              <Link
-                style={{ textDecoration: 'none' }}
-                href={`/notification/${notification.id}`}
-                key={index}
-                onClick={handleDropdownClose}
+          {notifications?.map((notification, index) => (
+            <Link
+              key={index}
+              href={`/notification/${notification.id}`}
+              style={{ textDecoration: 'none', color: 'inherit' }}
+              onClick={handleDropdownClose}
+            >
+              <MenuItem
+                sx={{
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: 2,
+                  position: 'relative',
+                  px: 4,
+                  py: 2.5,
+                  borderBottom: (theme) => `1px solid ${theme.palette.divider}`,
+                }}
               >
-                <MenuItem>
-                  <Box
+                <RenderAvatar notification={notification} />
+
+                <Box
+                  sx={{
+                    flex: '1',
+                    overflow: 'hidden',
+                    display: 'flex',
+                    flexDirection: 'column',
+                  }}
+                >
+                  <Typography
+                    variant='subtitle1'
                     sx={{
-                      width: '100%',
-                      display: 'flex',
-                      alignItems: 'center',
+                      fontWeight: 600,
+                      lineHeight: 1.3,
+                      whiteSpace: 'nowrap',
+                      textOverflow: 'ellipsis',
+                      overflow: 'hidden',
                     }}
                   >
-                    <RenderAvatar notification={notification} />
-                    <Box
-                      sx={{
-                        mx: 4,
-                        flex: '1 1',
-                        display: 'flex',
-                        overflow: 'hidden',
-                        flexDirection: 'column',
-                      }}
-                    >
-                      <MenuItemTitle>{notification.title}</MenuItemTitle>
-                      <MenuItemSubtitle variant='body2'>
-                        {notification.subtitle}
-                      </MenuItemSubtitle>
-                    </Box>
-                    <Typography
-                      variant='caption'
-                      sx={{ color: 'text.disabled' }}
-                    >
-                      {notification.meta}
-                    </Typography>
-                  </Box>
-                  <Box>
-                    <Badge
-                      color='success'
-                      variant='dot'
-                      invisible={!notification.status}
-                      sx={{
-                        position: 'absolute',
-                        top: '3px',
-                        right: '3px',
-                        '& .MuiBadge-badge': {
-                          top: 4,
-                          right: 4,
-                          boxShadow: (theme) =>
-                            `0 0 0 2px ${theme.palette.background.paper}`,
-                        },
-                      }}
-                    />
-                  </Box>
-                </MenuItem>
-              </Link>
-            ),
-          )}
+                    {notification.title}
+                  </Typography>
+                  <Typography
+                    variant='body2'
+                    sx={{
+                      color: 'text.secondary',
+                      whiteSpace: 'nowrap',
+                      textOverflow: 'ellipsis',
+                      overflow: 'hidden',
+                    }}
+                  >
+                    {notification.subtitle}
+                  </Typography>
+                  <Typography
+                    variant='caption'
+                    sx={{
+                      color: 'text.disabled',
+                      mt: 0.5,
+                      fontStyle: 'italic',
+                    }}
+                  >
+                    {notification.content}
+                  </Typography>
+                </Box>
+
+                {/* Badge de "não lida" */}
+                <Badge
+                  color='primary'
+                  variant='dot'
+                  invisible={notification.read}
+                  sx={{
+                    position: 'absolute',
+                    top: 12,
+                    right: 12,
+                    '& .MuiBadge-badge': {
+                      width: 10,
+                      height: 10,
+                      minWidth: 0,
+                      borderRadius: '50%',
+                      boxShadow: (theme) =>
+                        `0 0 0 2px ${theme.palette.background.paper}`,
+                    },
+                  }}
+                />
+              </MenuItem>
+            </Link>
+          ))}
         </ScrollWrapper>
+
         <MenuItem
           disableRipple
           disableTouchRipple

@@ -7,18 +7,21 @@ import {
   Badge,
   Box,
   CircularProgress,
-  MenuItem,
   Typography,
   styled,
+  Divider,
+  Button,
 } from '@mui/material'
 import CustomAvatar from 'src/@core/components/mui/avatar'
 import { getInitials } from 'src/@core/utils/get-initials'
 import { CustomAvatarProps } from 'src/@core/components/mui/avatar/types'
+import { formatDistanceToNow } from 'date-fns'
+import { readNotification } from '../api/notification/updateNotificaton'
 
 const Avatar = styled(CustomAvatar)<CustomAvatarProps>({
-  width: 38,
-  height: 38,
-  fontSize: '1.125rem',
+  width: 48,
+  height: 48,
+  fontSize: '1.25rem',
 })
 
 const Notification: NextPage = () => {
@@ -27,12 +30,15 @@ const Notification: NextPage = () => {
     null,
   )
   const { notifications } = useAuth()
+
   useEffect(() => {
     if (router.isReady) {
       const queryId = router.query.id
-      const response = notifications?.filter((item) => item.id === queryId)
-      if (response && response.length > 0) {
-        setNotification(response[0])
+      const response = notifications?.find((item) => item.id === queryId)
+
+      if (response) {
+        setNotification(response)
+        if (!response.read) readNotification(response.id)
       } else {
         setNotification(null)
       }
@@ -44,55 +50,44 @@ const Notification: NextPage = () => {
   }: {
     notification: NotificationsType
   }) => {
-    const { avatarAlt, avatarImg } = notification
-
-    if (avatarImg) {
-      return <Avatar alt={avatarAlt} src={avatarImg} />
-    } else {
-      return (
-        <Avatar skin='light' color='secondary'>
-          {getInitials(avatarAlt as string)}
-        </Avatar>
-      )
-    }
+    const { avatarAlt, avatarImg, name } = notification
+    return avatarImg ? (
+      <Avatar alt={avatarAlt} src={avatarImg} />
+    ) : (
+      <Avatar skin='light' color='secondary'>
+        {getInitials(name)}
+      </Avatar>
+    )
   }
 
   return (
     <>
       {notification ? (
-        <Box>
-          <MenuItem
-            sx={{
-              cursor: 'auto',
-              '&:hover': { backgroundColor: 'transparent' },
-            }}
-          >
-            <Box sx={{ width: '100%', display: 'flex', alignItems: 'center' }}>
-              <RenderAvatar notification={notification} />
-              <Box
-                sx={{
-                  mx: 4,
-                  flex: '1 1',
-                  display: 'flex',
-                  overflow: 'hidden',
-                  flexDirection: 'column',
-                }}
-              >
-                <Typography variant='h6'>{notification.title}</Typography>
-                <Typography variant='body2'>{notification.subtitle}</Typography>
-              </Box>
-              <Typography variant='caption' sx={{ color: 'text.disabled' }}>
-                {notification.meta}
+        <Box
+          sx={{
+            maxWidth: 600,
+            mx: 'auto',
+            mt: 8,
+            p: 4,
+            boxShadow: 3,
+            borderRadius: 2,
+            backgroundColor: 'background.paper',
+          }}
+        >
+          <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+            <RenderAvatar notification={notification} />
+            <Box sx={{ ml: 3 }}>
+              <Typography variant='h6'>{notification.title}</Typography>
+              <Typography variant='body2' color='text.secondary'>
+                {notification.subtitle}
               </Typography>
             </Box>
             <Badge
               color='success'
               variant='dot'
-              invisible={!notification.status}
+              invisible={!notification.read}
               sx={{
-                position: 'absolute',
-                top: '3px',
-                right: '3px',
+                ml: 'auto',
                 '& .MuiBadge-badge': {
                   top: 4,
                   right: 4,
@@ -101,14 +96,34 @@ const Notification: NextPage = () => {
                 },
               }}
             />
-          </MenuItem>
-          <p
-            style={{
-              paddingLeft: '20px',
-            }}
-          >
+          </Box>
+
+          <Divider sx={{ my: 2 }} />
+
+          <Typography variant='body1' sx={{ mb: 2 }}>
             {notification.content}
-          </p>
+          </Typography>
+          {notification.action && (
+            <Box sx={{ mt: 2 }}>
+              <Button
+                variant='contained'
+                color='primary'
+                onClick={() => {
+                  console.log('Notification action clicked!')
+                  // ação personalizada aqui
+                }}
+                sx={{ borderRadius: '8px' }}
+              >
+                Take Action
+              </Button>
+            </Box>
+          )}
+
+          <Typography variant='caption' color='text.disabled'>
+            {formatDistanceToNow(new Date(notification.createdAt), {
+              addSuffix: true,
+            })}
+          </Typography>
         </Box>
       ) : (
         <Box

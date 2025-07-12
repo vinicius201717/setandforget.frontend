@@ -85,15 +85,17 @@ function ModalEndGame({
   }
 
   const handleCreateFriend = async () => {
-    console.log('ok')
-
     try {
       const addresseeId =
         user?.id === playerOne.id ? playerTwo.id : playerOne.id
       await createFriendRequest(user?.id as string, addresseeId)
-      toast.success('Friend request sent!')
+      toast.success('Friend request sent!', {
+        position: 'bottom-right',
+      })
     } catch (err) {
-      toast.error('Failed to send friend request.')
+      toast.error('Failed to send friend request.', {
+        position: 'bottom-right',
+      })
     }
   }
 

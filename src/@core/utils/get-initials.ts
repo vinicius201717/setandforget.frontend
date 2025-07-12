@@ -1,5 +1,5 @@
-// ** Returns initials from string
-export const getInitials = (string: string) =>
-  string
-    .split(/\s/)
-    .reduce((response, word) => (response += word.slice(0, 1)), '')
+export const getInitials = (str: string) => {
+  const parts = str.trim().split(/\s+/)
+  if (parts.length === 1) return parts[0][0].toUpperCase()
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+}
