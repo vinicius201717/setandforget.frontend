@@ -92,6 +92,11 @@ export type NotificationsType = {
   action: boolean
 }
 
+export enum ActionTypeEnum {
+  FRIENDSHIP = 'FRIENDSHIP',
+  BLOCK = 'BLOCK',
+}
+
 export type RegisterCreateType = {
   title: string
   icon: string
