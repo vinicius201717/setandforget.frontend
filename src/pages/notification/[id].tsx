@@ -4,19 +4,22 @@ import type { NextPage } from 'next'
 import { ActionTypeEnum, NotificationsType } from 'src/context/types'
 import { useAuth } from 'src/hooks/useAuth'
 import {
-  Badge,
   Box,
   CircularProgress,
   Typography,
   styled,
   Divider,
 } from '@mui/material'
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
+import IconButton from '@mui/material/IconButton'
 import CustomAvatar from 'src/@core/components/mui/avatar'
 import { getInitials } from 'src/@core/utils/get-initials'
 import { CustomAvatarProps } from 'src/@core/components/mui/avatar/types'
 import { formatDistanceToNow } from 'date-fns'
 import { readNotification } from '../api/notification/updateNotificaton'
 import NotificationActions from 'src/components/notification/actions'
+import { deleteNotification } from '../api/notification/deleteNotification'
+import toast from 'react-hot-toast'
 
 const Avatar = styled(CustomAvatar)<CustomAvatarProps>({
   width: 48,
@@ -28,7 +31,6 @@ interface NotificationMeta {
   type: 'FRIEND_REQUEST' | string
   requesterId: string
   friendshipId: string
-  // Se quiser, adicione mais campos possíveis aqui
 }
 
 const Notification: NextPage = () => {
@@ -36,8 +38,9 @@ const Notification: NextPage = () => {
   const [notification, setNotification] = useState<
     NotificationsType | null | undefined
   >(null)
+  const [isDeleting, setIsDeleting] = useState(false)
   const [meta, setMeta] = useState<NotificationMeta | null>(null)
-  const { notifications } = useAuth()
+  const { notifications, removeNotification } = useAuth()
 
   useEffect(() => {
     if (router.isReady) {
@@ -74,11 +77,41 @@ const Notification: NextPage = () => {
     )
   }
 
+  console.log(notification?.meta)
+  // CONTINUE DAQUI. O META TEM QUE VIR COM O STATUS DA FRIENDSHIP PRA ATUALIZAR OS BOTOES DA PAGINA DE NOTIFICAÇÃO
+
+  const handleDeleteNotification = async (id: string) => {
+    try {
+      const success = await deleteNotification(id)
+
+      if (success) {
+        toast.success('Notification deleted successfully.', {
+          position: 'bottom-right',
+        })
+        removeNotification(id)
+        setIsDeleting(true)
+        setTimeout(() => {
+          router.back()
+        }, 400)
+      } else {
+        toast.error('Failed to delete notification.', {
+          position: 'bottom-right',
+        })
+      }
+    } catch (error) {
+      console.error('Error deleting notification:', error)
+      toast.error('An unexpected error occurred.', {
+        position: 'bottom-right',
+      })
+    }
+  }
+
   return (
     <>
       {notification ? (
         <Box
           sx={{
+            position: 'relative',
             maxWidth: 600,
             mx: 'auto',
             mt: 8,
@@ -86,8 +119,23 @@ const Notification: NextPage = () => {
             boxShadow: 3,
             borderRadius: 2,
             backgroundColor: 'background.paper',
+            transition: 'opacity 0.4s ease',
+            opacity: isDeleting ? 0 : 1,
           }}
         >
+          {/* Botão de apagar */}
+          <IconButton
+            aria-label='delete'
+            color='error'
+            disabled={!notification.currentAction}
+            sx={{ position: 'absolute', top: 8, right: 8 }}
+            onClick={() => {
+              handleDeleteNotification(notification.id)
+            }}
+          >
+            <DeleteOutlineIcon />
+          </IconButton>
+
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
             <RenderAvatar notification={notification} />
             <Box sx={{ ml: 3 }}>
@@ -96,20 +144,6 @@ const Notification: NextPage = () => {
                 {notification.subtitle}
               </Typography>
             </Box>
-            <Badge
-              color='success'
-              variant='dot'
-              invisible={!notification.read}
-              sx={{
-                ml: 'auto',
-                '& .MuiBadge-badge': {
-                  top: 4,
-                  right: 4,
-                  boxShadow: (theme) =>
-                    `0 0 0 2px ${theme.palette.background.paper}`,
-                },
-              }}
-            />
           </Box>
 
           <Divider sx={{ my: 2 }} />
@@ -117,15 +151,20 @@ const Notification: NextPage = () => {
           <Typography variant='body1' sx={{ mb: 2 }}>
             {notification.content}
           </Typography>
+
           {notification.action && (
             <NotificationActions
               friendshipId={meta?.friendshipId as string}
+              status={'ACCEPTED'}
               action={
                 notification.subtitle.toLocaleUpperCase() as ActionTypeEnum
               }
+              notificationId={notification.id}
             />
           )}
+
           <br />
+
           <Typography variant='caption' color='text.disabled'>
             {formatDistanceToNow(new Date(notification.createdAt), {
               addSuffix: true,

@@ -89,6 +89,7 @@ export type NotificationsType = {
   createdAt: Date
   updatedAt: Date
   read: boolean
+  currentAction?: string | null | undefined
   action: boolean
 }
 
@@ -159,4 +160,9 @@ export type AuthValuesType = {
     params: LoginAfterCodeParams,
     rememberMe: boolean,
   ) => Promise<any>
+  removeNotification: (id: string) => void
+  updateNotificationAction: (
+    id: string,
+    action: 'ACCEPTED' | 'DECLINED',
+  ) => void
 }

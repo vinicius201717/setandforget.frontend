@@ -1,23 +1,22 @@
 import { api } from 'src/lib/axios'
 import authConfig from 'src/configs/auth'
 
-export async function updateFriendshipStatus(
-  friendshipId: string,
-  status: 'ACCEPTED' | 'DECLINED',
+export async function deleteNotification(
   notificationId: string,
-) {
+): Promise<boolean> {
   const storedToken = window.localStorage.getItem(
     authConfig.storageTokenKeyName,
   )
-  const response = await api.patch(
-    `/friendships/${friendshipId}/${status}/${notificationId}`,
-    {},
-    {
+
+  try {
+    await api.delete(`/notification/${notificationId}`, {
       headers: {
         Authorization: `Bearer ${storedToken}`,
       },
-    },
-  )
-
-  return response.data
+    })
+    return true
+  } catch (error) {
+    console.error('Erro ao deletar notificação:', error)
+    return false
+  }
 }

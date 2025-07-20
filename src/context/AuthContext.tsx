@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
@@ -23,7 +24,6 @@ import { login } from 'src/pages/api/auth/login'
 import toast from 'react-hot-toast'
 import { sendCode } from 'src/pages/api/auth/loginCode'
 import { chessChallengeCancel } from 'src/pages/api/chess-challenge/chessChallengeCancel'
-import { checkIfHaveActiveGame } from 'src/utils/active-game'
 
 // ** Defaults
 const defaultProvider: AuthValuesType = {
@@ -38,6 +38,8 @@ const defaultProvider: AuthValuesType = {
   login: () => Promise.resolve(),
   logout: () => Promise.resolve(),
   loginAfterCode: () => Promise.resolve(),
+  removeNotification: () => {},
+  updateNotificationAction: () => {},
 }
 
 const AuthContext = createContext(defaultProvider)
@@ -145,6 +147,21 @@ const AuthProvider = ({ children }: Props) => {
     router.push('/login')
   }
 
+  const removeNotification = (id: string) => {
+    setNotifications((prev) => (prev ? prev.filter((n) => n.id !== id) : null))
+  }
+
+  const updateNotificationAction = (
+    id: string,
+    action: 'ACCEPTED' | 'DECLINED',
+  ) => {
+    setNotifications((prev) =>
+      prev
+        ? prev.map((n) => (n.id === id ? { ...n, currentAction: action } : n))
+        : null,
+    )
+  }
+
   const values = {
     user,
     notifications,
@@ -157,6 +174,8 @@ const AuthProvider = ({ children }: Props) => {
     login: handleLogin,
     logout: handleLogout,
     loginAfterCode: handleLoginAfterCode,
+    removeNotification,
+    updateNotificationAction,
   }
 
   return <AuthContext.Provider value={values}>{children}</AuthContext.Provider>

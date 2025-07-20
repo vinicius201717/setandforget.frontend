@@ -1,17 +1,27 @@
 import { Box, Button } from '@mui/material'
 import toast from 'react-hot-toast'
+import { useAuth } from 'src/hooks/useAuth'
 import { updateFriendshipStatus } from 'src/pages/api/friendship/updateFriend'
 
 type FriendShipNotificationProps = {
+  status: 'ACCEPTED' | 'DECLINED' | null
   friendshipId: string
+  notificationId: string
 }
 
 const FriendShipNotification = ({
   friendshipId,
+  notificationId,
+  status,
 }: FriendShipNotificationProps) => {
+  const { updateNotificationAction } = useAuth()
+
   const handleAction = async (status: 'ACCEPTED' | 'DECLINED') => {
     try {
-      await updateFriendshipStatus(friendshipId, status)
+      await updateFriendshipStatus(friendshipId, status, notificationId)
+
+      updateNotificationAction(notificationId, status)
+
       toast.success(`Friend request ${status.toLowerCase()}`, {
         position: 'bottom-right',
       })
