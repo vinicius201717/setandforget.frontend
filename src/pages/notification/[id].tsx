@@ -31,6 +31,7 @@ interface NotificationMeta {
   type: 'FRIEND_REQUEST' | string
   requesterId: string
   friendshipId: string
+  status: string
 }
 
 const Notification: NextPage = () => {
@@ -77,9 +78,6 @@ const Notification: NextPage = () => {
     )
   }
 
-  console.log(notification?.meta)
-  // CONTINUE DAQUI. O META TEM QUE VIR COM O STATUS DA FRIENDSHIP PRA ATUALIZAR OS BOTOES DA PAGINA DE NOTIFICAÇÃO
-
   const handleDeleteNotification = async (id: string) => {
     try {
       const success = await deleteNotification(id)
@@ -123,11 +121,10 @@ const Notification: NextPage = () => {
             opacity: isDeleting ? 0 : 1,
           }}
         >
-          {/* Botão de apagar */}
           <IconButton
             aria-label='delete'
             color='error'
-            disabled={!notification.currentAction}
+            disabled={meta?.status === 'PENDING'}
             sx={{ position: 'absolute', top: 8, right: 8 }}
             onClick={() => {
               handleDeleteNotification(notification.id)
@@ -152,15 +149,28 @@ const Notification: NextPage = () => {
             {notification.content}
           </Typography>
 
-          {notification.action && (
+          {notification.action && meta?.status === 'PENDING' && (
             <NotificationActions
-              friendshipId={meta?.friendshipId as string}
+              friendshipId={meta.friendshipId}
               status={'ACCEPTED'}
               action={
                 notification.subtitle.toLocaleUpperCase() as ActionTypeEnum
               }
               notificationId={notification.id}
             />
+          )}
+          {meta?.status !== 'PENDING' && (
+            <Typography
+              variant='body2'
+              sx={{ mt: 2 }}
+              color={
+                meta?.status === 'DECLINED' ? 'error.main' : 'success.main'
+              }
+            >
+              {meta?.status === 'DECLINED'
+                ? 'Solicitação de amizade recusada.'
+                : 'Agora vocês são amigos.'}
+            </Typography>
           )}
 
           <br />

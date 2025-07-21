@@ -6,7 +6,7 @@ type NotificationActionsProps = {
   action: ActionTypeEnum
   friendshipId: string
   notificationId: string
-  status: 'ACCEPTED' | 'DECLINED' | null
+  status: 'ACCEPTED' | 'DECLINED' | 'PENDING'
 }
 
 const NotificationActions = ({

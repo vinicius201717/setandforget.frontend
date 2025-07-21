@@ -163,6 +163,6 @@ export type AuthValuesType = {
   removeNotification: (id: string) => void
   updateNotificationAction: (
     id: string,
-    action: 'ACCEPTED' | 'DECLINED',
+    action: 'ACCEPTED' | 'DECLINED' | 'PENDING',
   ) => void
 }

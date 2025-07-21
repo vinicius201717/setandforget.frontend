@@ -1,10 +1,12 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Box, Button } from '@mui/material'
 import toast from 'react-hot-toast'
 import { useAuth } from 'src/hooks/useAuth'
 import { updateFriendshipStatus } from 'src/pages/api/friendship/updateFriend'
 
 type FriendShipNotificationProps = {
-  status: 'ACCEPTED' | 'DECLINED' | null
+  status: 'ACCEPTED' | 'DECLINED' | 'PENDING'
   friendshipId: string
   notificationId: string
 }
@@ -16,7 +18,7 @@ const FriendShipNotification = ({
 }: FriendShipNotificationProps) => {
   const { updateNotificationAction } = useAuth()
 
-  const handleAction = async (status: 'ACCEPTED' | 'DECLINED') => {
+  const handleAction = async (status: 'ACCEPTED' | 'DECLINED' | 'PENDING') => {
     try {
       await updateFriendshipStatus(friendshipId, status, notificationId)
 

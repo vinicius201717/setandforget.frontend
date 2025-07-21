@@ -3,7 +3,7 @@ import authConfig from 'src/configs/auth'
 
 export async function updateFriendshipStatus(
   friendshipId: string,
-  status: 'ACCEPTED' | 'DECLINED',
+  status: 'ACCEPTED' | 'DECLINED' | 'PENDING',
   notificationId: string,
 ) {
   const storedToken = window.localStorage.getItem(
