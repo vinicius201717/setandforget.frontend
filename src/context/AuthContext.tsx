@@ -153,7 +153,7 @@ const AuthProvider = ({ children }: Props) => {
 
   const updateNotificationAction = (
     id: string,
-    action: 'ACCEPTED' | 'DECLINED',
+    action: 'ACCEPTED' | 'DECLINED' | 'PENDING',
   ) => {
     setNotifications((prev) =>
       prev

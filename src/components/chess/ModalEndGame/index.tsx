@@ -27,6 +27,7 @@ import {
 import toast from 'react-hot-toast'
 import { CancelableToastContentRevenge } from '../PersistentToast/revenge'
 import { createFriendRequest } from 'src/pages/api/friendship/createFriend'
+import Link from 'next/link'
 interface ConfirmModalProps {
   open: boolean
   roomId: string
@@ -173,10 +174,32 @@ function ModalEndGame({
                 </TableCell>
               </TableRow>
               <TableRow>
-                <TableCell>{playerOne.name}</TableCell>
+                {playerOne.id === notAmI.id ? (
+                  <Link
+                    href={`/pages/people/${playerOne.id}`}
+                    style={{ textDecoration: 'none' }}
+                  >
+                    <TableCell>{playerOne.name}</TableCell>
+                  </Link>
+                ) : (
+                  <TableCell>{playerOne.name}</TableCell>
+                )}
+
+                {playerTwo.id === notAmI.id ? (
+                  <Link
+                    href={`/pages/people/${playerTwo.id}`}
+                    style={{ textDecoration: 'none' }}
+                  >
+                    <TableCell>{playerTwo.name}</TableCell>
+                  </Link>
+                ) : (
+                  <TableCell>{playerTwo.name}</TableCell>
+                )}
+
                 <TableCell></TableCell>
                 <TableCell align='right'>{playerTwo.name}</TableCell>
               </TableRow>
+
               <TableRow>
                 <TableCell>{formatMoney(amount)}</TableCell>
                 <TableCell></TableCell>

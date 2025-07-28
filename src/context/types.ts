@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-use-before-define */
 export type ErrCallbackType = (err: { [key: string]: string }) => void
@@ -91,6 +92,29 @@ export type NotificationsType = {
   read: boolean
   currentAction?: string | null | undefined
   action: boolean
+}
+
+export type FriendshipType = {
+  id: string
+  requesterId: string
+  addresseeId: string
+  status: 'PENDING' | 'ACCEPTED' | 'DECLINED'
+  createdAt: string
+  updatedAt: string
+}
+
+export type UserPeopleType = {
+  id: string
+  name: string
+  email: string
+  avatar: string | null
+  banner: string | null
+  created_at: string // ou Date
+}
+
+export type PeopleProfileResponse = {
+  people: UserDataType
+  friendship: FriendshipType | null
 }
 
 export enum ActionTypeEnum {
