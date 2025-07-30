@@ -150,17 +150,6 @@ export interface RoomResult {
   created_at: string
 }
 
-export interface RoomResultWithUserName {
-  id: string
-  roomId: string
-  winnerId: string
-  loserId: string
-  winner: { id: string; name: string }
-  loser: { id: string; name: string }
-  resultType: string
-  created_at: string
-}
-
 export interface Draw {
   active: boolean
   name: string
@@ -195,6 +184,24 @@ export interface RoomLogsLive {
   fen: string
   moveHistory: string
   duration: string
+}
+export interface Result {
+  id: string
+  roomId: string
+  winnerId: string
+  loserId: string
+  resultType: string
+  created_at: string
+  winner: Player
+  loser: Player
+  room: { id: string; challenge: Challenge }
+}
+
+export interface ApiResultsResponse {
+  results: Result[]
+  totalCount: number
+  totalPages: number
+  currentPage: number
 }
 
 export interface ChessboardComponentProps {

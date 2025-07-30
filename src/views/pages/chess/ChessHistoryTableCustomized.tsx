@@ -2,20 +2,21 @@ import React, { useEffect, useState } from 'react'
 import Paper from '@mui/material/Paper'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
-import TableContainer from '@mui/material/TableContainer'
+import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import { format } from 'date-fns'
-import { Badge, useTheme, Pagination } from '@mui/material'
+import { Badge, useTheme, Pagination, TableContainer } from '@mui/material'
 import Link from 'next/link'
-// import { formatMoney } from 'src/utils/format-money'
 import { StyledTableCell, StyledTableRow } from './style'
-import { RoomResultWithUserName } from 'src/types/apps/chessTypes'
+import { Result } from 'src/types/apps/chessTypes'
 import { useAuth } from 'src/hooks/useAuth'
 import { getChessResults } from 'src/pages/api/chess-result/chessResultGet'
+import { formatMoney } from 'src/utils/format-money'
+import { formatTime } from 'src/utils/format-timer'
 
-const TableRowStatus = (result: string) => {
-  if (result.includes('Draw')) {
+const TableRowStatus = (resultType: string) => {
+  if (resultType.includes('Draw')) {
     return (
       <>
         <Badge
@@ -34,7 +35,7 @@ const TableRowStatus = (result: string) => {
         {'Draw'}
       </>
     )
-  } else if (result === 'Checkmate') {
+  } else if (resultType === 'Checkmate') {
     return (
       <>
         <Badge
@@ -52,7 +53,7 @@ const TableRowStatus = (result: string) => {
         {'Winner'}
       </>
     )
-  } else if (result === 'Give up') {
+  } else if (resultType === 'Give up') {
     return (
       <>
         <Badge
@@ -71,6 +72,7 @@ const TableRowStatus = (result: string) => {
       </>
     )
   }
+  return null
 }
 
 const ChessHistoryTableCustomized = () => {
@@ -78,7 +80,7 @@ const ChessHistoryTableCustomized = () => {
   const { user } = useAuth()
 
   const [page, setPage] = useState(1)
-  const [chessResults, setChessResults] = useState<RoomResultWithUserName[]>()
+  const [chessResults, setChessResults] = useState<Result[]>([])
   const [totalCount, setTotalCount] = useState(0)
 
   const rowsPerPage = 10
@@ -97,6 +99,7 @@ const ChessHistoryTableCustomized = () => {
         setTotalCount(response.totalCount)
       } else {
         setChessResults([])
+        setTotalCount(0)
       }
     })
   }, [page])
@@ -104,25 +107,27 @@ const ChessHistoryTableCustomized = () => {
   return (
     <TableContainer component={Paper}>
       <Table sx={{ minWidth: 700 }} aria-label='Chess play'>
-        <TableRow>
-          <StyledTableCell>Result</StyledTableCell>
-          <StyledTableCell align='left'>Opponent</StyledTableCell>
-          <StyledTableCell align='left'>Amount</StyledTableCell>
-          <StyledTableCell align='left'>Result type</StyledTableCell>
-          <StyledTableCell align='left'>Opponent</StyledTableCell>
-          <StyledTableCell align='right'>Action</StyledTableCell>
-        </TableRow>
+        <TableHead>
+          <TableRow>
+            <StyledTableCell>Result</StyledTableCell>
+            <StyledTableCell align='left'>Opponent</StyledTableCell>
+            <StyledTableCell align='left'>Amount</StyledTableCell>
+            <StyledTableCell align='left'>Duration</StyledTableCell>{' '}
+            {/* Nova coluna */}
+            <StyledTableCell align='left'>Result type</StyledTableCell>
+            <StyledTableCell align='left'>Date</StyledTableCell>
+            <StyledTableCell align='right'>Action</StyledTableCell>
+          </TableRow>
+        </TableHead>
+
         <TableBody>
-          {chessResults && chessResults.length > 0 ? (
-            chessResults.map((row, index) => (
-              <StyledTableRow key={index}>
+          {chessResults.length > 0 ? (
+            chessResults.map((row) => (
+              <StyledTableRow key={row.id}>
                 <StyledTableCell
                   component='td'
                   scope='row'
-                  sx={{
-                    alignItems: 'center',
-                    gap: '20px',
-                  }}
+                  sx={{ display: 'flex', alignItems: 'center', gap: '20px' }}
                 >
                   {TableRowStatus(row.resultType)}
                 </StyledTableCell>
@@ -130,17 +135,21 @@ const ChessHistoryTableCustomized = () => {
                   {user?.id === row.winnerId ? row.loser.name : row.winner.name}
                 </StyledTableCell>
                 <StyledTableCell align='left'>
-                  {/* {formatMoney(row.amount / 100)} */}
+                  {formatMoney(row.room.challenge.amount)}
+                </StyledTableCell>
+                <StyledTableCell align='left'>
+                  {' '}
+                  {formatTime(row.room.challenge.duration)}
                 </StyledTableCell>
                 <StyledTableCell align='left'>{row.resultType}</StyledTableCell>
                 <StyledTableCell align='left'>
                   {row.created_at
                     ? format(new Date(row.created_at), 'dd/MM/yyyy HH:mm:ss')
-                    : 'Data não disponível'}
+                    : 'Date not available'}
                 </StyledTableCell>
                 <StyledTableCell align='right'>
                   <Link
-                    href={`/chess/play/${row.id}`}
+                    href={`/chess/play/${row.room.id}`}
                     rel='noopener noreferrer'
                     style={{
                       textDecoration: 'none',
@@ -155,7 +164,9 @@ const ChessHistoryTableCustomized = () => {
             ))
           ) : (
             <StyledTableRow>
-              <StyledTableCell colSpan={6} align='center'>
+              <StyledTableCell colSpan={7} align='center'>
+                {' '}
+                {/* Agora colSpan é 7 */}
                 No results found
               </StyledTableCell>
             </StyledTableRow>

@@ -1,16 +1,11 @@
 // ** MUI Imports
 import Grid from '@mui/material/Grid'
 import Card from '@mui/material/Card'
-import { styled } from '@mui/material/styles'
 import Typography from '@mui/material/Typography'
 
 import PageHeader from 'src/@core/components/page-header'
 import ChessHistoryTableCustomized from 'src/views/pages/chess/ChessHistoryTableCustomized'
-
-const StyledAnchor = styled('a')(({ theme }) => ({
-  textDecoration: 'none',
-  color: theme.palette.primary.main,
-}))
+import { StyledAnchor } from './style'
 
 const Transactions = () => {
   return (

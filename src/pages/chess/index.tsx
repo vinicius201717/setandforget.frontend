@@ -64,8 +64,6 @@ function HomePage() {
   >([])
 
   const { user, toastId, setToastId, setUser } = useAuth()
-  console.log(user)
-
   const handleOpenModal = (id: string) => {
     if (!globalChallenge) return
 

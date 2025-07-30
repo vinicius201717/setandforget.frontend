@@ -1,7 +1,11 @@
 import { api } from 'src/lib/axios'
 import authConfig from 'src/configs/auth'
+import { ApiResultsResponse } from 'src/types/apps/chessTypes'
 
-export async function getChessResults(page: number, pageSize: number) {
+export async function getChessResults(
+  page: number,
+  pageSize: number,
+): Promise<ApiResultsResponse | null> {
   const storedToken = window.localStorage.getItem(
     authConfig.storageTokenKeyName,
   )
