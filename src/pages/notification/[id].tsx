@@ -20,6 +20,7 @@ import { readNotification } from '../api/notification/updateNotificaton'
 import NotificationActions from 'src/components/notification/actions'
 import { deleteNotification } from '../api/notification/deleteNotification'
 import toast from 'react-hot-toast'
+import { getNotification } from '../api/notification/getNotification'
 
 const Avatar = styled(CustomAvatar)<CustomAvatarProps>({
   width: 48,
@@ -44,24 +45,42 @@ const Notification: NextPage = () => {
   const { notifications, removeNotification } = useAuth()
 
   useEffect(() => {
-    if (router.isReady) {
-      const queryId = router.query.id
-      const response = notifications?.find((item) => item.id === queryId)
+    const fetchData = async () => {
+      if (!router.isReady) return
+
       try {
-        if (response?.meta) {
-          setMeta(JSON.parse(response.meta) as NotificationMeta)
+        const notificationId = router.query.id as string
+        const response = await getNotification(notificationId)
+
+        if (!response || !response.notification) {
+          setNotification(null)
+          return
         }
-      } catch (e) {
-        console.error('Erro ao fazer parse do meta:', e)
-      }
-      if (response) {
-        setNotification(response)
-        if (!response.read) readNotification(response.id)
-      } else {
+
+        const { notification } = response
+        // tenta parsear o meta
+        if (notification.meta) {
+          try {
+            setMeta(JSON.parse(notification.meta) as NotificationMeta)
+          } catch (e) {
+            console.error('Erro ao fazer parse do meta:', e)
+          }
+        }
+
+        setNotification(notification)
+
+        // marca como lida, se ainda não estiver
+        if (!notification.read) {
+          readNotification(notification.id)
+        }
+      } catch (error) {
+        console.error('Erro ao buscar notificação:', error)
         setNotification(null)
       }
     }
-  }, [router.isReady, router.query, notifications])
+
+    fetchData()
+  }, [router.isReady, router.query.id, notifications])
 
   const RenderAvatar = ({
     notification,
@@ -69,7 +88,7 @@ const Notification: NextPage = () => {
     notification: NotificationsType
   }) => {
     const { avatarAlt, avatarImg, name } = notification
-    return avatarImg ? (
+    return avatarImg && avatarImg.trim() ? (
       <Avatar alt={avatarAlt} src={avatarImg} />
     ) : (
       <Avatar skin='light' color='secondary'>
@@ -176,9 +195,11 @@ const Notification: NextPage = () => {
           <br />
 
           <Typography variant='caption' color='text.disabled'>
-            {formatDistanceToNow(new Date(notification.createdAt), {
-              addSuffix: true,
-            })}
+            {notification?.createdAt
+              ? formatDistanceToNow(new Date(notification.createdAt), {
+                  addSuffix: true,
+                })
+              : 'Date unavailable'}
           </Typography>
         </Box>
       ) : (

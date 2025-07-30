@@ -2,9 +2,9 @@ import { api } from 'src/lib/axios'
 import authConfig from 'src/configs/auth'
 
 export async function onFriendAction(
-  action: 'add' | 'remove' | 'accept' | 'decline',
-  peopleId: string,
+  action: 'add' | 'remove' | 'accept' | 'decline' | 'cancel',
   myId: string,
+  peopleId: string,
   friendshipId: string | null,
 ) {
   try {
@@ -31,19 +31,37 @@ export async function onFriendAction(
         break
 
       case 'remove':
-        await api.delete(`/friendships/${friendshipId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        })
+        await api.patch(
+          `/friendships/${friendshipId}/DECLINED`,
+          {},
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          },
+        )
         break
 
       case 'accept':
-        await api.patch(`/friendships/${peopleId}/ACCEPTED`, {
-          headers: { Authorization: `Bearer ${token}` },
-        })
+        await api.patch(
+          `/friendships/${friendshipId}/ACCEPTED`,
+          {},
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          },
+        )
         break
 
       case 'decline':
-        await api.patch(`/friendships/${peopleId}/DECLINED`, {
+        await api.patch(
+          `/friendships/${friendshipId}/DECLINED`,
+          {},
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          },
+        )
+        break
+
+      case 'cancel':
+        await api.delete(`/friendships/${friendshipId}`, {
           headers: { Authorization: `Bearer ${token}` },
         })
         break

@@ -23,7 +23,7 @@ const AboutOverview = (props: PropsTypes) => {
       addSuffix: true,
     },
   )
-  // CONTINUAR DAQYU, AJUSTAR OS BUTOES DE AMIZADE DE ACORDO COM QUEM AMANDA A SOLICITAÇÃO
+  // CONTINUAR DAQYU, AJUSTAR OS BUTOES DE AMIZADE DE ACORDO COM QUEM MANDA A SOLICITAÇÃO
   return (
     <Grid container spacing={6}>
       <Grid item xs={12}>
