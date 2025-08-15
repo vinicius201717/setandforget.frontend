@@ -108,11 +108,11 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
 
   const handleTimeEnd = useCallback(() => {
     const winnerId =
-      user?.id === chessRoom?.playerOne
+      user?.id === chessRoom?.playerOne.id
         ? chessRoom?.playerTwo.id
         : chessRoom?.playerOne.id
 
-    const isLiveMoveVerificationAndWinnerPlayer: boolean = winnerId === user?.id
+    const isCurrentUserWinner: boolean = winnerId === user?.id
 
     isGameOverChess(
       chessRoomId as string,
@@ -121,7 +121,7 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
       user?.id as string,
       game,
       true,
-      !isLiveMoveVerificationAndWinnerPlayer,
+      isCurrentUserWinner,
       user as UserDataType,
       chessRoom?.challenge.amount as number,
       false,

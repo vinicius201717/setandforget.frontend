@@ -47,6 +47,7 @@ import { chessChallengeGet } from '../api/chess-challenge/chessChallengeGet'
 import { chessChallengeGetAll } from '../api/chess-challenge/chessChallengeGetAll'
 import { useAuth } from 'src/hooks/useAuth'
 import { connectSocket } from '../api/chess-room/chess-challenge-websocket'
+import ChallengeFriendModal from 'src/components/chess/components/ChallengeFriendModal'
 
 const registerFormSchema = z.object({
   duration: z.number(),
@@ -62,6 +63,7 @@ function HomePage() {
   const [globalChallenge, setGlobalChallenge] = useState<
     ChallengeGlobalType[] | null
   >([])
+  const [friendModalOpen, setFriendModalOpen] = useState(false)
 
   const { user, toastId, setToastId, setUser } = useAuth()
   const handleOpenModal = (id: string) => {
@@ -94,6 +96,7 @@ function HomePage() {
   const {
     control,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerFormSchema),
@@ -102,6 +105,9 @@ function HomePage() {
       amount: 10,
     },
   })
+
+  const watchedAmount = watch('amount')
+  const watchedDuration = watch('duration')
 
   const updateAccountAmount = (amount: number, action: string) => {
     if (user && user.Account) {
@@ -129,6 +135,10 @@ function HomePage() {
       setUser(updatedUser)
     }
   }
+
+  const handleOpenFriendModal = () => setFriendModalOpen(true)
+  const handleCloseFriendModal = () => setFriendModalOpen(false)
+
   const onSubmitPlay = (data: RegisterFormData) => {
     if (user?.Account.amount && user.Account.amount / 100 >= data.amount) {
       chessChallengeCreate(data)
@@ -302,19 +312,24 @@ function HomePage() {
               <FormHelperText>{errors.amount.message}</FormHelperText>
             )}
           </FormControl>
+          <Box display='flex' gap={1} mt={1} mb={2}>
+            <Button
+              type='submit'
+              variant='contained'
+              sx={{ flex: 4 }} // ocupa 80% aproximadamente
+            >
+              Play
+            </Button>
+            <Button
+              type='button'
+              variant='outlined'
+              sx={{ flex: 1 }}
+              onClick={handleOpenFriendModal}
+            >
+              Friend
+            </Button>
+          </Box>
 
-          <Button
-            type='submit'
-            variant='contained'
-            style={{
-              marginTop: '10px',
-              marginLeft: '3px',
-              marginBottom: '20px',
-              width: '100%',
-            }}
-          >
-            Jogar
-          </Button>
           <LinkHistory href={'chess/history'}>History game</LinkHistory>
         </FormContainer>
       </ContainerChildren>
@@ -374,6 +389,14 @@ function HomePage() {
           <TravelExploreIcon sx={{ color: '#FFF' }} />
         </ButtonIcon>
       </OptionButtonChange>
+      <ChallengeFriendModal
+        open={friendModalOpen}
+        userId={user?.id as string}
+        duration={watchedDuration}
+        amount={watchedAmount}
+        handleClose={handleCloseFriendModal}
+      />
+
       {modalInfo ? (
         <ConfirmModal
           open={modalOpen}

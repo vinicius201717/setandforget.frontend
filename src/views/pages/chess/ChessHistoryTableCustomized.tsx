@@ -6,7 +6,7 @@ import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import { format } from 'date-fns'
-import { Badge, useTheme, Pagination, TableContainer } from '@mui/material'
+import { useTheme, Pagination, TableContainer, Chip } from '@mui/material'
 import Link from 'next/link'
 import { StyledTableCell, StyledTableRow } from './style'
 import { Result } from 'src/types/apps/chessTypes'
@@ -14,65 +14,38 @@ import { useAuth } from 'src/hooks/useAuth'
 import { getChessResults } from 'src/pages/api/chess-result/chessResultGet'
 import { formatMoney } from 'src/utils/format-money'
 import { formatTime } from 'src/utils/format-timer'
+import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord'
 
-const TableRowStatus = (resultType: string) => {
-  if (resultType.includes('Draw')) {
+const TableRowStatus = (
+  winnerId: string,
+  userId: string,
+  resultType: string,
+) => {
+  const isWinner = userId === winnerId
+  const isDraw = resultType.includes('Draw proposal')
+  if (isDraw) {
     return (
-      <>
-        <Badge
-          color='default'
-          variant='dot'
-          sx={{
-            marginRight: '10px',
-            '& .MuiBadge-badge': {
-              right: 4,
-              boxShadow: (theme) =>
-                `0 0 0 2px ${theme.palette.background.paper}`,
-              backgroundColor: '#808080',
-            },
-          }}
-        />
-        {'Draw'}
-      </>
+      <Chip
+        size='small'
+        label={'Draw'}
+        color={'info'}
+        icon={<FiberManualRecordIcon fontSize='small' />}
+        variant='outlined'
+        sx={{ whiteSpace: 'nowrap' }}
+      />
     )
-  } else if (resultType === 'Checkmate') {
+  } else {
     return (
-      <>
-        <Badge
-          color='success'
-          variant='dot'
-          sx={{
-            marginRight: '10px',
-            '& .MuiBadge-badge': {
-              right: 4,
-              boxShadow: (theme) =>
-                `0 0 0 2px ${theme.palette.background.paper}`,
-            },
-          }}
-        />
-        {'Winner'}
-      </>
-    )
-  } else if (resultType === 'Give up') {
-    return (
-      <>
-        <Badge
-          color='error'
-          variant='dot'
-          sx={{
-            marginRight: '10px',
-            '& .MuiBadge-badge': {
-              right: 4,
-              boxShadow: (theme) =>
-                `0 0 0 2px ${theme.palette.background.paper}`,
-            },
-          }}
-        />
-        {'Loser'}
-      </>
+      <Chip
+        size='small'
+        label={isWinner ? 'Winner' : 'Loser'}
+        color={isWinner ? 'success' : 'error'}
+        icon={<FiberManualRecordIcon fontSize='small' />}
+        variant='outlined'
+        sx={{ whiteSpace: 'nowrap' }}
+      />
     )
   }
-  return null
 }
 
 const ChessHistoryTableCustomized = () => {
@@ -109,11 +82,10 @@ const ChessHistoryTableCustomized = () => {
       <Table sx={{ minWidth: 700 }} aria-label='Chess play'>
         <TableHead>
           <TableRow>
-            <StyledTableCell>Result</StyledTableCell>
+            <StyledTableCell align='left'>Result</StyledTableCell>
             <StyledTableCell align='left'>Opponent</StyledTableCell>
             <StyledTableCell align='left'>Amount</StyledTableCell>
             <StyledTableCell align='left'>Duration</StyledTableCell>{' '}
-            {/* Nova coluna */}
             <StyledTableCell align='left'>Result type</StyledTableCell>
             <StyledTableCell align='left'>Date</StyledTableCell>
             <StyledTableCell align='right'>Action</StyledTableCell>
@@ -124,16 +96,28 @@ const ChessHistoryTableCustomized = () => {
           {chessResults.length > 0 ? (
             chessResults.map((row) => (
               <StyledTableRow key={row.id}>
-                <StyledTableCell
-                  component='td'
-                  scope='row'
-                  sx={{ display: 'flex', alignItems: 'center', gap: '20px' }}
-                >
-                  {TableRowStatus(row.resultType)}
+                <StyledTableCell align='left'>
+                  {TableRowStatus(
+                    row.winner.id,
+                    user?.id as string,
+                    row.resultType,
+                  )}
                 </StyledTableCell>
                 <StyledTableCell align='left'>
-                  {user?.id === row.winnerId ? row.loser.name : row.winner.name}
+                  <Link
+                    href={
+                      user?.id === row.winner.id
+                        ? `/pages/people/${row.loser.id}`
+                        : `/pages/people/${row.winner.id}`
+                    }
+                    style={{ textDecoration: 'none', color: 'inherit' }}
+                  >
+                    {user?.id === row.winner.id
+                      ? row.loser.name
+                      : row.winner.name}
+                  </Link>
                 </StyledTableCell>
+
                 <StyledTableCell align='left'>
                   {formatMoney(row.room.challenge.amount)}
                 </StyledTableCell>

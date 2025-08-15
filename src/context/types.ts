@@ -103,6 +103,17 @@ export type FriendshipType = {
   updatedAt: string
 }
 
+export type FriendshipChallengeType = {
+  id: string
+  requesterId: string
+  addresseeId: string
+  status: 'PENDING' | 'ACCEPTED' | 'DECLINED'
+  createdAt: string
+  updatedAt: string
+  requester: { name: string }
+  addressee: { name: string }
+}
+
 export type UserPeopleType = {
   id: string
   name: string
