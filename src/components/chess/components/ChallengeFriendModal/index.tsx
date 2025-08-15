@@ -16,6 +16,11 @@ import { getFriends } from 'src/pages/api/friendship/getFriends'
 import { FriendshipChallengeType } from 'src/context/types'
 import toast from 'react-hot-toast'
 import { chessFriendChallengeCreate } from 'src/pages/api/chess-challenge/chessFriendChallengeCreate'
+import { CancelableToastContent } from '../../PersistentToast'
+import { useAuth } from 'src/hooks/useAuth'
+import { CreateChallengeReturn } from 'src/types/apps/chessTypes'
+import { chessChallengeCancel } from 'src/pages/api/chess-challenge/chessChallengeCancel'
+import { connectSocket } from 'src/pages/api/chess-room/chess-challenge-websocket'
 
 type ChallengeFriendModalProps = {
   open: boolean
@@ -38,6 +43,8 @@ const ChallengeFriendModal: React.FC<ChallengeFriendModalProps> = ({
 
   const [peace, setPeace] = useState<'white' | 'black'>('white')
 
+  const { user, toastId, setUser, setToastId } = useAuth()
+
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value as 'white' | 'black'
     setPeace(value)
@@ -52,6 +59,14 @@ const ChallengeFriendModal: React.FC<ChallengeFriendModalProps> = ({
         console.error('Failed to fetch friends:', error)
       })
   }, [userId])
+
+  useEffect(() => {
+    const challengeId = window.localStorage.getItem('chess-challenge-id')
+    const roomId = window.localStorage.getItem('chess-room-id')
+    if (challengeId && roomId) {
+      chessChallengeCancel(challengeId, roomId, JSON.stringify(amount))
+    }
+  }, [])
 
   const mappedFriends = friendsList.map((friend) => {
     const friendUser =
@@ -77,6 +92,35 @@ const ChallengeFriendModal: React.FC<ChallengeFriendModalProps> = ({
       return
     }
 
+    const updateAccountAmount = (amount: number, action: string) => {
+      if (user && user.Account) {
+        let newAmount: number
+        switch (action) {
+          case 'subtraction':
+            newAmount = (user.Account.amount / 100 - amount) * 100
+            break
+
+          case 'plus':
+            newAmount = user.Account.amount
+            break
+          default:
+            newAmount = user.Account.amount
+            break
+        }
+
+        const updatedUser = {
+          ...user,
+          Account: {
+            ...user.Account,
+            amount: newAmount,
+          },
+        }
+        setUser(updatedUser)
+      }
+    }
+
+    // ABRIR SALA COM SOCKET PRA DEIXAR ONLINE ESPERANDO O JOGADOR ADDREESS ACEITAR O DESAFIO
+
     const friend = mappedFriends.find((f) => f.id === selectedFriend)
     if (!friend) return
     const data = {
@@ -85,12 +129,39 @@ const ChallengeFriendModal: React.FC<ChallengeFriendModalProps> = ({
       userId: selectedFriend,
       peace,
     }
-    chessFriendChallengeCreate(data).then((response) => {
-      console.log(response)
+    chessFriendChallengeCreate(data).then((response: CreateChallengeReturn) => {
+      if (response) {
+        updateAccountAmount(data.amount, 'subtraction')
+        connectSocket(
+          response.challenge.id,
+          response.room.id,
+          userId,
+          userId,
+          JSON.stringify(data.amount),
+          null,
+          null,
+          null,
+          null,
+          null,
+        )
+        window.localStorage.setItem('chess-room-id', response.room.id)
+        window.localStorage.setItem('chess-challenge-id', response.challenge.id)
 
-      toast.success(`Challenge sent to ${friend.name}`, {
-        position: 'bottom-right',
-      })
+        setToastId(
+          toast.loading(
+            <CancelableToastContent
+              toastId={toastId}
+              amount={data.amount}
+              updateAccountAmount={updateAccountAmount}
+            />,
+            {
+              position: 'bottom-right',
+              duration: Infinity,
+              id: 'chess-loading-toast',
+            },
+          ),
+        )
+      }
     })
 
     handleClose()

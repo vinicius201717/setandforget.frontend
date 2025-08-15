@@ -131,6 +131,7 @@ export type PeopleProfileResponse = {
 export enum ActionTypeEnum {
   FRIENDSHIP = 'FRIENDSHIP',
   BLOCK = 'BLOCK',
+  CHESS_CHALLENGE = 'CHALLENGE',
 }
 
 export type RegisterCreateType = {

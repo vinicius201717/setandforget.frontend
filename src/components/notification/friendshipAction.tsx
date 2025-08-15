@@ -1,9 +1,17 @@
-/* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable no-unused-vars */
+import { ActionTypeEnum } from 'src/context/types'
 import { Box, Button } from '@mui/material'
-import toast from 'react-hot-toast'
-import { useAuth } from 'src/hooks/useAuth'
 import { updateFriendshipStatus } from 'src/pages/api/friendship/updateFriend'
+import { useAuth } from 'src/hooks/useAuth'
+import toast from 'react-hot-toast'
+
+type FriendshipActionProps = {
+  action: ActionTypeEnum
+  friendshipId: string
+  notificationId: string
+  status: 'ACCEPTED' | 'DECLINED' | 'PENDING'
+}
 
 type FriendShipNotificationProps = {
   status: 'ACCEPTED' | 'DECLINED' | 'PENDING'
@@ -58,4 +66,30 @@ const FriendShipNotification = ({
   )
 }
 
-export default FriendShipNotification
+const FriendshipAction = ({
+  action,
+  friendshipId,
+  notificationId,
+  status,
+}: FriendshipActionProps) => {
+  const renderActionComponent = () => {
+    switch (action) {
+      case ActionTypeEnum.FRIENDSHIP:
+        return (
+          <FriendShipNotification
+            friendshipId={friendshipId}
+            notificationId={notificationId}
+            status={status}
+          />
+        )
+      case ActionTypeEnum.BLOCK:
+        return <span>Blocked</span>
+      default:
+        return <span>Ação desconhecida</span>
+    }
+  }
+
+  return <>{renderActionComponent()}</>
+}
+
+export default FriendshipAction
