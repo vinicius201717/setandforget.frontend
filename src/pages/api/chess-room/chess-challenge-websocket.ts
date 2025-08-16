@@ -12,6 +12,7 @@ export const connectSocket = (
   creatorId: string | null,
   userId: string | null,
   amount: string | null,
+  friendChallenge: string | null,
   setDraw: React.Dispatch<React.SetStateAction<Draw>> | null,
   setRevenge: React.Dispatch<React.SetStateAction<Revenge>> | null,
   setGameStatus: React.Dispatch<React.SetStateAction<GameStatus>> | null,
@@ -41,6 +42,7 @@ export const connectSocket = (
       creatorId,
       userId,
       amount,
+      friendChallenge,
     },
   })
 
@@ -58,8 +60,6 @@ export const connectSocket = (
   })
 
   socket.on('reconnected', (game) => {
-    console.log(game)
-
     if (setChessRoom) setChessRoom(game)
   })
 

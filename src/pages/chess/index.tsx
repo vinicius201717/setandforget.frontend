@@ -162,6 +162,7 @@ function HomePage() {
               null,
               null,
               null,
+              null,
             )
           } else {
             updateAccountAmount(data.amount, 'subtraction')
@@ -176,6 +177,7 @@ function HomePage() {
               userId,
               userId,
               amount,
+              null,
               null,
               null,
               null,
@@ -225,7 +227,7 @@ function HomePage() {
     })
     const challengeId = window.localStorage.getItem('chess-challenge-id')
     if (challengeId) {
-      chessChallengeGet(challengeId).then((response: Challenge) => {
+      chessChallengeGet(challengeId, false).then((response: Challenge) => {
         if (toastId === null && response) {
           setToastId(
             toast.loading(

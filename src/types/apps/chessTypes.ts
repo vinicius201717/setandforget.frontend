@@ -109,6 +109,27 @@ export interface ChallengeGlobalType {
   duration: number
   amount: number
 }
+export interface GetChallengeInterface {
+  id: string
+  roomId: string | null
+  userId: string
+  amount: number
+  duration: number
+  status: boolean
+  created_at: string // ou Date
+  updated_at: string // ou Date
+  Room: {
+    id: string
+    challengeId: string
+    playerOneId: string
+    playerTwoId: string
+    duration: number
+    status: boolean
+    created_at: string // ou Date, se você for converter
+    updated_at: string // ou Date
+    userId: string | null
+  }
+}
 
 export interface Challenge {
   id: string

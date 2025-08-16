@@ -4,6 +4,9 @@ import { ActionTypeEnum } from 'src/context/types'
 import { Box, Button } from '@mui/material'
 import { useAuth } from 'src/hooks/useAuth'
 import toast from 'react-hot-toast'
+import { chessChallengeGet } from 'src/pages/api/chess-challenge/chessChallengeGet'
+import { connectSocket } from 'src/pages/api/chess-room/chess-challenge-websocket'
+import { GetChallengeInterface } from 'src/types/apps/chessTypes'
 
 type ChessChallengeActionProps = {
   action: ActionTypeEnum
@@ -23,40 +26,46 @@ const ChessChallengeNotification = ({
   notificationId,
   status,
 }: ChessChallengeNotificationProps) => {
-  const { updateNotificationAction } = useAuth()
-
+  const { updateNotificationAction, user } = useAuth()
   const handleAction = async (status: 'ACCEPTED' | 'DECLINED' | 'PENDING') => {
     try {
-      //   const data = useAuth()
+      const response: GetChallengeInterface = await chessChallengeGet(
+        challengeId,
+        true,
+      )
 
-      //   const onPlay = () => {
-      //     if (
-      //       data.user?.Account.amount &&
-      //       data.user?.Account.amount >= parseFloat(amount) * 100
-      //     ) {
-      //       window.localStorage.setItem('chess-room-id', roomId)
-      //       connectSocket(
-      //         challengeId,
-      //         roomId,
-      //         user.id,
-      //         data?.user?.id as string,
-      //         amount,
-      //         null,
-      //         null,
-      //         null,
-      //         null,
-      //         null,
-      //       )
-      //     } else {
-      //       toast.error('Insuficient sald', { position: 'bottom-right' })
-      //     }
-      //   }
-      // CODIGO PRA ACEITAR O DESAFIO E ENTRAR NA SALA.
-      // PRECISO CONTINUAR DAQUI ATUALIZANDO AS OPCOES DE DESAFIO: ACEITAR, RECUSAR.
-      // Atualiza o status do desafio de xadrez
-      //   await updateChessChallengeStatus(challengeId, status, notificationId)
+      if (!response) {
+        toast.error('Challenge canceled', {
+          position: 'bottom-right',
+        })
+        return
+      }
+      if (status === 'ACCEPTED') {
+        if (
+          user?.Account.amount &&
+          user?.Account.amount >= response.amount * 100
+        ) {
+          window.localStorage.setItem('chess-room-id', response.Room.id)
 
-      updateNotificationAction(notificationId, status)
+          connectSocket(
+            challengeId,
+            response.Room.id,
+            response.userId,
+            user?.id as string,
+            response.amount.toString(),
+            'true',
+            null,
+            null,
+            null,
+            null,
+            null,
+          )
+        } else {
+          toast.error('Insufficient saldo', { position: 'bottom-right' })
+        }
+      }
+
+      await updateNotificationAction(notificationId, status)
 
       toast.success(`Chess challenge ${status.toLowerCase()}`, {
         position: 'bottom-right',

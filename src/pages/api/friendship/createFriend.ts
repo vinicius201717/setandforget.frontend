@@ -8,8 +8,6 @@ export async function createFriendRequest(
   const storedToken = window.localStorage.getItem(
     authConfig.storageTokenKeyName,
   )
-  console.log('ok')
-
   const data = await api.post(
     '/friendships',
     {

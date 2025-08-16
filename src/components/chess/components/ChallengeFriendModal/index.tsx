@@ -138,6 +138,7 @@ const ChallengeFriendModal: React.FC<ChallengeFriendModalProps> = ({
           userId,
           userId,
           JSON.stringify(data.amount),
+          'true',
           null,
           null,
           null,
