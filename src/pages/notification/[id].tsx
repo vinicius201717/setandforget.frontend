@@ -22,25 +22,10 @@ import toast from 'react-hot-toast'
 import { getNotification } from '../api/notification/getNotification'
 import FriendshipAction from 'src/components/notification/friendshipAction'
 import ChessChallengeAction from 'src/components/notification/chessChallengeAction'
+import { NotificationMeta } from 'src/types/apps/notification'
 
 // Tipos discriminados para meta (union type para diferentes contextos)
-type FriendRequestMeta = {
-  type: 'FRIEND_REQUEST'
-  requesterId: string
-  friendshipId: string
-  status: string
-}
-
-type ChessChallengeMeta = {
-  type: 'CHESS_CHALLENGE'
-  challengerId: string
-  challengeId: string
-  status: string
-  // Adicione campos específicos para desafio de xadrez, ex: gameSettings, etc.
-}
-
-// Union type para suportar múltiplos tipos de notificações
-type NotificationMeta = FriendRequestMeta | ChessChallengeMeta // Adicione mais tipos conforme necessário, ex: | OtherMeta
+// Adicione mais tipos conforme necessário, ex: | OtherMeta
 
 const Avatar = styled(CustomAvatar)<CustomAvatarProps>({
   width: 48,

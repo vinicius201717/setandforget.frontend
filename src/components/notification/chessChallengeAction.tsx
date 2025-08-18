@@ -7,6 +7,8 @@ import toast from 'react-hot-toast'
 import { chessChallengeGet } from 'src/pages/api/chess-challenge/chessChallengeGet'
 import { connectSocket } from 'src/pages/api/chess-room/chess-challenge-websocket'
 import { GetChallengeInterface } from 'src/types/apps/chessTypes'
+import { deleteNotification } from 'src/pages/api/notification/deleteNotification'
+import { updateNotificationStatus } from 'src/pages/api/notification/updateNotificationStatus'
 
 type ChessChallengeActionProps = {
   action: ActionTypeEnum
@@ -24,26 +26,29 @@ type ChessChallengeNotificationProps = {
 const ChessChallengeNotification = ({
   challengeId,
   notificationId,
-  status,
 }: ChessChallengeNotificationProps) => {
   const { updateNotificationAction, user } = useAuth()
+
   const handleAction = async (status: 'ACCEPTED' | 'DECLINED' | 'PENDING') => {
     try {
-      const response: GetChallengeInterface = await chessChallengeGet(
-        challengeId,
-        true,
-      )
+      await updateNotificationStatus(notificationId, status)
 
-      if (!response) {
-        toast.error('Challenge canceled', {
-          position: 'bottom-right',
-        })
-        return
-      }
+      updateNotificationAction(notificationId, status)
+
       if (status === 'ACCEPTED') {
+        const response: GetChallengeInterface = await chessChallengeGet(
+          challengeId,
+          true,
+        )
+
+        if (!response) {
+          toast.error('Challenge canceled', { position: 'bottom-right' })
+          return
+        }
+
         if (
           user?.Account.amount &&
-          user?.Account.amount >= response.amount * 100
+          user.Account.amount >= response.amount * 100
         ) {
           window.localStorage.setItem('chess-room-id', response.Room.id)
 
@@ -51,7 +56,7 @@ const ChessChallengeNotification = ({
             challengeId,
             response.Room.id,
             response.userId,
-            user?.id as string,
+            user.id,
             response.amount.toString(),
             'true',
             null,
@@ -62,22 +67,23 @@ const ChessChallengeNotification = ({
           )
         } else {
           toast.error('Insufficient saldo', { position: 'bottom-right' })
+          deleteNotification(notificationId)
+          return
         }
+      } else {
+        updateNotificationAction(notificationId, status)
       }
-
-      await updateNotificationAction(notificationId, status)
 
       toast.success(`Chess challenge ${status.toLowerCase()}`, {
         position: 'bottom-right',
       })
     } catch (error) {
+      console.log('ok')
+
       console.error('Failed to update chess challenge status:', error)
-      toast.error('Something went wrong', {
-        position: 'bottom-right',
-      })
+      toast.error('Something went wrong', { position: 'bottom-right' })
     }
   }
-
   return (
     <Box sx={{ display: 'flex', gap: 2, marginLeft: 0 }}>
       <Button

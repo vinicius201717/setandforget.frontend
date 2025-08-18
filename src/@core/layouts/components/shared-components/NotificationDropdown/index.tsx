@@ -1,3 +1,4 @@
+/* eslint-disable import/no-duplicates */
 // ** React Imports
 import { useState, SyntheticEvent, Fragment, ReactNode } from 'react'
 
@@ -12,6 +13,7 @@ import Typography from '@mui/material/Typography'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
+import VisibilityIcon from '@mui/icons-material/Visibility'
 
 // ** Type Imports
 import { Settings } from 'src/@core/context/settingsContext'
@@ -27,6 +29,8 @@ import { readAllNotifications } from 'src/pages/api/notification/readAllNotifica
 import toast from 'react-hot-toast'
 import { useAuth } from 'src/hooks/useAuth'
 import Link from 'next/link'
+import { formatDistanceToNow } from 'date-fns'
+import { ptBR } from 'date-fns/locale'
 
 interface Props {
   settings: Settings
@@ -250,6 +254,23 @@ const NotificationDropdown = (props: Props) => {
                   >
                     {notification.subtitle}
                   </Typography>
+
+                  <Typography
+                    variant='caption'
+                    sx={{
+                      color: 'text.disabled',
+                      fontStyle: 'italic',
+                      pr: 1,
+                      position: 'absolute',
+                      bottom: 4,
+                      right: 0, // canto inferior direito
+                    }}
+                  >
+                    {formatDistanceToNow(new Date(notification.createdAt), {
+                      addSuffix: true,
+                      locale: ptBR,
+                    })}
+                  </Typography>
                   <Typography
                     variant='caption'
                     sx={{
@@ -291,6 +312,7 @@ const NotificationDropdown = (props: Props) => {
           disableTouchRipple
           sx={{
             py: 3.5,
+            gap: '10px',
             borderBottom: 0,
             cursor: 'default',
             userSelect: 'auto',
@@ -305,6 +327,12 @@ const NotificationDropdown = (props: Props) => {
           >
             Read All Notifications
           </Button>
+          <Link
+            href='/notification/all'
+            style={{ textDecoration: 'none', color: 'inherit' }}
+          >
+            <VisibilityIcon />
+          </Link>
         </MenuItem>
       </Menu>
     </Fragment>

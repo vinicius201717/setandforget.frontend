@@ -155,6 +155,8 @@ const AuthProvider = ({ children }: Props) => {
     id: string,
     action: 'ACCEPTED' | 'DECLINED' | 'PENDING',
   ) => {
+    console.log('ok')
+
     setNotifications((prev) =>
       prev
         ? prev.map((n) => (n.id === id ? { ...n, currentAction: action } : n))
