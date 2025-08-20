@@ -69,9 +69,9 @@ export const ToastRevenge = ({
   const refuseRevengeToast = () => {
     const roomId = window.localStorage.getItem('chess-room-id')
     if (roomId) {
+      toast.dismiss(toastId)
       const userRefuseName = user?.name as string
       refuseRevenge(roomId, userId, userRefuseName)
-      toast.dismiss(toastId)
 
       toast(`You have declined the rematch request.`, {
         position: 'bottom-right',

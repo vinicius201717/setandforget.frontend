@@ -34,13 +34,11 @@ const ChessChallengeNotification = ({
       await updateNotificationStatus(notificationId, status)
 
       updateNotificationAction(notificationId, status)
-
+      const response: GetChallengeInterface = await chessChallengeGet(
+        challengeId,
+        true,
+      )
       if (status === 'ACCEPTED') {
-        const response: GetChallengeInterface = await chessChallengeGet(
-          challengeId,
-          true,
-        )
-
         if (!response) {
           toast.error('Challenge canceled', { position: 'bottom-right' })
           return
@@ -71,6 +69,21 @@ const ChessChallengeNotification = ({
           return
         }
       } else {
+        // TENTAR LOGAR NO WEBSOCKET PRA TENTAR NOTIFICAR O USUARIO QUE EU CANCELEI O DESAFIO
+        // VERIFICAR COM IA SE TEM OUTRA FORMA DE FAZER ISSO
+        connectSocket(
+          challengeId,
+          response.Room.id,
+          response.userId,
+          'undefined',
+          response.amount.toString(),
+          'true',
+          null,
+          null,
+          null,
+          null,
+          null,
+        )
         updateNotificationAction(notificationId, status)
       }
 
@@ -78,8 +91,6 @@ const ChessChallengeNotification = ({
         position: 'bottom-right',
       })
     } catch (error) {
-      console.log('ok')
-
       console.error('Failed to update chess challenge status:', error)
       toast.error('Something went wrong', { position: 'bottom-right' })
     }
