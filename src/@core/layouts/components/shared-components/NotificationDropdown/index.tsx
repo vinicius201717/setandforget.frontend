@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable import/no-duplicates */
 // ** React Imports
 import { useState, SyntheticEvent, Fragment, ReactNode } from 'react'
@@ -263,7 +264,7 @@ const NotificationDropdown = (props: Props) => {
                       pr: 1,
                       position: 'absolute',
                       bottom: 4,
-                      right: 0, // canto inferior direito
+                      right: 0,
                     }}
                   >
                     {formatDistanceToNow(new Date(notification.createdAt), {

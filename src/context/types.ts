@@ -76,7 +76,6 @@ export type CreditCardTransactionType = {
   name?: string
   lastDigits: string
 }
-
 export type NotificationsType = {
   id: string
   meta: string
@@ -201,4 +200,5 @@ export type AuthValuesType = {
     id: string,
     action: 'ACCEPTED' | 'DECLINED' | 'PENDING',
   ) => void
+  addNotification: (payload: NotificationsType) => void
 }

@@ -69,6 +69,7 @@ import 'src/iconify-bundle/icons-bundle-react'
 import '../../styles/globals.css'
 import { queryClient } from 'src/lib/react-query'
 import { CartOddsProvider } from 'src/context/CartOddsContext'
+import { PresenceProvider } from 'src/context/PresenceContext'
 
 // ** Extend App Props with Emotion
 type ExtendedAppProps = AppProps & {
@@ -147,37 +148,39 @@ const App = (props: ExtendedAppProps) => {
           openDialogSecurityCode={() => {}}
           onSetUserId={(id: string) => {}}
         >
-          <QueryClientProvider client={queryClient}>
-            <SettingsProvider
-              {...(setConfig ? { pageSettings: setConfig() } : {})}
-            >
-              <SettingsConsumer>
-                {({ settings }) => {
-                  return (
-                    <ThemeComponent settings={settings}>
-                      <CartOddsProvider>
-                        <Guard authGuard={authGuard} guestGuard={guestGuard}>
-                          <AclGuard
-                            aclAbilities={aclAbilities}
-                            guestGuard={guestGuard}
-                            authGuard={authGuard}
-                          >
-                            {getLayout(<Component {...pageProps} />)}
-                          </AclGuard>
-                        </Guard>
-                        <ReactHotToast>
-                          <Toaster
-                            position={settings.toastPosition}
-                            toastOptions={{ className: 'react-hot-toast' }}
-                          />
-                        </ReactHotToast>
-                      </CartOddsProvider>
-                    </ThemeComponent>
-                  )
-                }}
-              </SettingsConsumer>
-            </SettingsProvider>
-          </QueryClientProvider>
+          <PresenceProvider>
+            <QueryClientProvider client={queryClient}>
+              <SettingsProvider
+                {...(setConfig ? { pageSettings: setConfig() } : {})}
+              >
+                <SettingsConsumer>
+                  {({ settings }) => {
+                    return (
+                      <ThemeComponent settings={settings}>
+                        <CartOddsProvider>
+                          <Guard authGuard={authGuard} guestGuard={guestGuard}>
+                            <AclGuard
+                              aclAbilities={aclAbilities}
+                              guestGuard={guestGuard}
+                              authGuard={authGuard}
+                            >
+                              {getLayout(<Component {...pageProps} />)}
+                            </AclGuard>
+                          </Guard>
+                          <ReactHotToast>
+                            <Toaster
+                              position={settings.toastPosition}
+                              toastOptions={{ className: 'react-hot-toast' }}
+                            />
+                          </ReactHotToast>
+                        </CartOddsProvider>
+                      </ThemeComponent>
+                    )
+                  }}
+                </SettingsConsumer>
+              </SettingsProvider>
+            </QueryClientProvider>
+          </PresenceProvider>
         </AuthProvider>
       </CacheProvider>
     </Provider>

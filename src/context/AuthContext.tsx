@@ -40,6 +40,7 @@ const defaultProvider: AuthValuesType = {
   loginAfterCode: () => Promise.resolve(),
   removeNotification: () => {},
   updateNotificationAction: () => {},
+  addNotification: () => {},
 }
 
 const AuthContext = createContext(defaultProvider)
@@ -151,6 +152,12 @@ const AuthProvider = ({ children }: Props) => {
     setNotifications((prev) => (prev ? prev.filter((n) => n.id !== id) : null))
   }
 
+  const addNotification = (payload: NotificationsType) => {
+    console.log(payload)
+
+    setNotifications((prev) => [...(prev || []), payload])
+  }
+
   const updateNotificationAction = (
     id: string,
     action: 'ACCEPTED' | 'DECLINED' | 'PENDING',
@@ -178,6 +185,7 @@ const AuthProvider = ({ children }: Props) => {
     loginAfterCode: handleLoginAfterCode,
     removeNotification,
     updateNotificationAction,
+    addNotification,
   }
 
   return <AuthContext.Provider value={values}>{children}</AuthContext.Provider>
