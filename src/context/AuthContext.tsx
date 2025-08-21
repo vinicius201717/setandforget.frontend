@@ -153,8 +153,6 @@ const AuthProvider = ({ children }: Props) => {
   }
 
   const addNotification = (payload: NotificationsType) => {
-    console.log(payload)
-
     setNotifications((prev) => [...(prev || []), payload])
   }
 

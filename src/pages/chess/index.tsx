@@ -13,6 +13,7 @@ import {
   InputAdornment,
   InputLabel,
   OutlinedInput,
+  Tooltip,
   Typography,
 } from '@mui/material'
 import { z } from 'zod'
@@ -48,6 +49,8 @@ import { chessChallengeGetAll } from '../api/chess-challenge/chessChallengeGetAl
 import { useAuth } from 'src/hooks/useAuth'
 import { connectSocket } from '../api/chess-room/chess-challenge-websocket'
 import ChallengeFriendModal from 'src/components/chess/components/ChallengeFriendModal'
+import { chessRoomGet } from '../api/chess-room/chess-room-get'
+import { useRouter } from 'next/router'
 
 const registerFormSchema = z.object({
   duration: z.number(),
@@ -63,6 +66,8 @@ function HomePage() {
   const [globalChallenge, setGlobalChallenge] = useState<
     ChallengeGlobalType[] | null
   >([])
+  const [activeGame, setActiveGame] = useState<boolean>(false)
+  const [roomId, setRoomId] = useState<string>('')
   const [friendModalOpen, setFriendModalOpen] = useState(false)
 
   const { user, toastId, setToastId, setUser } = useAuth()
@@ -85,6 +90,8 @@ function HomePage() {
 
     setModalOpen(true)
   }
+
+  const router = useRouter()
 
   const handleCloseModal = () => setModalOpen(false)
 
@@ -223,7 +230,20 @@ function HomePage() {
     }
   }
 
+  const handleBackGame = (roomId: string) => {
+    router.push(`/chess/play/${roomId}`)
+  }
+
   useEffect(() => {
+    const roomId = window.localStorage.getItem('chess-room-id')
+    if (roomId) {
+      chessRoomGet(roomId).then((response) => {
+        if (response.status) {
+          setRoomId(roomId)
+          setActiveGame(true)
+        }
+      })
+    }
     chessChallengeGetAll().then((response: ChallengeGlobalType[] | null) => {
       setGlobalChallenge(response)
     })
@@ -393,6 +413,27 @@ function HomePage() {
           <TravelExploreIcon sx={{ color: '#FFF' }} />
         </ButtonIcon>
       </OptionButtonChange>
+      <Tooltip title='BACK TO PLAY' arrow>
+        <Button
+          variant='contained'
+          color='secondary'
+          title='PLAY'
+          sx={{
+            display: activeGame ? 'flex' : 'none',
+            width: '40px',
+            height: '60px',
+            borderRadius: '10%',
+            position: 'fixed',
+            bottom: '50px',
+            right: '50px',
+            minWidth: 0,
+            fontSize: '28px',
+          }}
+          onClick={() => handleBackGame(roomId)}
+        >
+          ♟️
+        </Button>
+      </Tooltip>
       <ChallengeFriendModal
         open={friendModalOpen}
         userId={user?.id as string}

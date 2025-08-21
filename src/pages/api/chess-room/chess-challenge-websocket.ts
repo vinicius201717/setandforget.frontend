@@ -140,6 +140,7 @@ export const connectSocket = (
   })
 
   socket.on('endGame', (data) => {
+    window.localStorage.removeItem('chess-room-id')
     if (setGameStatus)
       setGameStatus({
         status: data.status,
