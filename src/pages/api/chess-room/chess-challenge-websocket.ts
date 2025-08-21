@@ -13,6 +13,7 @@ export const connectSocket = (
   userId: string | null,
   amount: string | null,
   friendChallenge: string | null,
+  toastId: string | null,
   setDraw: React.Dispatch<React.SetStateAction<Draw>> | null,
   setRevenge: React.Dispatch<React.SetStateAction<Revenge>> | null,
   setGameStatus: React.Dispatch<React.SetStateAction<GameStatus>> | null,
@@ -118,6 +119,13 @@ export const connectSocket = (
         status: data.status,
         cancelled: data.cancelled,
       })
+  })
+
+  socket.on('revengeDeclined', (user: { name: string }) => {
+    toast(`${user.name} refuse  challenge!`, {
+      position: 'bottom-right',
+    })
+    toast.dismiss(toastId as string)
   })
 
   socket.on('revengeCancelRequest', (data: Revenge) => {

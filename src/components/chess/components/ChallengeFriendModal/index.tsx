@@ -139,6 +139,7 @@ const ChallengeFriendModal: React.FC<ChallengeFriendModalProps> = ({
           userId,
           JSON.stringify(data.amount),
           'true',
+          toastId as string,
           null,
           null,
           null,

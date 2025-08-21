@@ -62,6 +62,7 @@ const ChessChallengeNotification = ({
             null,
             null,
             null,
+            null,
           )
         } else {
           toast.error('Insufficient saldo', { position: 'bottom-right' })
@@ -69,15 +70,15 @@ const ChessChallengeNotification = ({
           return
         }
       } else {
-        // TENTAR LOGAR NO WEBSOCKET PRA TENTAR NOTIFICAR O USUARIO QUE EU CANCELEI O DESAFIO
-        // VERIFICAR COM IA SE TEM OUTRA FORMA DE FAZER ISSO
+        const userIdUndefined = user?.id + '_undefined'
         connectSocket(
           challengeId,
           response.Room.id,
           response.userId,
-          'undefined',
+          userIdUndefined,
           response.amount.toString(),
           'true',
+          null,
           null,
           null,
           null,

@@ -31,8 +31,6 @@ export const ToastRevenge = ({
 }: RevengeProps) => {
   const { user } = useAuth()
 
-  // CONTINUAR DAQUI.
-
   const handleAcceptRevenge = (data: RevengeType) => {
     if (user?.Account.amount && user.Account.amount / 100 >= data.amount) {
       chessChallengeCreate(data)

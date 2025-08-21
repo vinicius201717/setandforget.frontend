@@ -59,6 +59,7 @@ function ConfirmModal({
         null,
         null,
         null,
+        null,
       )
     } else {
       toast.error('Insuficient sald', { position: 'bottom-right' })
