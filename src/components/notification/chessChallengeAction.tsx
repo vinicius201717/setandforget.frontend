@@ -136,7 +136,7 @@ const ChessChallengeAction = ({
           />
         )
       default:
-        return <span>Ação desconhecida</span>
+        return <span>UNKNOWN ACTION</span>
     }
   }
 

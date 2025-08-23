@@ -23,6 +23,8 @@ import { getNotification } from '../api/notification/getNotification'
 import FriendshipAction from 'src/components/notification/friendshipAction'
 import ChessChallengeAction from 'src/components/notification/chessChallengeAction'
 import { NotificationMeta } from 'src/types/apps/notification'
+import { formatMoney } from 'src/utils/format-money'
+import { formatTime } from 'src/utils/format-timer'
 
 // Tipos discriminados para meta (union type para diferentes contextos)
 // Adicione mais tipos conforme necessário, ex: | OtherMeta
@@ -61,13 +63,12 @@ const Notification: NextPage = () => {
           try {
             setMeta(JSON.parse(notification.meta) as NotificationMeta)
           } catch (e) {
-            console.error('Erro ao fazer parse do meta:', e)
+            console.error('Error to do parse:', e)
           }
         }
 
         setNotification(notification)
 
-        // Marca como lida, se ainda não estiver
         if (!notification.read) {
           readNotification(notification.id)
         }
@@ -121,7 +122,6 @@ const Notification: NextPage = () => {
     }
   }
 
-  // Função para renderizar ações baseadas no tipo de meta
   const renderActions = () => {
     if (!meta || !notification?.action) return null
 
@@ -255,6 +255,33 @@ const Notification: NextPage = () => {
           <Typography variant='body1' sx={{ mb: 2 }}>
             {notification.content}
           </Typography>
+          {meta?.type === 'CHESS_CHALLENGE' && (
+            <Box
+              sx={{
+                mt: 2,
+                p: 2,
+                borderRadius: 2,
+                display: 'flex',
+                gap: 4,
+                justifyContent: 'flex-start',
+                alignItems: 'center',
+              }}
+            >
+              <Box>
+                <Typography variant='caption'>Amount</Typography>
+                <Typography variant='h6'>{formatMoney(meta.amount)}</Typography>
+              </Box>
+
+              <Divider orientation='vertical' flexItem />
+
+              <Box sx={{ textAlign: 'center' }}>
+                <Typography variant='caption'>Duration</Typography>
+                <Typography variant='h6' color='secondary'>
+                  {formatTime(meta.duration)} min
+                </Typography>
+              </Box>
+            </Box>
+          )}
 
           {renderActions()}
           {renderStatusMessage()}

@@ -60,6 +60,11 @@ export const PresenceProvider = ({ children }: Props) => {
       )
     })
 
+    socket.on('presenteFriendship', (teste: any) => {
+      console.log(teste)
+      // CONTINUAR DAQUI
+    })
+
     socket.on('user-offline', ({ userId }: { userId: string }) => {
       setOnlineUsers((prev) => prev.filter((id) => id !== userId))
     })

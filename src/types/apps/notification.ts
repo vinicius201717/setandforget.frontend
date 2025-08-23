@@ -37,7 +37,8 @@ type ChessChallengeMeta = {
   challengerId: string
   challengeId: string
   status: string
-  // Adicione campos específicos para desafio de xadrez, ex: gameSettings, etc.
+  amount: number
+  duration: number
 }
 
 // Union type para suportar múltiplos tipos de notificações

@@ -241,6 +241,8 @@ function HomePage() {
         if (response.status) {
           setRoomId(roomId)
           setActiveGame(true)
+        } else {
+          window.localStorage.removeItem('chess-room-id')
         }
       })
     }
