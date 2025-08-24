@@ -202,3 +202,12 @@ export type AuthValuesType = {
   ) => void
   addNotification: (payload: NotificationsType) => void
 }
+
+export type OnlineUser = {
+  friendId: string
+  friendshipId: string
+  name: string
+  status: 'ACCEPTED' | 'PENDING' | 'DECLINED'
+  createdAt: string
+  updatedAt: string
+}

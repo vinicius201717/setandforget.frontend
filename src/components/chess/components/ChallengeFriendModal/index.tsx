@@ -21,6 +21,7 @@ import { useAuth } from 'src/hooks/useAuth'
 import { CreateChallengeReturn } from 'src/types/apps/chessTypes'
 import { chessChallengeCancel } from 'src/pages/api/chess-challenge/chessChallengeCancel'
 import { connectSocket } from 'src/pages/api/chess-room/chess-challenge-websocket'
+import { usePresence } from 'src/context/PresenceContext'
 
 type ChallengeFriendModalProps = {
   open: boolean
@@ -44,6 +45,8 @@ const ChallengeFriendModal: React.FC<ChallengeFriendModalProps> = ({
   const [peace, setPeace] = useState<'white' | 'black'>('white')
 
   const { user, toastId, setUser, setToastId } = useAuth()
+
+  const { onlineUsers } = usePresence()
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value as 'white' | 'black'
@@ -73,16 +76,21 @@ const ChallengeFriendModal: React.FC<ChallengeFriendModalProps> = ({
       friend.requesterId === userId ? friend.addressee : friend.requester
     const friendUserId =
       friend.requesterId === userId ? friend.addresseeId : friend.requesterId
+
     return {
       id: friendUserId,
       name: friendUser.name,
-      originalFriendship: friend,
+      online: (onlineUsers ?? []).some(
+        (online) => online.friendId === friendUserId,
+      ),
     }
   })
 
-  const filteredFriends = mappedFriends.filter((friend) =>
-    friend.name.toLowerCase().includes(search.toLowerCase()),
-  )
+  const filteredFriends = mappedFriends
+    .filter((friend) =>
+      friend.name.toLowerCase().includes(search.toLowerCase()),
+    )
+    .sort((a, b) => (a.online === b.online ? 0 : a.online ? -1 : 1))
 
   const handleChallenge = () => {
     if (!selectedFriend) {
@@ -177,14 +185,14 @@ const ChallengeFriendModal: React.FC<ChallengeFriendModalProps> = ({
           top: '50%',
           left: '50%',
           transform: 'translate(-50%, -50%)',
-          width: 400,
+          width: 450,
           bgcolor: 'background.paper',
           boxShadow: 24,
           p: 4,
-          borderRadius: 2,
+          borderRadius: 1,
         }}
       >
-        <Typography variant='h6' mb={2}>
+        <Typography variant='h5' fontWeight={600} mb={3} color='text.primary'>
           Challenge a Friend
         </Typography>
 
@@ -194,10 +202,11 @@ const ChallengeFriendModal: React.FC<ChallengeFriendModalProps> = ({
           variant='outlined'
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          sx={{ mb: 2 }}
+          sx={{ mb: 3 }}
         />
-        <FormControl component='fieldset'>
-          <FormLabel component='legend'>Color</FormLabel>
+
+        <FormControl component='fieldset' sx={{ mb: 3 }}>
+          <FormLabel component='legend'>Choose your color</FormLabel>
           <RadioGroup row value={peace} onChange={handleChange}>
             <FormControlLabel
               value='white'
@@ -211,8 +220,9 @@ const ChallengeFriendModal: React.FC<ChallengeFriendModalProps> = ({
             />
           </RadioGroup>
         </FormControl>
-        <Divider />
-        <br />
+
+        <Divider sx={{ mb: 3 }} />
+
         <FormControl component='fieldset'>
           <RadioGroup
             value={selectedFriend}
@@ -223,13 +233,32 @@ const ChallengeFriendModal: React.FC<ChallengeFriendModalProps> = ({
                 key={friend.id}
                 value={friend.id}
                 control={<Radio />}
-                label={friend.name}
+                label={
+                  <Box display='flex' alignItems='center' gap={1}>
+                    <Box
+                      sx={{
+                        width: 12,
+                        height: 12,
+                        borderRadius: '50%',
+                        bgcolor: friend.online ? 'green' : 'grey.500',
+                        border: '1px solid #ccc',
+                        marginLeft: '10px',
+                      }}
+                    />
+                    <Typography>{friend.name}</Typography>
+                  </Box>
+                }
+                sx={{
+                  mb: 1,
+                  px: 1,
+                  borderRadius: 1,
+                }}
               />
             ))}
           </RadioGroup>
         </FormControl>
 
-        <Box mt={3} display='flex' justifyContent='flex-end' gap={1}>
+        <Box mt={4} display='flex' justifyContent='flex-end' gap={2}>
           <Button variant='outlined' onClick={handleClose}>
             Cancel
           </Button>

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable no-unused-vars */
@@ -12,10 +13,10 @@ import {
 } from 'react'
 import { io, Socket } from 'socket.io-client'
 import { AuthContext } from './AuthContext'
-import { NotificationsType } from './types'
+import { NotificationsType, OnlineUser } from './types'
 
 type PresenceContextType = {
-  onlineUsers: string[]
+  onlineUsers: OnlineUser[]
   socket: Socket | null
   sendNotification: (toUserId: string, message: string) => void
   pingServer: () => void
@@ -36,7 +37,8 @@ type Props = {
 
 export const PresenceProvider = ({ children }: Props) => {
   const { user, addNotification } = useContext(AuthContext)
-  const [onlineUsers, setOnlineUsers] = useState<string[]>([])
+  const [onlineUsers, setOnlineUsers] = useState<OnlineUser[]>([])
+
   const socketRef = useRef<Socket | null>(null)
 
   useEffect(() => {
@@ -54,18 +56,17 @@ export const PresenceProvider = ({ children }: Props) => {
     // ========================
     // Eventos do servidor
     // ========================
-    socket.on('user-online', ({ userId }: { userId: string }) => {
+    socket.on('user-online', ({ userId }: { userId: OnlineUser }) => {
       setOnlineUsers((prev) =>
         prev.includes(userId) ? prev : [...prev, userId],
       )
     })
 
-    socket.on('presenteFriendship', (teste: any) => {
-      console.log(teste)
-      // CONTINUAR DAQUI
+    socket.on('presenteFriendship', (onlines: OnlineUser[]) => {
+      setOnlineUsers(onlines)
     })
 
-    socket.on('user-offline', ({ userId }: { userId: string }) => {
+    socket.on('user-offline', ({ userId }: { userId: OnlineUser }) => {
       setOnlineUsers((prev) => prev.filter((id) => id !== userId))
     })
 
