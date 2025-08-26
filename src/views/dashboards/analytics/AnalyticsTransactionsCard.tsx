@@ -1,23 +1,32 @@
-// ** React Imports
 import { ReactElement } from 'react'
-
-// ** MUI Imports
 import Box from '@mui/material/Box'
 import Grid from '@mui/material/Grid'
 import Card from '@mui/material/Card'
 import CardHeader from '@mui/material/CardHeader'
 import Typography from '@mui/material/Typography'
 import CardContent from '@mui/material/CardContent'
-
-// ** Icon Imports
 import Icon from 'src/@core/components/icon'
-
-// ** Types
 import { ThemeColor } from 'src/@core/layouts/types'
-
-// ** Custom Components Imports
 import OptionsMenu from 'src/@core/components/option-menu'
 import CustomAvatar from 'src/@core/components/mui/avatar'
+
+interface DailySummary {
+  date: string
+  deposit: number
+  withdraw: number
+  profit: number
+}
+
+interface PaymentSummary {
+  daily: DailySummary[]
+  hasMoreThan1000: boolean
+  profit: number
+  totalDeposits: number
+}
+
+interface AnalyticsTransactionsCardProps {
+  summary: PaymentSummary | null
+}
 
 interface DataType {
   stats: string
@@ -26,37 +35,41 @@ interface DataType {
   icon: ReactElement
 }
 
-const salesData: DataType[] = [
-  {
-    stats: '245k',
-    title: 'Sales',
-    color: 'primary',
-    icon: <Icon icon='mdi:trending-up' />,
-  },
-  {
-    stats: '12.5k',
-    title: 'Customers',
-    color: 'success',
-    icon: <Icon icon='mdi:account-outline' />,
-  },
-  {
-    stats: '1.54k',
-    color: 'warning',
-    title: 'Products',
-    icon: <Icon icon='mdi:cellphone-link' />,
-  },
-  {
-    stats: '$88k',
-    color: 'info',
-    title: 'Revenue',
-    icon: <Icon icon='mdi:currency-usd' />,
-  },
-]
+const renderStats = (summary: PaymentSummary | null) => {
+  if (!summary) {
+    return <Typography variant='caption'>No data available</Typography>
+  }
 
-const renderStats = () => {
-  return salesData.map((item: DataType, index: number) => (
+  const data: DataType[] = [
+    {
+      stats: `$${summary.totalDeposits.toLocaleString('en-US', { minimumFractionDigits: 2 })}`,
+      title: 'Total Deposits',
+      color: 'primary',
+      icon: <Icon icon='mdi:currency-usd' />,
+    },
+    {
+      stats: `$${summary.profit.toLocaleString('en-US', { minimumFractionDigits: 2 })}`,
+      title: 'Profit',
+      color: 'success',
+      icon: <Icon icon='mdi:trending-up' />,
+    },
+    {
+      stats: summary.hasMoreThan1000 ? 'Yes' : 'No',
+      title: 'Deposits > $1000',
+      color: 'info',
+      icon: <Icon icon='mdi:check-circle' />,
+    },
+    {
+      stats: `${summary.daily.length}`,
+      title: 'Daily Records',
+      color: 'warning',
+      icon: <Icon icon='mdi:calendar' />,
+    },
+  ]
+
+  return data.map((item: DataType, index: number) => (
     <Grid item xs={12} sm={3} key={index}>
-      <Box key={index} sx={{ display: 'flex', alignItems: 'center' }}>
+      <Box sx={{ display: 'flex', alignItems: 'center' }}>
         <CustomAvatar
           variant='rounded'
           color={item.color}
@@ -79,7 +92,9 @@ const renderStats = () => {
   ))
 }
 
-const AnalyticsTransactionsCard = () => {
+const AnalyticsTransactionsCard = ({
+  summary,
+}: AnalyticsTransactionsCardProps) => {
   return (
     <Card>
       <CardHeader
@@ -111,7 +126,7 @@ const AnalyticsTransactionsCard = () => {
       />
       <CardContent sx={{ pt: (theme) => `${theme.spacing(3)} !important` }}>
         <Grid container spacing={[5, 0]}>
-          {renderStats()}
+          {renderStats(summary)}
         </Grid>
       </CardContent>
     </Card>

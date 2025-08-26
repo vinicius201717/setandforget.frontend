@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
 // ** MUI Imports
@@ -17,8 +18,10 @@ import { formatMoney } from 'src/utils/format-money'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import DepositSuccessModal from 'src/components/deposit/DepositSuccessModal'
+import { updateDeposit } from 'src/pages/api/payment/updateDeposit'
 
 interface TableCustomizedProps {
+  setDeposit: (deposit: Deposit[]) => void
   deposit: Deposit[] | undefined
   handlePageDeposit: (page: number) => void
   currentPage: number
@@ -32,7 +35,7 @@ interface DepositResponse {
   }
 }
 
-const TableRowStatus = (status: 'PENDING' | 'COMPLETED' | 'FAILED') => {
+const TableRowStatus = (status: 'PENDING' | 'PAID' | 'FAILED') => {
   switch (status) {
     case 'PENDING':
       return (
@@ -48,7 +51,7 @@ const TableRowStatus = (status: 'PENDING' | 'COMPLETED' | 'FAILED') => {
           }}
         />
       )
-    case 'COMPLETED':
+    case 'PAID':
       return (
         <Badge
           color='success'
@@ -82,6 +85,7 @@ const TableRowStatus = (status: 'PENDING' | 'COMPLETED' | 'FAILED') => {
 }
 
 const TableCustomizedDeposit = ({
+  setDeposit,
   deposit,
   handlePageDeposit,
   currentPage,
@@ -117,13 +121,29 @@ const TableCustomizedDeposit = ({
   }
 
   const actionButton = (row: Deposit) => {
-    if (validButtons.has(row.id as string)) {
+    if (row.status !== 'PENDING') return null
+
+    const updatedAt = new Date(row.updatedAt)
+    const now = new Date()
+
+    const diffMs = now.getTime() - updatedAt.getTime()
+    const diffMinutes = diffMs / 1000 / 60
+
+    if (diffMinutes <= 5) {
       return (
         <Button variant='contained' onClick={() => handleOpenModal(row)}>
           Pagar
         </Button>
       )
+    } else {
+      updateDeposit(row.id as string, 'FAILED')
+      setDeposit(
+        (deposit ?? []).map((dep) =>
+          dep.id === row.id ? { ...dep, status: 'FAILED' } : dep,
+        ),
+      )
     }
+
     return null
   }
 
@@ -159,7 +179,7 @@ const TableCustomizedDeposit = ({
       setValidButtons(newValidButtons)
     }, 1000)
 
-    return () => clearInterval(timer) // Limpa o intervalo ao desmontar
+    return () => clearInterval(timer)
   }, [mappedTransactions])
 
   // Timer para o modal
@@ -207,7 +227,7 @@ const TableCustomizedDeposit = ({
                       }}
                     >
                       {TableRowStatus(
-                        row.status as 'PENDING' | 'COMPLETED' | 'FAILED',
+                        row.status as 'PENDING' | 'PAID' | 'FAILED',
                       )}
                       {row.status}
                     </Box>

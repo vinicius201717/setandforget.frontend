@@ -17,6 +17,7 @@ export interface DepositRequest {
 
 export interface DepositResponse {
   response?: {
+    id?: string
     message?: string
     expire?: number
     pixCode?: string
@@ -79,6 +80,7 @@ export async function deposit(data: DepositRequest): Promise<DepositResponse> {
 
     if (response.status === 201) {
       const apiResponse = {
+        id: response.data.id,
         message: response.data.message || 'Operation completed successfully!',
         expire: response.data.expire,
         pixCode: response.data.pixCode,

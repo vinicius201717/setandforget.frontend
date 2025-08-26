@@ -119,6 +119,7 @@ const Transactions = () => {
               <CircularProgress />
             ) : (
               <TableCustomizedDeposit
+                setDeposit={setDeposit}
                 deposit={deposit}
                 handlePageDeposit={handlePageDeposit}
                 currentPage={pageDeposit}

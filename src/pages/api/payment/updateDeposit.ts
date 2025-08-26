@@ -2,7 +2,8 @@ import { api } from 'src/lib/axios'
 import authConfig from 'src/configs/auth'
 
 export async function updateDeposit(
-  transactionId: string,
+  paymentId: string,
+  status: string,
 ): Promise<string | null | undefined> {
   try {
     const storedToken = window.localStorage.getItem(
@@ -11,7 +12,7 @@ export async function updateDeposit(
     if (storedToken) {
       const response = await api.patch(
         '/payments/deposit',
-        { transactionId },
+        { paymentId, status },
         {
           headers: {
             Authorization: `Bearer ${storedToken}`,

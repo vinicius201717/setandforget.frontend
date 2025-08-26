@@ -21,13 +21,16 @@ import AnalyticsWeeklyOverview from 'src/views/dashboards/analytics/AnalyticsWee
 import AnalyticsDepositWithdraw from 'src/views/dashboards/analytics/AnalyticsDepositWithdraw'
 import AnalyticsSalesByCountries from 'src/views/dashboards/analytics/AnalyticsSalesByCountries'
 import AnalyticsTransactionsCard from 'src/views/dashboards/analytics/AnalyticsTransactionsCard'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { getDashboardData } from 'src/pages/api/dashboard/getData'
+import { PaymentSummary } from 'src/types/apps/dashboardType'
 
 const AnalyticsDashboard = () => {
+  const [summary, setSummary] = useState<PaymentSummary | null>(null)
+
   useEffect(() => {
     getDashboardData().then((response) => {
-      console.log(response)
+      setSummary(response)
     })
   }, [])
   return (
@@ -37,7 +40,7 @@ const AnalyticsDashboard = () => {
           <AnalyticsTrophy />
         </Grid>
         <Grid item xs={12} md={8}>
-          <AnalyticsTransactionsCard />
+          <AnalyticsTransactionsCard summary={summary} />
         </Grid>
         <Grid item xs={12} md={6} lg={4}>
           <AnalyticsWeeklyOverview />

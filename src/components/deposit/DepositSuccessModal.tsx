@@ -13,6 +13,7 @@ import { ContentCopy } from '@mui/icons-material'
 import { QRCodeCanvas } from 'qrcode.react'
 import toast from 'react-hot-toast'
 import { DepositResponse } from 'src/pages/api/payment/deposit'
+import { updateDeposit } from 'src/pages/api/payment/updateDeposit'
 
 interface Props {
   open: boolean
@@ -59,6 +60,13 @@ export default function DepositSuccessModal({
     const sec = s % 60
     return `${min}:${sec < 10 ? '0' : ''}${sec}`
   }
+
+  useEffect(() => {
+    if (timeLeft === 290 && open) {
+      updateDeposit(response.response?.id as string, 'FAILED')
+      onClose()
+    }
+  }, [timeLeft, open, onClose, response])
 
   return (
     <Modal open={open} onClose={onClose}>
