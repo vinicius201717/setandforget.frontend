@@ -38,7 +38,9 @@ const Chip = (props: CustomChipProps) => {
         'MuiChip-rounded': rounded,
         'MuiChip-light': skin === 'light',
       })}
-      sx={skin === 'light' && color ? Object.assign(colors[color], sx) : sx}
+      sx={
+        skin === 'light' && color ? Object.assign(colors[color] || {}, sx) : sx
+      }
     />
   )
 }

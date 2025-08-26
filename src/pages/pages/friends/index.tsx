@@ -5,28 +5,76 @@ import Card from '@mui/material/Card'
 import Typography from '@mui/material/Typography'
 import { DataGrid, GridColDef } from '@mui/x-data-grid'
 
-// ** Custom Components
 import CustomChip from 'src/@core/components/mui/chip'
 import CustomAvatar from 'src/@core/components/mui/avatar'
 
-// ** Utils Import
 import { getInitials } from 'src/@core/utils/get-initials'
-import { usePresence } from 'src/context/PresenceContext'
-import { OnlineUser } from 'src/context/types'
+import { FriendshipChallengeType } from 'src/context/types'
 import Link from 'next/link'
-import { Button } from '@mui/material'
+import { useEffect, useState } from 'react'
+import { getFriends } from 'src/pages/api/friendship/getFriends'
+import { useAuth } from 'src/hooks/useAuth'
+import { usePresence } from 'src/context/PresenceContext'
 
-interface CellType {
-  row: OnlineUser
+interface FriendWithPresence extends FriendshipChallengeType {
+  friendId: string
+  friendName: string
+  presence: 'Online' | 'Offline'
 }
 
-const AnalyticsTable = () => {
-  const { onlineUsers } = usePresence()
+interface CellType {
+  row: FriendWithPresence
+}
 
+const FriendsTable = () => {
+  const { onlineUsers } = usePresence()
+  const { user } = useAuth()
+  const [friends, setFriends] = useState<FriendWithPresence[]>([])
+
+  useEffect(() => {
+    if (!user?.id) return
+
+    getFriends(user.id).then((response) => {
+      // Mapeando os amigos e definindo friendId, friendName e presença
+      const allFriends: FriendWithPresence[] = response.data.map(
+        (friend: FriendshipChallengeType) => {
+          const friendId =
+            friend.requesterId === user.id
+              ? friend.addresseeId
+              : friend.requesterId
+          const friendName =
+            friend.requesterId === user.id
+              ? friend.addressee.name
+              : friend.requester.name
+
+          const isOnline = onlineUsers.some(
+            (online) => online.friendId === friendId,
+          )
+
+          return {
+            ...friend,
+            friendId,
+            friendName,
+            presence: isOnline ? 'Online' : 'Offline',
+          }
+        },
+      )
+
+      // Ordena Online antes de Offline
+      const sorted = allFriends.sort((a, b) => {
+        if (a.presence === b.presence) return 0
+        return a.presence === 'Online' ? -1 : 1
+      })
+
+      setFriends(sorted)
+    })
+  }, [user, onlineUsers])
+
+  // Colunas do DataGrid
   const columns: GridColDef[] = [
     {
       flex: 0.25,
-      field: 'name',
+      field: 'friendName',
       minWidth: 200,
       headerName: 'Name',
       renderCell: ({ row }: CellType) => (
@@ -34,18 +82,12 @@ const AnalyticsTable = () => {
           href={`/pages/people/${row.friendId}`}
           style={{ textDecoration: 'none', color: 'inherit' }}
         >
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              color: 'inherit',
-            }}
-          >
+          <Box sx={{ display: 'flex', alignItems: 'center', color: 'inherit' }}>
             <CustomAvatar
               skin='light'
               sx={{ mr: 3, width: 30, height: 30, fontSize: '.8rem' }}
             >
-              {getInitials(row.name || 'JD')}
+              {getInitials(row.friendName || 'JD')}
             </CustomAvatar>
             <Box sx={{ display: 'flex', flexDirection: 'column' }}>
               <Typography
@@ -57,30 +99,29 @@ const AnalyticsTable = () => {
                   letterSpacing: '0.22px',
                 }}
               >
-                {row.name || 'John Doe'}
+                {row.friendName || 'John Doe'}
               </Typography>
               <Typography
                 variant='body2'
                 sx={{ fontSize: '0.75rem', letterSpacing: '0.4px' }}
               >
-                Online
+                {row.status}
               </Typography>
             </Box>
           </Box>
         </Link>
       ),
     },
-
     {
       flex: 0.2,
       minWidth: 140,
-      field: 'status',
+      field: 'presence',
       headerName: 'Status',
-      renderCell: () => (
+      renderCell: ({ row }: CellType) => (
         <CustomChip
           skin='light'
-          label='Online'
-          color='success'
+          label={row.presence}
+          color={row.presence === 'Online' ? 'success' : 'default'}
           sx={{
             height: 24,
             fontSize: '0.75rem',
@@ -99,23 +140,21 @@ const AnalyticsTable = () => {
           variant='h6'
           sx={{ p: 3, pt: 2, fontWeight: 600, letterSpacing: '0.15px' }}
         >
-          Friendships
+          Friends
         </Typography>
         <Link
           href='/pages/friends'
           style={{ textDecoration: 'none', color: 'inherit', margin: '10px' }}
         >
-          <Button fullWidth variant='contained'>
-            All friends
-          </Button>
+          Refresh
         </Link>
       </Box>
 
-      {onlineUsers.length > 0 ? (
+      {friends.length > 0 ? (
         <DataGrid
           autoHeight
           hideFooter
-          rows={onlineUsers}
+          rows={friends}
           columns={columns}
           getRowId={(row) => row.friendId}
           disableRowSelectionOnClick
@@ -123,7 +162,7 @@ const AnalyticsTable = () => {
       ) : (
         <Box p={3}>
           <Typography variant='body2'>
-            You don't have any online friends at the moment.
+            You haven't added any friends yet
           </Typography>
         </Box>
       )}
@@ -131,4 +170,4 @@ const AnalyticsTable = () => {
   )
 }
 
-export default AnalyticsTable
+export default FriendsTable
