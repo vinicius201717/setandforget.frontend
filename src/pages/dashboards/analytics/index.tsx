@@ -21,8 +21,15 @@ import AnalyticsWeeklyOverview from 'src/views/dashboards/analytics/AnalyticsWee
 import AnalyticsDepositWithdraw from 'src/views/dashboards/analytics/AnalyticsDepositWithdraw'
 import AnalyticsSalesByCountries from 'src/views/dashboards/analytics/AnalyticsSalesByCountries'
 import AnalyticsTransactionsCard from 'src/views/dashboards/analytics/AnalyticsTransactionsCard'
+import { useEffect } from 'react'
+import { getDashboardData } from 'src/pages/api/dashboard/getData'
 
 const AnalyticsDashboard = () => {
+  useEffect(() => {
+    getDashboardData().then((response) => {
+      console.log(response)
+    })
+  }, [])
   return (
     <ApexChartWrapper>
       <Grid container spacing={6}>

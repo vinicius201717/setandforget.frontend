@@ -51,22 +51,40 @@ const shortcuts: ShortcutsType[] = [
     url: '/pages/account-settings/connections/',
   },
   {
-    title: 'Settings',
-    icon: 'mdi:signature',
+    title: 'Plans',
+    icon: 'mdi:wallet-membership',
     subtitle: 'Signature',
     url: '/pages/pricing/',
   },
   {
-    title: 'Deposit/Withdraw',
+    title: 'Deposit',
     icon: 'mdi:currency-usd',
     subtitle: 'Money',
     url: '/pages/deposit/',
+  },
+  {
+    title: 'Withdraw',
+    icon: 'mdi:cash-minus',
+    subtitle: 'Money',
+    url: '/pages/withdraw/',
   },
   {
     title: 'Transactions',
     icon: 'mdi:bank-transfer',
     subtitle: 'Deposits and Withdraw',
     url: '/pages/transactions/',
+  },
+  {
+    title: 'Notifications',
+    icon: 'mdi:bell',
+    subtitle: 'All',
+    url: '/notification/all/',
+  },
+  {
+    title: 'Friends',
+    icon: 'mdi:account-multiple',
+    subtitle: 'All',
+    url: '/pages/friends/',
   },
 ]
 

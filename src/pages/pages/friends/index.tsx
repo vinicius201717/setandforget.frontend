@@ -135,20 +135,12 @@ const FriendsTable = () => {
 
   return (
     <Card>
-      <Box display={'flex'} justifyContent={'space-between'}>
-        <Typography
-          variant='h6'
-          sx={{ p: 3, pt: 2, fontWeight: 600, letterSpacing: '0.15px' }}
-        >
-          Friends
-        </Typography>
-        <Link
-          href='/pages/friends'
-          style={{ textDecoration: 'none', color: 'inherit', margin: '10px' }}
-        >
-          Refresh
-        </Link>
-      </Box>
+      <Typography
+        variant='h6'
+        sx={{ p: 3, pt: 2, fontWeight: 600, letterSpacing: '0.15px' }}
+      >
+        Friends
+      </Typography>
 
       {friends.length > 0 ? (
         <DataGrid
