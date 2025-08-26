@@ -2,6 +2,7 @@ type PeriodSummary = {
   totalDeposits: number
   totalWithdrawals: number
   depositCount: number
+  hasMoreThan1000: boolean
   withdrawalCount: number
   profit: number
   profitPercentage: number
@@ -18,10 +19,23 @@ export type PaymentSummary = {
   isPositive: boolean
   profitPercentage: number
   daily: any[]
-  amountAccount: { amount: number }
-  lastWeek: PeriodSummary
-  lastMonth: PeriodSummary
-  lastYear: PeriodSummary
+  amountAccount: number
+  lastWeek?: PeriodSummary
+  lastMonth?: PeriodSummary
+  lastYear?: PeriodSummary
+}
+
+export type PaymentSummaryUnic = {
+  totalDeposits: number
+  totalWithdrawals: number
+  depositCount: number
+  withdrawalCount: number
+  amountAccount: number
+  hasMoreThan1000: boolean
+  profit: number
+  isPositive: boolean
+  profitPercentage: number
+  daily: any[]
 }
 export interface AnalyticsTotalProfitProps {
   profit: number
