@@ -9,20 +9,7 @@ import Icon from 'src/@core/components/icon'
 import { ThemeColor } from 'src/@core/layouts/types'
 import OptionsMenu from 'src/@core/components/option-menu'
 import CustomAvatar from 'src/@core/components/mui/avatar'
-
-interface DailySummary {
-  date: string
-  deposit: number
-  withdraw: number
-  profit: number
-}
-
-interface PaymentSummary {
-  daily: DailySummary[]
-  hasMoreThan1000: boolean
-  profit: number
-  totalDeposits: number
-}
+import { PaymentSummary } from 'src/types/apps/dashboardType'
 
 interface AnalyticsTransactionsCardProps {
   summary: PaymentSummary | null
@@ -39,31 +26,52 @@ const renderStats = (summary: PaymentSummary | null) => {
   if (!summary) {
     return <Typography variant='caption'>No data available</Typography>
   }
-
   const data: DataType[] = [
     {
-      stats: `$${summary.totalDeposits.toLocaleString('en-US', { minimumFractionDigits: 2 })}`,
-      title: 'Total Deposits',
+      stats: summary.totalDeposits.toLocaleString('pt-BR', {
+        style: 'currency',
+        currency: 'BRL',
+        minimumFractionDigits: 2,
+      }),
+      title: 'Deposit Amount',
       color: 'primary',
       icon: <Icon icon='mdi:currency-usd' />,
     },
     {
-      stats: `$${summary.profit.toLocaleString('en-US', { minimumFractionDigits: 2 })}`,
-      title: 'Profit',
-      color: 'success',
-      icon: <Icon icon='mdi:trending-up' />,
+      stats: summary.totalWithdrawals.toLocaleString('pt-BR', {
+        style: 'currency',
+        currency: 'BRL',
+        minimumFractionDigits: 2,
+      }),
+      title: 'Withdrawl total',
+      color: 'primary',
+      icon: <Icon icon='mdi:currency-usd' />,
     },
     {
-      stats: summary.hasMoreThan1000 ? 'Yes' : 'No',
+      stats: `${summary.profit.toLocaleString('pt-BR', {
+        style: 'currency',
+        currency: 'BRL',
+        minimumFractionDigits: 2,
+      })}`,
+      title: 'Profit',
+      color: summary.profit >= 0 ? 'success' : 'error',
+      icon: (
+        <Icon
+          icon={summary.profit >= 0 ? 'mdi:trending-up' : 'mdi:trending-down'}
+          style={{
+            color: summary.profit >= 0 ? '#16a34a' : '#dc2626',
+            backgroundColor: summary.profit >= 0 ? '#dcfce7' : '#fee2e2',
+            borderRadius: '50%',
+            padding: '6px',
+          }}
+        />
+      ),
+    },
+    {
+      stats: `${summary.profitPercentage.toFixed(2)}%`,
       title: 'Deposits > $1000',
       color: 'info',
       icon: <Icon icon='mdi:check-circle' />,
-    },
-    {
-      stats: `${summary.daily.length}`,
-      title: 'Daily Records',
-      color: 'warning',
-      icon: <Icon icon='mdi:calendar' />,
     },
   ]
 

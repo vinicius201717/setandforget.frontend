@@ -1,21 +1,32 @@
-interface DailySummary {
-  date: string
-  deposit: number
-  withdraw: number
+type PeriodSummary = {
+  totalDeposits: number
+  totalWithdrawals: number
+  depositCount: number
+  withdrawalCount: number
   profit: number
+  profitPercentage: number
+  isPositive: boolean
 }
 
-export interface PaymentSummary {
-  daily: DailySummary[]
+export type PaymentSummary = {
+  totalDeposits: number
+  totalWithdrawals: number
+  depositCount: number
+  withdrawalCount: number
   hasMoreThan1000: boolean
   profit: number
-  totalDeposits: number
+  isPositive: boolean
+  profitPercentage: number
+  daily: any[]
+  amountAccount: { amount: number }
+  lastWeek: PeriodSummary
+  lastMonth: PeriodSummary
+  lastYear: PeriodSummary
 }
-
 export interface AnalyticsTotalProfitProps {
   profit: number
 }
 
 export interface AnalyticsDepositWithdrawProps {
-  daily: DailySummary[]
+  daily: PaymentSummary[]
 }

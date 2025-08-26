@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 // ** React Import
 import { ReactNode } from 'react'
 
@@ -39,4 +40,5 @@ export type OptionsMenuType = {
   iconButtonProps?: IconButtonProps
   iconProps?: Omit<IconProps, 'icon'>
   menuProps?: Omit<MenuProps, 'open'>
+  onSelect?: (value: string) => void
 }
