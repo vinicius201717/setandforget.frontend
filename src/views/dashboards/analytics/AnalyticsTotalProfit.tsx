@@ -10,11 +10,20 @@ import { ApexOptions } from 'apexcharts'
 // ** Custom Components Imports
 import ReactApexcharts from 'src/@core/components/react-apexcharts'
 
-const series = [{ data: [0, 20, 5, 30, 15, 45] }]
+interface CardStatsLineChartProps {
+  amount: number // valor principal do card
+  seriesData: number[] // dados do gráfico
+  title?: string // título do card
+}
 
-const CardStatsLineChart = () => {
-  // ** Hook
+const CardStatsLineChart = ({
+  amount,
+  seriesData,
+  title = 'Total Profit',
+}: CardStatsLineChartProps) => {
   const theme = useTheme()
+
+  const series = [{ data: seriesData || [] }]
 
   const options: ApexOptions = {
     chart: {
@@ -25,18 +34,9 @@ const CardStatsLineChart = () => {
     grid: {
       strokeDashArray: 6,
       borderColor: theme.palette.divider,
-      xaxis: {
-        lines: { show: true },
-      },
-      yaxis: {
-        lines: { show: false },
-      },
-      padding: {
-        top: -10,
-        left: -7,
-        right: 5,
-        bottom: 5,
-      },
+      xaxis: { lines: { show: true } },
+      yaxis: { lines: { show: false } },
+      padding: { top: -10, left: -7, right: 5, bottom: 5 },
     },
     stroke: {
       width: 3,
@@ -57,7 +57,7 @@ const CardStatsLineChart = () => {
           seriesIndex: 0,
           strokeColor: theme.palette.primary.main,
           fillColor: theme.palette.background.paper,
-          dataPointIndex: series[0].data.length - 1,
+          dataPointIndex: (seriesData?.length ?? 1) - 1,
         },
       ],
       hover: { size: 7 },
@@ -67,15 +67,13 @@ const CardStatsLineChart = () => {
       axisTicks: { show: false },
       axisBorder: { show: false },
     },
-    yaxis: {
-      labels: { show: false },
-    },
+    yaxis: { labels: { show: false } },
   }
 
   return (
     <Card>
       <CardContent>
-        <Typography variant='h6'>$86.4k</Typography>
+        <Typography variant='h6'>{`R$ ${(amount || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}</Typography>
         <ReactApexcharts
           type='line'
           height={98}
@@ -86,7 +84,7 @@ const CardStatsLineChart = () => {
           variant='body2'
           sx={{ fontWeight: 600, textAlign: 'center', color: 'text.primary' }}
         >
-          Total Profit
+          {title}
         </Typography>
       </CardContent>
     </Card>

@@ -4,9 +4,6 @@ import Grid from '@mui/material/Grid'
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
 
-// ** Custom Components Imports
-import CardStatisticsVerticalComponent from 'src/@core/components/card-statistics/card-stats-vertical'
-
 // ** Styled Component Import
 import ApexChartWrapper from 'src/@core/styles/libs/react-apexcharts'
 
@@ -22,15 +19,24 @@ import AnalyticsDepositWithdraw from 'src/views/dashboards/analytics/AnalyticsDe
 import AnalyticsSalesByCountries from 'src/views/dashboards/analytics/AnalyticsSalesByCountries'
 import AnalyticsTransactionsCard from 'src/views/dashboards/analytics/AnalyticsTransactionsCard'
 import { useEffect, useState } from 'react'
-import { getDashboardData } from 'src/pages/api/dashboard/getData'
-import { PaymentSummary } from 'src/types/apps/dashboardType'
+import { getDashboardTransactionsData } from 'src/pages/api/dashboard/getTransactionsData'
+import {
+  DashboardChessData,
+  PaymentSummary,
+} from 'src/types/apps/dashboardType'
+import { getDashboardChessData } from 'src/pages/api/dashboard/getChessData'
+import CardStatsVertical from 'src/@core/components/card-statistics/card-stats-vertical'
 
 const AnalyticsDashboard = () => {
   const [summary, setSummary] = useState<PaymentSummary | null>(null)
+  const [game, setGame] = useState<DashboardChessData>()
 
   useEffect(() => {
-    getDashboardData().then((response) => {
+    getDashboardTransactionsData().then((response) => {
       setSummary(response)
+    })
+    getDashboardChessData().then((response) => {
+      setGame(response)
     })
   }, [])
   return (
@@ -51,11 +57,15 @@ const AnalyticsDashboard = () => {
         <Grid item xs={12} md={6} lg={4}>
           <Grid container spacing={6}>
             <Grid item xs={6}>
-              <AnalyticsTotalProfit />
+              <AnalyticsTotalProfit
+                amount={game?.netProfit as number}
+                seriesData={game?.lastTwentyGames as number[]}
+              />
             </Grid>
             <Grid item xs={6}>
-              <CardStatisticsVerticalComponent
-                stats='$25.6k'
+              <CardStatsVertical
+                data={game}
+                stats={game?.netProfit.toString() as string}
                 icon={<Icon icon='mdi:poll' />}
                 color='secondary'
                 trendNumber='+42%'
@@ -64,7 +74,7 @@ const AnalyticsDashboard = () => {
               />
             </Grid>
             <Grid item xs={6}>
-              <CardStatisticsVerticalComponent
+              <CardStatsVertical
                 stats='862'
                 trend='negative'
                 trendNumber='-18%'

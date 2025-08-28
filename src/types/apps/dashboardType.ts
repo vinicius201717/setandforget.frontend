@@ -44,3 +44,15 @@ export interface AnalyticsTotalProfitProps {
 export interface AnalyticsDepositWithdrawProps {
   daily: PaymentSummary[]
 }
+
+export interface DashboardChessData {
+  lossAmount: number
+  netProfit: number
+  profitAmount: number
+  profitPercentage: number
+  totalDraws: number
+  totalLosses: number
+  totalMatches: number
+  totalWins: number
+  lastTwentyGames: number[]
+}

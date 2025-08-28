@@ -8,10 +8,14 @@ import CardContent from '@mui/material/CardContent'
 import CustomAvatar from 'src/@core/components/mui/avatar'
 import OptionsMenu from 'src/@core/components/option-menu'
 
-// ** Types Imports
 import { CardStatsVerticalProps } from 'src/@core/components/card-statistics/types'
+import { DashboardChessData } from 'src/types/apps/dashboardType'
 
-const CardStatsVertical = (props: CardStatsVerticalProps) => {
+interface ExtendedCardStatsVerticalProps extends CardStatsVerticalProps {
+  data?: DashboardChessData
+}
+
+const CardStatsVertical = (props: ExtendedCardStatsVerticalProps) => {
   // ** Props
   const {
     title,
@@ -22,7 +26,21 @@ const CardStatsVertical = (props: CardStatsVerticalProps) => {
     optionsMenuProps,
     color = 'primary',
     trend = 'positive',
+    data,
   } = props
+
+  // If 'data' is provided, override or calculate props based on it
+  const finalStats = data ? data.netProfit.toString() : stats
+  const finalTrendNumber = data
+    ? `${data.profitPercentage >= 0 ? '+' : ''}${data.profitPercentage.toFixed(2)}%`
+    : trendNumber
+  const finalTrend = data
+    ? data.profitPercentage >= 0
+      ? 'positive'
+      : 'negative'
+    : trend
+  const finalTitle = data ? 'Total Profit' : title
+  const finalSubtitle = data ? 'Profit' : subtitle
 
   return (
     <Card>
@@ -52,7 +70,7 @@ const CardStatsVertical = (props: CardStatsVerticalProps) => {
           )}
         </Box>
         <Typography sx={{ fontWeight: 600, fontSize: '0.875rem' }}>
-          {title}
+          {finalTitle}
         </Typography>
         <Box
           sx={{
@@ -64,17 +82,23 @@ const CardStatsVertical = (props: CardStatsVerticalProps) => {
           }}
         >
           <Typography variant='h6' sx={{ mr: 2 }}>
-            {stats}
+            {new Intl.NumberFormat('pt-BR', {
+              style: 'currency',
+              currency: 'BRL',
+            }).format(Number(finalStats))}
           </Typography>
+
           <Typography
             component='sup'
             variant='caption'
-            sx={{ color: trend === 'positive' ? 'success.main' : 'error.main' }}
+            sx={{
+              color: finalTrend === 'positive' ? 'success.main' : 'error.main',
+            }}
           >
-            {trendNumber}
+            {finalTrendNumber}
           </Typography>
         </Box>
-        <Typography variant='caption'>{subtitle}</Typography>
+        <Typography variant='caption'>{finalSubtitle}</Typography>
       </CardContent>
     </Card>
   )
