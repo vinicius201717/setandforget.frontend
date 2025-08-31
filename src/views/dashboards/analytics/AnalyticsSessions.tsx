@@ -9,67 +9,57 @@ import { ApexOptions } from 'apexcharts'
 
 // ** Custom Components Imports
 import ReactApexcharts from 'src/@core/components/react-apexcharts'
+import { DashboardChessData } from 'src/types/apps/dashboardType'
 
-const series = [
-  {
-    name: '2022',
-    data: [45, 85, 65, 50, 70],
-  },
-]
+type Props = {
+  data?: DashboardChessData
+}
 
-const CardStatsDistributedColumnChart = () => {
-  // ** Hook
+const CardStatsDistributedColumnChart = ({ data }: Props) => {
   const theme = useTheme()
 
+  const categories = [
+    `${data?.totalWins} Win`,
+    `${data?.totalLosses} Loss`,
+    `${data?.totalDraws} Draw`,
+  ]
+
+  const series = [
+    {
+      name: 'Games',
+      data: [
+        data?.totalWins || 0,
+        data?.totalLosses || 0,
+        data?.totalDraws || 0,
+      ],
+    },
+  ]
+
   const options: ApexOptions = {
-    chart: {
-      type: 'bar',
-      stacked: false,
-      parentHeightOffset: 0,
-      toolbar: { show: false },
-    },
-    tooltip: {
-      x: { show: false },
-    },
-    grid: {
-      show: false,
-      padding: {
-        top: -10,
-        left: -7,
-        right: 0,
-        bottom: 5,
-      },
-    },
+    chart: { type: 'bar', toolbar: { show: false }, parentHeightOffset: 0 },
+    grid: { show: false, padding: { top: -10, left: -7, right: 0, bottom: 5 } },
     states: {
-      hover: {
-        filter: { type: 'none' },
-      },
-      active: {
-        filter: { type: 'none' },
-      },
+      hover: { filter: { type: 'none' } },
+      active: { filter: { type: 'none' } },
     },
     legend: { show: false },
     dataLabels: { enabled: false },
     colors: [
+      theme.palette.success.main,
       theme.palette.error.main,
-      theme.palette.primary.main,
-      theme.palette.error.main,
-      theme.palette.primary.main,
-      theme.palette.primary.main,
+      theme.palette.info.main,
     ],
     plotOptions: {
       bar: {
         horizontal: false,
-        columnWidth: '20%',
-        borderRadius: 4,
+        columnWidth: '30%',
+        borderRadius: 6,
         startingShape: 'rounded',
         endingShape: 'rounded',
         distributed: true,
         colors: {
-          backgroundBarRadius: 5,
+          backgroundBarRadius: 6,
           backgroundBarColors: [
-            theme.palette.customColors.trackBg,
-            theme.palette.customColors.trackBg,
             theme.palette.customColors.trackBg,
             theme.palette.customColors.trackBg,
             theme.palette.customColors.trackBg,
@@ -78,29 +68,37 @@ const CardStatsDistributedColumnChart = () => {
       },
     },
     xaxis: {
-      labels: { show: false },
+      categories,
+      labels: {
+        show: true,
+        style: {
+          fontSize: '10px',
+          colors: [
+            theme.palette.getContrastText(theme.palette.background.default),
+            theme.palette.getContrastText(theme.palette.background.default),
+            theme.palette.getContrastText(theme.palette.background.default),
+          ],
+        },
+      },
       axisTicks: { show: false },
       axisBorder: { show: false },
     },
-    yaxis: { show: false },
+    yaxis: { show: false, max: data?.totalMatches || undefined },
   }
 
   return (
     <Card>
       <CardContent>
-        <Typography variant='h6'>2,856</Typography>
+        <Typography variant='body2'>
+          Total games {data?.totalMatches || 0}
+        </Typography>
+
         <ReactApexcharts
           type='bar'
-          height={98}
+          height={120}
           options={options}
           series={series}
         />
-        <Typography
-          variant='body2'
-          sx={{ fontWeight: 600, textAlign: 'center', color: 'text.primary' }}
-        >
-          Sessions
-        </Typography>
       </CardContent>
     </Card>
   )

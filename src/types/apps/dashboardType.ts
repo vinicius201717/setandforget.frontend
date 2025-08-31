@@ -55,4 +55,42 @@ export interface DashboardChessData {
   totalMatches: number
   totalWins: number
   lastTwentyGames: number[]
+  rating: number
+}
+
+interface Deposit {
+  id: string
+  userId: string
+  amount: number
+  customerName: string
+  customerDocument: string
+  customerPhone: string
+  customerEmail: string
+  paymentType: string
+  productName: string
+  pixCode: string | null
+  referenceId: string
+  status: string
+  externalOrderId: string | null
+  createdAt: Date
+  updatedAt: Date
+}
+
+interface Withdrawl {
+  id: string
+  userId: string
+  amount: number
+  status: string
+  externalOrderId: string | null
+  createdAt: Date
+  updatedAt: Date
+  pixKey: string | null
+  pixKeyType: number | null
+  ownerTaxnumber: string | null
+  ownerNamePixKey: string | null
+}
+
+export interface DepositWithdrawResponse {
+  deposits: Deposit[]
+  withdrawls: Withdrawl[]
 }

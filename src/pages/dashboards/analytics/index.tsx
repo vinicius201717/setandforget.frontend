@@ -22,14 +22,26 @@ import { useEffect, useState } from 'react'
 import { getDashboardTransactionsData } from 'src/pages/api/dashboard/getTransactionsData'
 import {
   DashboardChessData,
+  DepositWithdrawResponse,
   PaymentSummary,
 } from 'src/types/apps/dashboardType'
 import { getDashboardChessData } from 'src/pages/api/dashboard/getChessData'
 import CardStatsVertical from 'src/@core/components/card-statistics/card-stats-vertical'
+import CardStatsRatingVertical from 'src/@core/components/card-statistics/card-stats-vertical/rating'
+import { useAuth } from 'src/hooks/useAuth'
+import { getDashboardDepositWithdraw } from 'src/pages/api/dashboard/getDepositWithdraw'
 
 const AnalyticsDashboard = () => {
   const [summary, setSummary] = useState<PaymentSummary | null>(null)
   const [game, setGame] = useState<DashboardChessData>()
+  const [depositWithdraw, setDepositWithdraw] =
+    useState<DepositWithdrawResponse>({
+      deposits: [],
+      withdrawls: [],
+    })
+
+  const { user } = useAuth()
+  const amount = (user?.Account.amount as number) / 100
 
   useEffect(() => {
     getDashboardTransactionsData().then((response) => {
@@ -38,12 +50,15 @@ const AnalyticsDashboard = () => {
     getDashboardChessData().then((response) => {
       setGame(response)
     })
+    getDashboardDepositWithdraw().then((response) => {
+      setDepositWithdraw(response)
+    })
   }, [])
   return (
     <ApexChartWrapper>
       <Grid container spacing={6}>
         <Grid item xs={12} md={4}>
-          <AnalyticsTrophy />
+          <AnalyticsTrophy name={user?.name as string} amount={amount} />
         </Grid>
         <Grid item xs={12} md={8}>
           <AnalyticsTransactionsCard summary={summary} />
@@ -74,17 +89,14 @@ const AnalyticsDashboard = () => {
               />
             </Grid>
             <Grid item xs={6}>
-              <CardStatsVertical
-                stats='862'
-                trend='negative'
-                trendNumber='-18%'
-                title='New Project'
-                subtitle='Yearly Project'
+              <CardStatsRatingVertical
+                title='Rating'
+                rating={game?.rating}
                 icon={<Icon icon='mdi:briefcase-variant-outline' />}
               />
             </Grid>
             <Grid item xs={6}>
-              <AnalyticsSessions />
+              <AnalyticsSessions data={game as DashboardChessData} />
             </Grid>
           </Grid>
         </Grid>
@@ -92,7 +104,7 @@ const AnalyticsDashboard = () => {
           <AnalyticsPerformance />
         </Grid>
         <Grid item xs={12} md={8}>
-          <AnalyticsDepositWithdraw />
+          <AnalyticsDepositWithdraw depositWithdraw={depositWithdraw} />
         </Grid>
         <Grid item xs={12} md={4}>
           <AnalyticsSalesByCountries />

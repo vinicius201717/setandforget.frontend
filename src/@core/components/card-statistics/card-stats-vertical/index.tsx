@@ -11,7 +11,8 @@ import OptionsMenu from 'src/@core/components/option-menu'
 import { CardStatsVerticalProps } from 'src/@core/components/card-statistics/types'
 import { DashboardChessData } from 'src/types/apps/dashboardType'
 
-interface ExtendedCardStatsVerticalProps extends CardStatsVerticalProps {
+interface ExtendedCardStatsVerticalProps
+  extends Partial<CardStatsVerticalProps> {
   data?: DashboardChessData
 }
 

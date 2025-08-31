@@ -4,6 +4,7 @@ import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
 import CardContent from '@mui/material/CardContent'
 import { styled, useTheme } from '@mui/material/styles'
+import { formatMoney } from 'src/utils/format-money'
 
 // Styled component for the triangle shaped background image
 const TriangleImg = styled('img')(({ theme }) => ({
@@ -22,22 +23,26 @@ const TrophyImg = styled('img')({
   position: 'absolute',
 })
 
-const AnalyticsTrophy = () => {
+interface AnalyticsTrophyProps {
+  name: string
+  amount: number
+}
+
+const AnalyticsTrophy = ({ name, amount }: AnalyticsTrophyProps) => {
   // ** Hook
   const theme = useTheme()
-
   const imageSrc =
     theme.palette.mode === 'light' ? 'triangle-light.png' : 'triangle-dark.png'
 
   return (
     <Card sx={{ position: 'relative' }}>
       <CardContent>
-        <Typography variant='h6'>Congratulations John! 🥳</Typography>
+        <Typography variant='h6'>Congratulations {name}! 🥳</Typography>
         <Typography variant='body2' sx={{ letterSpacing: '0.25px' }}>
-          Best seller of the month
+          You are part of the family.
         </Typography>
         <Typography variant='h5' sx={{ my: 4, color: 'primary.main' }}>
-          $42.8k
+          {formatMoney(amount)}
         </Typography>
         <Button size='small' variant='contained'>
           View Sales

@@ -6,101 +6,10 @@ import CardHeader from '@mui/material/CardHeader'
 import Typography from '@mui/material/Typography'
 import CardContent from '@mui/material/CardContent'
 import MuiDivider, { DividerProps } from '@mui/material/Divider'
-
-interface DataType {
-  logo: string
-  title: string
-  amount: string
-  subtitle: string
-  logoWidth: number
-  logoHeight: number
-}
-
-const depositData = [
-  {
-    logoWidth: 28,
-    logoHeight: 29,
-    amount: '+$4,650',
-    subtitle: 'Sell UI Kit',
-    title: 'Gumroad Account',
-    logo: '/images/logos/gumroad.png',
-  },
-  {
-    logoWidth: 38,
-    logoHeight: 38,
-    amount: '+$92,705',
-    title: 'Mastercard',
-    subtitle: 'Wallet deposit',
-    logo: '/images/logos/mastercard-label.png',
-  },
-  {
-    logoWidth: 20,
-    logoHeight: 28,
-    amount: '+$957',
-    title: 'Stripe Account',
-    subtitle: 'iOS Application',
-    logo: '/images/logos/stripe.png',
-  },
-  {
-    logoWidth: 34,
-    logoHeight: 32,
-    amount: '+$6,837',
-    title: 'American Bank',
-    subtitle: 'Bank Transfer',
-    logo: '/images/logos/american-bank.png',
-  },
-  {
-    logoWidth: 33,
-    logoHeight: 22,
-    amount: '+$446',
-    title: 'Bank Account',
-    subtitle: 'Wallet deposit',
-    logo: '/images/logos/citi-bank.png',
-  },
-]
-
-const withdrawData = [
-  {
-    logoWidth: 29,
-    logoHeight: 30,
-    amount: '-$145',
-    title: 'Google Adsense',
-    subtitle: 'Paypal deposit',
-    logo: '/images/logos/google.png',
-  },
-  {
-    logoWidth: 34,
-    logoHeight: 34,
-    amount: '-$1870',
-    title: 'Github Enterprise',
-    logo: '/images/logos/github.png',
-    subtitle: 'Security & compliance',
-  },
-  {
-    logoWidth: 30,
-    logoHeight: 30,
-    amount: '-$450',
-    title: 'Upgrade Slack Plan',
-    subtitle: 'Debit card deposit',
-    logo: '/images/logos/slack.png',
-  },
-  {
-    logoWidth: 30,
-    logoHeight: 30,
-    amount: '-$540',
-    title: 'Digital Ocean',
-    subtitle: 'Cloud Hosting',
-    logo: '/images/logos/digital-ocean.png',
-  },
-  {
-    logoWidth: 36,
-    logoHeight: 21,
-    amount: '-$21',
-    title: 'AWS Account',
-    logo: '/images/logos/aws.png',
-    subtitle: 'Choosing a Cloud Platform',
-  },
-]
+import Button from '@mui/material/Button'
+import { DepositWithdrawResponse } from 'src/types/apps/dashboardType'
+import Image from 'next/image'
+import Link from 'next/link'
 
 // Styled Divider component
 const Divider = styled(MuiDivider)<DividerProps>(({ theme }) => ({
@@ -113,16 +22,32 @@ const Divider = styled(MuiDivider)<DividerProps>(({ theme }) => ({
   },
 }))
 
-const AnalyticsDepositWithdraw = () => {
+interface DepositWithdrawProps {
+  depositWithdraw: DepositWithdrawResponse
+}
+
+const AnalyticsDepositWithdraw = ({
+  depositWithdraw,
+}: DepositWithdrawProps) => {
   return (
     <Card
       sx={{
         display: 'flex',
         justifyContent: 'space-between',
         flexDirection: ['column', 'column', 'row'],
+        alignItems: 'stretch',
+        height: '100%',
       }}
     >
-      <Box sx={{ width: '100%' }}>
+      {/* Deposits */}
+      <Box
+        sx={{
+          width: '100%',
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
         <CardHeader
           title='Deposit'
           sx={{
@@ -130,7 +55,6 @@ const AnalyticsDepositWithdraw = () => {
             alignItems: 'center',
             '& .MuiCardHeader-action': { mt: 0.6 },
           }}
-          action={<Typography variant='caption'>View All</Typography>}
           titleTypographyProps={{
             variant: 'h6',
             sx: {
@@ -139,15 +63,49 @@ const AnalyticsDepositWithdraw = () => {
             },
           }}
         />
-        <CardContent sx={{ pb: (theme) => `${theme.spacing(5.5)} !important` }}>
-          {depositData.map((item: DataType, index: number) => {
-            return (
+
+        <CardContent
+          sx={{
+            flex: 1,
+            pb: (theme) => `${theme.spacing(5.5)} !important`,
+            maxHeight: 300, // altura máxima do conteúdo
+            overflowY: 'auto', // barra de rolagem vertical
+          }}
+        >
+          {depositWithdraw.deposits.length === 0 ? (
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                height: '100%',
+                textAlign: 'center',
+              }}
+            >
+              <Image
+                src={'/images/pages/no-deposit.png'}
+                alt='No deposits'
+                width={180}
+                height={150}
+              />
+              <Typography variant='body2' sx={{ mt: 2 }}>
+                No deposits yet
+              </Typography>
+              <Link href={'/pages/deposit'}>
+                <Button variant='contained' sx={{ mt: 2 }}>
+                  Make a deposit
+                </Button>
+              </Link>
+            </Box>
+          ) : (
+            depositWithdraw.deposits.map((item, index) => (
               <Box
-                key={item.title}
+                key={item.id}
                 sx={{
                   display: 'flex',
                   alignItems: 'center',
-                  mb: index !== depositData.length - 1 ? 6 : 0,
+                  mb: index !== depositWithdraw.deposits.length - 1 ? 6 : 0,
                 }}
               >
                 <Box
@@ -157,11 +115,17 @@ const AnalyticsDepositWithdraw = () => {
                     justifyContent: 'center',
                   }}
                 >
-                  <img
-                    src={item.logo}
-                    alt={item.title}
-                    width={item.logoWidth}
-                    height={item.logoHeight}
+                  <Image
+                    src={
+                      item.paymentType === 'pix'
+                        ? '/images/logos/pix.png'
+                        : item.paymentType === 'card'
+                          ? '/images/logos/card.png'
+                          : '/images/logos/default.png'
+                    }
+                    alt={item.paymentType}
+                    width={28}
+                    height={28}
                   />
                 </Box>
                 <Box
@@ -176,26 +140,34 @@ const AnalyticsDepositWithdraw = () => {
                 >
                   <Box sx={{ mr: 2, display: 'flex', flexDirection: 'column' }}>
                     <Typography sx={{ fontWeight: 600, fontSize: '0.875rem' }}>
-                      {item.title}
+                      {item.paymentType.toUpperCase()}
                     </Typography>
-                    <Typography variant='caption'>{item.subtitle}</Typography>
+                    <Typography variant='caption'>{'payment'}</Typography>
                   </Box>
                   <Typography
                     variant='subtitle2'
                     sx={{ fontWeight: 600, color: 'success.main' }}
                   >
-                    {item.amount}
+                    +${item.amount}
                   </Typography>
                 </Box>
               </Box>
-            )
-          })}
+            ))
+          )}
         </CardContent>
       </Box>
 
       <Divider flexItem />
 
-      <Box sx={{ width: '100%' }}>
+      {/* Withdrawals */}
+      <Box
+        sx={{
+          width: '100%',
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
         <CardHeader
           title='Withdraw'
           sx={{
@@ -203,7 +175,14 @@ const AnalyticsDepositWithdraw = () => {
             alignItems: 'center',
             '& .MuiCardHeader-action': { mt: 0.6 },
           }}
-          action={<Typography variant='caption'>View All</Typography>}
+          action={
+            <Link
+              href='/pages/transactions'
+              style={{ textDecoration: 'none', color: 'inherit' }}
+            >
+              View All
+            </Link>
+          }
           titleTypographyProps={{
             variant: 'h6',
             sx: {
@@ -212,29 +191,63 @@ const AnalyticsDepositWithdraw = () => {
             },
           }}
         />
-        <CardContent sx={{ pb: (theme) => `${theme.spacing(5.5)} !important` }}>
-          {withdrawData.map((item: DataType, index: number) => {
-            return (
+
+        <CardContent
+          sx={{
+            flex: 1,
+            pb: (theme) => `${theme.spacing(5.5)} !important`,
+            maxHeight: 300, // altura máxima do conteúdo
+            overflowY: 'auto', // barra de rolagem vertical
+          }}
+        >
+          {depositWithdraw.withdrawls.length === 0 ? (
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                height: '100%',
+                textAlign: 'center',
+              }}
+            >
+              <Image
+                src={'/images/pages/no-withdraw.png'}
+                alt='No withdrawals'
+                width={150}
+                height={150}
+              />
+              <Typography variant='body2' sx={{ mt: 2 }}>
+                No withdrawals yet
+              </Typography>
+              <Link href={'/pages/withdraw'}>
+                <Button variant='contained' sx={{ mt: 2 }}>
+                  Make a withdraw
+                </Button>
+              </Link>
+            </Box>
+          ) : (
+            depositWithdraw.withdrawls.map((item, index) => (
               <Box
-                key={item.title}
+                key={item.id}
                 sx={{
                   display: 'flex',
                   alignItems: 'center',
-                  mb: index !== depositData.length - 1 ? 6 : 0,
+                  mb: index !== depositWithdraw.withdrawls.length - 1 ? 6 : 0,
                 }}
               >
                 <Box
                   sx={{
-                    minWidth: 36,
+                    minWidth: 38,
                     display: 'flex',
                     justifyContent: 'center',
                   }}
                 >
-                  <img
-                    src={item.logo}
-                    alt={item.title}
-                    width={item.logoWidth}
-                    height={item.logoHeight}
+                  <Image
+                    src={'/images/logos/pix.png'}
+                    alt={'PIX'}
+                    width={28}
+                    height={28}
                   />
                 </Box>
                 <Box
@@ -249,20 +262,20 @@ const AnalyticsDepositWithdraw = () => {
                 >
                   <Box sx={{ mr: 2, display: 'flex', flexDirection: 'column' }}>
                     <Typography sx={{ fontWeight: 600, fontSize: '0.875rem' }}>
-                      {item.title}
+                      {'PIX'}
                     </Typography>
-                    <Typography variant='caption'>{item.subtitle}</Typography>
+                    <Typography variant='caption'>{'withdrawal'}</Typography>
                   </Box>
                   <Typography
                     variant='subtitle2'
                     sx={{ fontWeight: 600, color: 'error.main' }}
                   >
-                    {item.amount}
+                    -${item.amount}
                   </Typography>
                 </Box>
               </Box>
-            )
-          })}
+            ))
+          )}
         </CardContent>
       </Box>
     </Card>
