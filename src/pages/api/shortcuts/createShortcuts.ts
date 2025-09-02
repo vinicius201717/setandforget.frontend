@@ -18,8 +18,6 @@ export async function createShortcuts(
       authConfig.storageTokenKeyName,
     )
     if (!shortcutExist(shortcuts, data)) {
-      console.log(shortcuts)
-
       if (storedToken) {
         const response = await api.post('/shortcuts', data, {
           headers: {

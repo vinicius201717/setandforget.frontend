@@ -225,6 +225,15 @@ export interface ApiResultsResponse {
   currentPage: number
 }
 
+export interface Rating {
+  id: string
+  userId: string
+  chessBlitzRating: number
+  chessBulletRating: number
+  chessDailyRating: number
+  chessRapidRating: number
+}
+
 export interface ChessboardComponentProps {
   chessRoomId?: string
   selectedSquare: Square | null

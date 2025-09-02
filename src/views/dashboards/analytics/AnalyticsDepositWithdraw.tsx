@@ -68,8 +68,11 @@ const AnalyticsDepositWithdraw = ({
           sx={{
             flex: 1,
             pb: (theme) => `${theme.spacing(5.5)} !important`,
-            maxHeight: 300, // altura máxima do conteúdo
-            overflowY: 'auto', // barra de rolagem vertical
+            maxHeight: 300,
+            overflowY: 'auto',
+            '&::-webkit-scrollbar': {
+              width: '8px',
+            },
           }}
         >
           {depositWithdraw.deposits.length === 0 ? (
@@ -196,8 +199,11 @@ const AnalyticsDepositWithdraw = ({
           sx={{
             flex: 1,
             pb: (theme) => `${theme.spacing(5.5)} !important`,
-            maxHeight: 300, // altura máxima do conteúdo
-            overflowY: 'auto', // barra de rolagem vertical
+            maxHeight: 300,
+            overflowY: 'auto',
+            '&::-webkit-scrollbar': {
+              width: '8px',
+            },
           }}
         >
           {depositWithdraw.withdrawls.length === 0 ? (

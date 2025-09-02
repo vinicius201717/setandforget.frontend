@@ -51,6 +51,8 @@ import { connectSocket } from '../api/chess-room/chess-challenge-websocket'
 import ChallengeFriendModal from 'src/components/chess/components/ChallengeFriendModal'
 import { chessRoomGet } from '../api/chess-room/chess-room-get'
 import { useRouter } from 'next/router'
+import { getRating } from '../api/rating/getRating'
+import ModalUserChess from 'src/components/chess/ModalUserChess'
 
 const registerFormSchema = z.object({
   duration: z.number(),
@@ -60,15 +62,17 @@ const registerFormSchema = z.object({
 type RegisterFormData = z.infer<typeof registerFormSchema>
 
 function HomePage() {
-  const [modalOpen, setModalOpen] = useState(false)
+  const [modalOpen, setModalOpen] = useState<boolean>(false)
   const [modalInfo, setModalInfo] = useState<GameType>()
-  const [modalFilterGlobalOpen, setModalFilterGlobalOpen] = useState(false)
+  const [modalFilterGlobalOpen, setModalFilterGlobalOpen] =
+    useState<boolean>(false)
   const [globalChallenge, setGlobalChallenge] = useState<
     ChallengeGlobalType[] | null
   >([])
   const [activeGame, setActiveGame] = useState<boolean>(false)
   const [roomId, setRoomId] = useState<string>('')
-  const [friendModalOpen, setFriendModalOpen] = useState(false)
+  const [friendModalOpen, setFriendModalOpen] = useState<boolean>(false)
+  const [modalUserChess, setModalUserChess] = useState<boolean>(false)
 
   const { user, toastId, setToastId, setUser } = useAuth()
   const handleOpenModal = (id: string) => {
@@ -95,10 +99,18 @@ function HomePage() {
 
   const handleCloseModal = () => setModalOpen(false)
 
+  const handleCloseModalUserChess = () => setModalUserChess(false)
+
   const handleOpenModalFilterGlobal = () => setModalFilterGlobalOpen(true)
   const handleCloseModalFilterGlobal = () => setModalFilterGlobalOpen(false)
 
   const [screen, setScreen] = useState<1 | 2>(1)
+
+  useEffect(() => {
+    getRating().then((response) => {
+      if (!response) setModalUserChess(true)
+    })
+  }, [])
 
   const {
     control,
@@ -465,6 +477,10 @@ function HomePage() {
       >
         <p>Teste pra ver se ta funcionando</p>
       </FilterGlobalPlayers>
+      <ModalUserChess
+        open={modalUserChess}
+        onClose={handleCloseModalUserChess}
+      />
     </Container>
   )
 }
