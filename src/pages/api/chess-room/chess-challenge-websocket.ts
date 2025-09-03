@@ -13,6 +13,12 @@ export const connectSocket = (
   userId: string | null,
   amount: string | null,
   friendChallenge: string | null,
+  chessGameType:
+    | 'chessBulletRating'
+    | 'chessBlitzRating'
+    | 'chessRapidRating'
+    | 'chessDailyRating'
+    | null,
   toastId: string | null,
   setDraw: React.Dispatch<React.SetStateAction<Draw>> | null,
   setRevenge: React.Dispatch<React.SetStateAction<Revenge>> | null,
@@ -44,6 +50,7 @@ export const connectSocket = (
       userId,
       amount,
       friendChallenge,
+      chessGameType,
     },
   })
 

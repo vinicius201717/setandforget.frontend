@@ -45,6 +45,15 @@ export interface AnalyticsDepositWithdrawProps {
   daily: PaymentSummary[]
 }
 
+interface Rating {
+  id: string
+  userId: string
+  chessBulletRating: number
+  chessBlitzRating: number
+  chessRapidRating: number
+  chessDailyRating: number
+}
+
 export interface DashboardChessData {
   lossAmount: number
   netProfit: number
@@ -55,7 +64,7 @@ export interface DashboardChessData {
   totalMatches: number
   totalWins: number
   lastTwentyGames: number[]
-  rating: number
+  rating: Rating
 }
 
 interface Deposit {

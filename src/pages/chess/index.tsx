@@ -183,6 +183,7 @@ function HomePage() {
               null,
               null,
               null,
+              null,
             )
           } else {
             updateAccountAmount(data.amount, 'subtraction')
@@ -190,6 +191,16 @@ function HomePage() {
             const challengeId = response.challenge.id
             const userId = response.challenge.userId
             const amount = JSON.stringify(data.amount)
+            console.log(data.duration)
+
+            const chessGameType =
+              data.duration < 3 * 60
+                ? 'chessBulletRating'
+                : data.duration < 10 * 60
+                  ? 'chessBlitzRating'
+                  : data.duration < 60 * 60
+                    ? 'chessRapidRating'
+                    : 'chessDailyRating'
 
             connectSocket(
               challengeId,
@@ -198,6 +209,7 @@ function HomePage() {
               userId,
               amount,
               null,
+              chessGameType,
               null,
               null,
               null,

@@ -63,6 +63,7 @@ const ChessChallengeNotification = ({
             null,
             null,
             null,
+            null,
           )
         } else {
           toast.error('Insufficient saldo', { position: 'bottom-right' })
@@ -78,6 +79,7 @@ const ChessChallengeNotification = ({
           userIdUndefined,
           response.amount.toString(),
           'true',
+          null,
           null,
           null,
           null,

@@ -402,6 +402,7 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
               null,
               null,
               null,
+              null,
               setDraw,
               setRevenge,
               setGameStatus,

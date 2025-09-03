@@ -14,7 +14,7 @@ export async function getRating(): Promise<Rating | null | undefined> {
           Authorization: `Bearer ${storedToken}`,
         },
       })
-      if (response.status === 201) {
+      if (response.status === 200) {
         return response.data
       } else {
         return null

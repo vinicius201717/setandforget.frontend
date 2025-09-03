@@ -139,6 +139,14 @@ const ChallengeFriendModal: React.FC<ChallengeFriendModalProps> = ({
     }
     chessFriendChallengeCreate(data).then((response: CreateChallengeReturn) => {
       if (response) {
+        const chessGameType =
+          data.duration < 3 * 60
+            ? 'chessBulletRating'
+            : data.duration < 10 * 60
+              ? 'chessBlitzRating'
+              : data.duration < 60 * 60
+                ? 'chessRapidRating'
+                : 'chessDailyRating'
         updateAccountAmount(data.amount, 'subtraction')
         connectSocket(
           response.challenge.id,
@@ -147,6 +155,7 @@ const ChallengeFriendModal: React.FC<ChallengeFriendModalProps> = ({
           userId,
           JSON.stringify(data.amount),
           'true',
+          chessGameType,
           toastId as string,
           null,
           null,

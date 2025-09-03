@@ -1,67 +1,116 @@
 // ** MUI Imports
+import React from 'react'
 import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
 import Typography from '@mui/material/Typography'
 import CardContent from '@mui/material/CardContent'
 import Button from '@mui/material/Button'
+import IconButton from '@mui/material/IconButton'
+import Menu from '@mui/material/Menu'
+import MenuItem from '@mui/material/MenuItem'
+import MoreVertIcon from '@mui/icons-material/MoreVert'
 
 // ** Custom Components Imports
 import CustomAvatar from 'src/@core/components/mui/avatar'
 
-import { CardStatsVerticalProps } from 'src/@core/components/card-statistics/types'
-import Link from 'next/link'
+// ** Types
+import { Rating } from 'src/types/apps/chessTypes'
 
-interface ExtendedCardStatsVerticalProps
-  extends Partial<CardStatsVerticalProps> {
-  rating?: number
+interface CardStatsRatingVerticalProps {
+  title?: string
+  icon?: React.ReactNode
+  rating?: Rating
 }
 
-const CardStatsRatingVertical = (props: ExtendedCardStatsVerticalProps) => {
-  const { title, icon, rating = 0 } = props
+const ratingTypes = {
+  chessBulletRating: 'Bullet',
+  chessBlitzRating: 'Blitz',
+  chessRapidRating: 'Rapid',
+  chessDailyRating: 'Daily',
+} as const
+
+type RatingType = keyof typeof ratingTypes
+
+const CardStatsRatingVertical: React.FC<CardStatsRatingVerticalProps> = ({
+  title,
+  icon,
+  rating,
+}) => {
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
+  const [selectedType, setSelectedType] =
+    React.useState<RatingType>('chessBlitzRating')
+
+  const open = Boolean(anchorEl)
+
+  const handleMenuOpen = (event: React.MouseEvent<HTMLButtonElement>) =>
+    setAnchorEl(event.currentTarget)
+  const handleMenuClose = () => setAnchorEl(null)
+  const handleSelect = (type: RatingType) => {
+    setSelectedType(type)
+    handleMenuClose()
+  }
+
+  const displayedRating = rating?.[selectedType] ?? 0
 
   return (
     <Card>
       <CardContent>
-        {/* Avatar e ícone */}
+        {/* Header com Avatar, Título e Menu */}
         <Box
           sx={{
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'flex-start',
+            justifyContent: 'space-between',
             mb: 3,
           }}
         >
-          <CustomAvatar
-            color='primary'
-            sx={{ boxShadow: 3, mr: 3, width: 48, height: 48 }}
-          >
-            {icon}
-          </CustomAvatar>
-          <Typography sx={{ fontWeight: 700, fontSize: '1rem' }}>
-            {title}
-          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <CustomAvatar
+              color='primary'
+              sx={{ boxShadow: 3, mr: 3, width: 48, height: 48 }}
+            >
+              {icon}
+            </CustomAvatar>
+            <Typography sx={{ fontWeight: 700, fontSize: '1rem' }}>
+              {title}
+            </Typography>
+          </Box>
+
+          <IconButton onClick={handleMenuOpen}>
+            <MoreVertIcon />
+          </IconButton>
+
+          <Menu anchorEl={anchorEl} open={open} onClose={handleMenuClose}>
+            {Object.entries(ratingTypes).map(([key, label]) => (
+              <MenuItem
+                key={key}
+                selected={selectedType === key}
+                onClick={() => handleSelect(key as RatingType)}
+              >
+                {label}
+              </MenuItem>
+            ))}
+          </Menu>
         </Box>
 
         {/* Rating */}
-        {rating !== undefined && (
-          <Typography
-            variant='h4'
-            sx={{ fontWeight: 700, color: 'primary.main', mb: 2 }}
-          >
-            {rating}
-          </Typography>
-        )}
+        <Typography variant='body1'>{ratingTypes[selectedType]}</Typography>
+        <Typography
+          variant='h6'
+          sx={{ fontWeight: 700, color: 'primary.main', mb: 2 }}
+        >
+          {displayedRating}
+        </Typography>
 
-        <Link href={'/chess'}>
-          <Button
-            rel='noopener'
-            variant='contained'
-            size='small'
-            sx={{ textTransform: 'none' }}
-          >
-            {'Chess'}
-          </Button>
-        </Link>
+        <Button
+          rel='noopener'
+          variant='contained'
+          size='small'
+          sx={{ textTransform: 'none' }}
+          onClick={() => console.log('Ir para Chess')}
+        >
+          Chess
+        </Button>
       </CardContent>
     </Card>
   )
