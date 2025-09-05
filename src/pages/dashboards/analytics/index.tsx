@@ -24,6 +24,7 @@ import {
   DashboardChessData,
   DepositWithdrawResponse,
   PaymentSummary,
+  UserRankings,
 } from 'src/types/apps/dashboardType'
 import { getDashboardChessData } from 'src/pages/api/dashboard/getChessData'
 import CardStatsVertical from 'src/@core/components/card-statistics/card-stats-vertical'
@@ -67,7 +68,7 @@ const AnalyticsDashboard = () => {
           <AnalyticsWeeklyOverview />
         </Grid>
         <Grid item xs={12} md={6} lg={4}>
-          <AnalyticsTotalEarning />
+          <AnalyticsTotalEarning rankings={game?.rankings as UserRankings} />
         </Grid>
         <Grid item xs={12} md={6} lg={4}>
           <Grid container spacing={6}>

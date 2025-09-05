@@ -6,8 +6,6 @@ import CardContent from '@mui/material/CardContent'
 
 // ** Custom Components Imports
 import CustomAvatar from 'src/@core/components/mui/avatar'
-import OptionsMenu from 'src/@core/components/option-menu'
-
 import { CardStatsVerticalProps } from 'src/@core/components/card-statistics/types'
 import { DashboardChessData } from 'src/types/apps/dashboardType'
 
@@ -24,7 +22,6 @@ const CardStatsVertical = (props: ExtendedCardStatsVerticalProps) => {
     icon,
     stats,
     trendNumber,
-    optionsMenuProps,
     color = 'primary',
     trend = 'positive',
     data,
@@ -57,18 +54,6 @@ const CardStatsVertical = (props: ExtendedCardStatsVerticalProps) => {
           <CustomAvatar color={color} sx={{ boxShadow: 3, mr: 4 }}>
             {icon}
           </CustomAvatar>
-          {optionsMenuProps ? (
-            <OptionsMenu {...optionsMenuProps} />
-          ) : (
-            <OptionsMenu
-              options={['Refresh', 'Share', 'Update']}
-              iconButtonProps={{
-                size: 'small',
-                className: 'card-more-options',
-                sx: { color: 'text.secondary' },
-              }}
-            />
-          )}
         </Box>
         <Typography sx={{ fontWeight: 600, fontSize: '0.875rem' }}>
           {finalTitle}

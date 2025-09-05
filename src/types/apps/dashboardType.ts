@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 type PeriodSummary = {
   totalDeposits: number
   totalWithdrawals: number
@@ -54,6 +55,31 @@ interface Rating {
   chessDailyRating: number
 }
 
+export interface UserInfo {
+  name: string
+}
+
+export interface RankEntry {
+  User: UserInfo
+  chessBulletRating?: number
+  chessBlitzRating?: number
+  chessRapidRating?: number
+  chessDailyRating?: number
+}
+
+export interface RatingRank {
+  rank: RankEntry[]
+  userRank: number
+  userRating: number
+}
+
+export interface UserRankings {
+  bullet: RatingRank
+  blitz: RatingRank
+  rapid: RatingRank
+  daily: RatingRank
+}
+
 export interface DashboardChessData {
   lossAmount: number
   netProfit: number
@@ -65,6 +91,7 @@ export interface DashboardChessData {
   totalWins: number
   lastTwentyGames: number[]
   rating: Rating
+  rankings: UserRankings
 }
 
 interface Deposit {
