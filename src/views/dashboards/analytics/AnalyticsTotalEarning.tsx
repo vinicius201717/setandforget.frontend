@@ -22,45 +22,6 @@ interface AnalyticsTotalEarningProps {
   rankings: UserRankings
 }
 
-export const fakeUserRankings: UserRankings = {
-  blitz: {
-    rank: [
-      { User: { name: 'Alice' }, chessBlitzRating: 1500 },
-      { User: { name: 'Livia' }, chessBlitzRating: 1349 },
-      { User: { name: 'Charlie' }, chessBlitzRating: 1300 },
-    ],
-    userRank: 343,
-    userRating: 1009,
-  },
-  bullet: {
-    rank: [
-      { User: { name: 'Vinicius Sousa' }, chessBulletRating: 1219 },
-      { User: { name: 'Alice' }, chessBulletRating: 1190 },
-      { User: { name: 'Bob' }, chessBulletRating: 1100 },
-    ],
-    userRank: 1,
-    userRating: 1219,
-  },
-  rapid: {
-    rank: [
-      { User: { name: 'Alice' }, chessRapidRating: 1520 },
-      { User: { name: 'Bob' }, chessRapidRating: 1500 },
-      { User: { name: 'Vinicius Sousa' }, chessRapidRating: 1484 },
-    ],
-    userRank: 3,
-    userRating: 1484,
-  },
-  daily: {
-    rank: [
-      { User: { name: 'Bob' }, chessDailyRating: 1400 },
-      { User: { name: 'Vinicius Sousa' }, chessDailyRating: 1346 },
-      { User: { name: 'Charlie' }, chessDailyRating: 1200 },
-    ],
-    userRank: 2,
-    userRating: 1346,
-  },
-}
-
 const modes = {
   bullet: { ratingKey: 'chessBulletRating', color: 'primary' as ThemeColor },
   blitz: { ratingKey: 'chessBlitzRating', color: 'secondary' as ThemeColor },
@@ -78,7 +39,7 @@ const AnalyticsTotalEarning: React.FC<AnalyticsTotalEarningProps> = ({
 
   const { user } = useAuth()
 
-  const modeData = fakeUserRankings?.[selectedMode]
+  const modeData = rankings?.[selectedMode]
   const { rank, userRank, userRating } = modeData || {
     rank: [],
     userRank: 0,

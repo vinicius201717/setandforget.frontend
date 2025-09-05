@@ -2,7 +2,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-unused-vars */
-import React, { useState, useEffect, useCallback, useRef } from 'react'
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import Chessboard from 'chessboardjsx'
 import { Chess, Square } from 'chess.js'
 import { formatTime } from 'src/utils/format-timer'
@@ -87,8 +87,16 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
   const [orientation, setOrientation] = useState<'w' | 'b'>('w')
   const [ticketOrMoves, setTicketOrMoves] = useState<1 | 2 | null>(1)
   const [capturedPieces, setCapturedPieces] = useState<string[]>([])
+  const [preMoves, setPreMoves] = useState<
+    { from: string; to: string; promotion?: string }[]
+  >([])
 
   const theme = useTheme()
+
+  const highlightPreMove = {
+    backgroundColor: lighten(theme.palette.secondary.main, 0.5),
+  }
+
   const { user, setUser, setLoading, toastId, setToastId } = useAuth()
 
   const moveSound =
@@ -315,6 +323,33 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
   }, [liveMove])
 
   useEffect(() => {
+    if (
+      gameStatus.status &&
+      game.turn() === orientation &&
+      preMoves.length > 0
+    ) {
+      const nextMove = preMoves[0]
+      const legalMoves = game.moves({ verbose: true })
+      const isMoveLegal = legalMoves.some(
+        (m) =>
+          m.from === nextMove.from &&
+          m.to === nextMove.to &&
+          (m.promotion === nextMove.promotion || !m.promotion),
+      )
+
+      if (isMoveLegal) {
+        const timer = setTimeout(() => {
+          handleMove(nextMove.from, nextMove.to)
+          setPreMoves((prev) => prev.slice(1))
+        }, 250)
+        return () => clearTimeout(timer)
+      } else {
+        setPreMoves([])
+      }
+    }
+  }, [game.turn(), preMoves])
+
+  useEffect(() => {
     if (draw.active) {
       setToastId(
         toast(
@@ -494,6 +529,22 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
     [game, chessRoom, moves, chessRoomId, user?.id],
   )
 
+  const fenWithPreMove = useMemo(() => {
+    if (preMoves.length === 0) return fen
+
+    const tempGame = new Chess(fen)
+    const move = preMoves[0]
+    const legalMoves = tempGame.moves({ verbose: true })
+    const isMoveLegal = legalMoves.some(
+      (m) =>
+        m.from === move.from &&
+        m.to === move.to &&
+        (m.promotion === move.promotion || !m.promotion),
+    )
+    if (isMoveLegal) tempGame.move(move)
+    return tempGame.fen()
+  }, [fen, preMoves])
+
   const handleSquareClick = useCallback(
     (square: Square) => {
       if (gameStatus.status) {
@@ -514,6 +565,17 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
               setHighlightSquareTo(null)
             }
           } else {
+            if (orientation !== turn) {
+              setPreMoves((prev) => [
+                ...prev,
+                { from: selectedSquare, to: square, promotion: 'q' },
+              ])
+              setSelectedSquare(null)
+              setHighlightSquareFrom(null)
+              setHighlightSquareTo(null)
+              return
+            }
+
             const move = { from: selectedSquare, to: square, promotion: 'q' }
             const legalMoves = game.moves({ verbose: true })
             const isMoveLegal = legalMoves.some(
@@ -607,6 +669,8 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
             (piece && piece.color !== game.turn()) ||
             orientation !== game.turn()
           ) {
+            setPreMoves((prev) => [...prev, { from, to, promotion: 'q' }])
+
             setHighlightSquareFrom(null)
             setHighlightSquareTo(null)
             return
@@ -768,7 +832,7 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
               <Chessboard
                 boardStyle={{ width: '100%', height: '100%' }}
                 calcWidth={() => 600}
-                position={fen}
+                position={fenWithPreMove}
                 orientation={orientation === 'w' ? 'white' : 'black'}
                 onDrop={({ sourceSquare, targetSquare }) =>
                   handleMove(sourceSquare, targetSquare)
@@ -781,8 +845,27 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
                   ...(highlightSquareTo && {
                     [highlightSquareTo]: highlightStyleTo,
                   }),
+                  // destaque dos pre-moves
+                  ...preMoves.reduce(
+                    (acc, move) => {
+                      acc[move.from] = {
+                        backgroundColor: lighten(
+                          theme.palette.secondary.main,
+                          0.5,
+                        ),
+                      }
+                      acc[move.to] = {
+                        backgroundColor: lighten(
+                          theme.palette.secondary.main,
+                          0.5,
+                        ),
+                      }
+                      return acc
+                    },
+                    {} as Record<string, any>,
+                  ),
                 }}
-                transitionDuration={100}
+                transitionDuration={200}
               />
               {orientation === 'w' ? (
                 <ContainerMobileChessDisplay>
