@@ -116,20 +116,11 @@ const AnalyticsTotalEarning: React.FC<AnalyticsTotalEarningProps> = ({
   return (
     <Card sx={{ display: 'flex', flexDirection: 'column' }}>
       {/* Month prize info */}
-      <CardContent sx={{ pb: 1 }}>
-        <Typography variant='h6' sx={{ mb: 1 }}>
-          Monthly Prize: <strong>R$ 1,500.00</strong>
-        </Typography>
-        <LinearProgress
-          variant='determinate'
-          value={progressMonth}
-          sx={{ height: 10, borderRadius: 5, mb: 1 }}
-        />
-        <Typography variant='body2' color='text.secondary'>
-          Time left until end of the month: {timeLeft}
+      <CardContent sx={{ pb: 10 }}>
+        <Typography variant='h5' sx={{ mb: 1 }}>
+          BEST GOODGAME CHESS PLAYERS
         </Typography>
       </CardContent>
-
       {/* Ranking */}
       <CardHeader
         title={`${selectedMode.charAt(0).toUpperCase() + selectedMode.slice(1)} Rankings`}

@@ -15,6 +15,7 @@ import CustomAvatar from 'src/@core/components/mui/avatar'
 
 // ** Types
 import { Rating } from 'src/types/apps/chessTypes'
+import Link from 'next/link'
 
 interface CardStatsRatingVerticalProps {
   title?: string
@@ -102,15 +103,16 @@ const CardStatsRatingVertical: React.FC<CardStatsRatingVerticalProps> = ({
           {displayedRating}
         </Typography>
 
-        <Button
-          rel='noopener'
-          variant='contained'
-          size='small'
-          sx={{ textTransform: 'none' }}
-          onClick={() => console.log('Ir para Chess')}
-        >
-          Chess
-        </Button>
+        <Link href={'/chess'}>
+          <Button
+            rel='noopener'
+            variant='contained'
+            size='small'
+            sx={{ textTransform: 'none' }}
+          >
+            Chess
+          </Button>
+        </Link>
       </CardContent>
     </Card>
   )

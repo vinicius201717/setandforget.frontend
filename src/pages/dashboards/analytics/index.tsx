@@ -12,11 +12,9 @@ import AnalyticsTable from 'src/views/dashboards/analytics/AnalyticsTable'
 import AnalyticsTrophy from 'src/views/dashboards/analytics/AnalyticsTrophy'
 import AnalyticsSessions from 'src/views/dashboards/analytics/AnalyticsSessions'
 import AnalyticsTotalProfit from 'src/views/dashboards/analytics/AnalyticsTotalProfit'
-import AnalyticsPerformance from 'src/views/dashboards/analytics/AnalyticsPerformance'
 import AnalyticsTotalEarning from 'src/views/dashboards/analytics/AnalyticsTotalEarning'
 import AnalyticsWeeklyOverview from 'src/views/dashboards/analytics/AnalyticsWeeklyOverview'
 import AnalyticsDepositWithdraw from 'src/views/dashboards/analytics/AnalyticsDepositWithdraw'
-import AnalyticsSalesByCountries from 'src/views/dashboards/analytics/AnalyticsSalesByCountries'
 import AnalyticsTransactionsCard from 'src/views/dashboards/analytics/AnalyticsTransactionsCard'
 import { useEffect, useState } from 'react'
 import { getDashboardTransactionsData } from 'src/pages/api/dashboard/getTransactionsData'
@@ -101,15 +99,16 @@ const AnalyticsDashboard = () => {
             </Grid>
           </Grid>
         </Grid>
-        <Grid item xs={12} md={6} lg={4}>
+        {/* <Grid item xs={12} md={4}>
+          <AnalyticsSalesByCountries />
+        </Grid> */}
+        {/* <Grid item xs={12} md={6} lg={4}>
           <AnalyticsPerformance />
-        </Grid>
+        </Grid> */}
         <Grid item xs={12} md={8}>
           <AnalyticsDepositWithdraw depositWithdraw={depositWithdraw} />
         </Grid>
-        <Grid item xs={12} md={4}>
-          <AnalyticsSalesByCountries />
-        </Grid>
+
         <Grid item xs={12} md={12} lg={8}>
           <AnalyticsTable />
         </Grid>
