@@ -87,9 +87,11 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
   const [orientation, setOrientation] = useState<'w' | 'b'>('w')
   const [ticketOrMoves, setTicketOrMoves] = useState<1 | 2 | null>(1)
   const [capturedPieces, setCapturedPieces] = useState<string[]>([])
-  const [preMoves, setPreMoves] = useState<
-    { from: string; to: string; promotion?: string }[]
-  >([])
+  const [preMove, setPreMove] = useState<{
+    from: string
+    to: string
+    promotion?: string
+  } | null>(null)
 
   const theme = useTheme()
 
@@ -323,31 +325,23 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
   }, [liveMove])
 
   useEffect(() => {
-    if (
-      gameStatus.status &&
-      game.turn() === orientation &&
-      preMoves.length > 0
-    ) {
-      const nextMove = preMoves[0]
+    if (gameStatus.status && game.turn() === orientation && preMove) {
       const legalMoves = game.moves({ verbose: true })
-      const isMoveLegal = legalMoves.some(
+      const isMoveLegal = legalMoves.find(
         (m) =>
-          m.from === nextMove.from &&
-          m.to === nextMove.to &&
-          (m.promotion === nextMove.promotion || !m.promotion),
+          m.from === preMove.from &&
+          m.to === preMove.to &&
+          (m.promotion === preMove.promotion || !m.promotion),
       )
 
       if (isMoveLegal) {
-        const timer = setTimeout(() => {
-          handleMove(nextMove.from, nextMove.to)
-          setPreMoves((prev) => prev.slice(1))
-        }, 250)
-        return () => clearTimeout(timer)
+        handleMove(preMove.from, preMove.to)
+        setPreMove(null)
       } else {
-        setPreMoves([])
+        setPreMove(null)
       }
     }
-  }, [game.turn(), preMoves])
+  }, [game.turn(), preMove])
 
   useEffect(() => {
     if (draw.active) {
@@ -529,22 +523,6 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
     [game, chessRoom, moves, chessRoomId, user?.id],
   )
 
-  const fenWithPreMove = useMemo(() => {
-    if (preMoves.length === 0) return fen
-
-    const tempGame = new Chess(fen)
-    const move = preMoves[0]
-    const legalMoves = tempGame.moves({ verbose: true })
-    const isMoveLegal = legalMoves.some(
-      (m) =>
-        m.from === move.from &&
-        m.to === move.to &&
-        (m.promotion === move.promotion || !m.promotion),
-    )
-    if (isMoveLegal) tempGame.move(move)
-    return tempGame.fen()
-  }, [fen, preMoves])
-
   const handleSquareClick = useCallback(
     (square: Square) => {
       if (gameStatus.status) {
@@ -565,17 +543,6 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
               setHighlightSquareTo(null)
             }
           } else {
-            if (orientation !== turn) {
-              setPreMoves((prev) => [
-                ...prev,
-                { from: selectedSquare, to: square, promotion: 'q' },
-              ])
-              setSelectedSquare(null)
-              setHighlightSquareFrom(null)
-              setHighlightSquareTo(null)
-              return
-            }
-
             const move = { from: selectedSquare, to: square, promotion: 'q' }
             const legalMoves = game.moves({ verbose: true })
             const isMoveLegal = legalMoves.some(
@@ -648,6 +615,20 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
               }
             }
           }
+        } else {
+          const piece = game.get(square)
+          if (piece && piece.color === orientation) {
+            setSelectedSquare(square)
+            setHighlightSquareFrom(square)
+            setHighlightSquareTo(null)
+            setPreMove(null)
+          } else {
+            if (selectedSquare) {
+              setPreMove({ from: selectedSquare, to: square, promotion: 'q' })
+              setHighlightSquareFrom(null)
+              setHighlightSquareTo(null)
+            }
+          }
         }
       }
     },
@@ -669,7 +650,7 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
             (piece && piece.color !== game.turn()) ||
             orientation !== game.turn()
           ) {
-            setPreMoves((prev) => [...prev, { from, to, promotion: 'q' }])
+            setPreMove({ from: fromSquare, to: toSquare, promotion: 'q' })
 
             setHighlightSquareFrom(null)
             setHighlightSquareTo(null)
@@ -832,7 +813,7 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
               <Chessboard
                 boardStyle={{ width: '100%', height: '100%' }}
                 calcWidth={() => 600}
-                position={fenWithPreMove}
+                position={game.fen()}
                 orientation={orientation === 'w' ? 'white' : 'black'}
                 onDrop={({ sourceSquare, targetSquare }) =>
                   handleMove(sourceSquare, targetSquare)
@@ -845,27 +826,22 @@ const ChessboardComponent: React.FC<{ chessRoomId?: string }> = ({
                   ...(highlightSquareTo && {
                     [highlightSquareTo]: highlightStyleTo,
                   }),
-                  // destaque dos pre-moves
-                  ...preMoves.reduce(
-                    (acc, move) => {
-                      acc[move.from] = {
-                        backgroundColor: lighten(
-                          theme.palette.secondary.main,
-                          0.5,
-                        ),
-                      }
-                      acc[move.to] = {
-                        backgroundColor: lighten(
-                          theme.palette.secondary.main,
-                          0.5,
-                        ),
-                      }
-                      return acc
+                  ...(preMove && {
+                    [preMove.from]: {
+                      backgroundColor: lighten(
+                        theme.palette.secondary.main,
+                        0.5,
+                      ),
                     },
-                    {} as Record<string, any>,
-                  ),
+                    [preMove.to]: {
+                      backgroundColor: lighten(
+                        theme.palette.secondary.main,
+                        0.5,
+                      ),
+                    },
+                  }),
                 }}
-                transitionDuration={200}
+                transitionDuration={100}
               />
               {orientation === 'w' ? (
                 <ContainerMobileChessDisplay>
