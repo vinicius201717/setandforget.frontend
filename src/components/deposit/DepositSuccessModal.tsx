@@ -62,7 +62,7 @@ export default function DepositSuccessModal({
   }
 
   useEffect(() => {
-    if (timeLeft === 290 && open) {
+    if (timeLeft === 0 && open) {
       updateDeposit(response.response?.id as string, 'FAILED')
       onClose()
     }
@@ -93,7 +93,20 @@ export default function DepositSuccessModal({
           spacing={2}
           sx={{ my: 3 }}
         >
-          <QRCodeCanvas value={pixCode} size={200} />
+          <Box
+            sx={{
+              p: 2,
+              borderRadius: 1,
+              bgcolor: '#fff',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          >
+            <QRCodeCanvas value={pixCode} size={200} />
+          </Box>
+
           <Typography variant='body2' textAlign='center'>
             Scan the QR Code or copy the code below:
           </Typography>

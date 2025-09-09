@@ -1,6 +1,5 @@
 /* eslint-disable import/no-absolute-path */
 import Link from 'next/link'
-import Image from 'next/image'
 
 // ** MUI Imports
 import IconButton from '@mui/material/IconButton'
@@ -13,10 +12,8 @@ import { LayoutProps } from 'src/@core/layouts/types'
 
 // ** Custom Icon Import
 import Icon from 'src/@core/components/icon'
-
-import logo from '/public/images/logos/good-game/good-game-logo.png'
-// ** Configs
 import themeConfig from 'src/configs/themeConfig'
+import GoodGameLogo from 'src/@core/components/logo'
 
 interface Props {
   navHover: boolean
@@ -102,7 +99,7 @@ const VerticalNavHeader = (props: Props) => {
         userNavMenuBranding(props)
       ) : (
         <LinkStyled href='/'>
-          <Image src={logo} alt='Logo' width={50} height={50} />
+          <GoodGameLogo width={60} height={60} />
           <HeaderTitle
             variant='h6'
             sx={{

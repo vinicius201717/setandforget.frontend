@@ -44,9 +44,6 @@ import BlankLayout from 'src/@core/layouts/BlankLayout'
 // ** Demo Imports
 import FooterIllustrationsV2 from 'src/views/pages/auth/FooterIllustrationsV2'
 
-// ** Logo
-import goodGameLogo from 'public/images/logos/good-game/good-game-logo.png'
-
 // #region styled
 // ** Styled Components
 import {
@@ -59,7 +56,7 @@ import {
   TypographyStyled,
 } from './style'
 import { Dialog, DialogContent } from '@mui/material'
-import Image from 'next/image'
+import GoodGameLogo from 'src/@core/components/logo'
 // #endregion
 const formSchema = z.object({
   email: z.string().email(),
@@ -212,12 +209,7 @@ const LoginPage = () => {
                 justifyContent: 'center',
               }}
             >
-              <Image
-                src={goodGameLogo}
-                width={50}
-                height={50}
-                alt='good-game'
-              />
+              <GoodGameLogo />
               <Typography
                 variant='h6'
                 sx={{
