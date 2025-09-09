@@ -101,7 +101,7 @@ const VerticalNavHeader = (props: Props) => {
         <LinkStyled href='/'>
           <GoodGameLogo width={60} height={60} />
           <HeaderTitle
-            variant='h6'
+            variant='body2'
             sx={{
               ...menuCollapsedStyles,
               ...(navCollapsed && !navHover ? {} : { ml: 3 }),

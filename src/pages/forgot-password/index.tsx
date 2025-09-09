@@ -28,6 +28,13 @@ import { useSettings } from 'src/@core/hooks/useSettings'
 import FooterIllustrationsV2 from 'src/views/pages/auth/FooterIllustrationsV2'
 import GoodGameLogo from 'src/@core/components/logo'
 
+// ** Form + Validation
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { requestPasswordReset } from '../api/auth/requestPasswordReset'
+import toast from 'react-hot-toast'
+
 // Styled Components
 const ForgotPasswordIllustrationWrapper = styled(Box)<BoxProps>(
   ({ theme }) => ({
@@ -77,14 +84,47 @@ const LinkStyled = styled(Link)(({ theme }) => ({
   color: theme.palette.primary.main,
 }))
 
+// =======================
+// Validation schema
+// =======================
+const schema = z.object({
+  email: z.string().email('Enter a valid email address'),
+})
+
+type ForgotPasswordForm = z.infer<typeof schema>
+
 const ForgotPassword = () => {
   // ** Hooks
   const theme = useTheme()
   const { settings } = useSettings()
-
-  // ** Vars
   const { skin } = settings
   const hidden = useMediaQuery(theme.breakpoints.down('md'))
+
+  // ** Form
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<ForgotPasswordForm>({
+    resolver: zodResolver(schema),
+  })
+
+  // ** Handlers
+  const onSubmit = async (data: ForgotPasswordForm) => {
+    requestPasswordReset({
+      data: { email: data.email },
+    }).then((response) => {
+      if (response) {
+        toast.success('Email sent successfully', {
+          position: 'bottom-right',
+        })
+      } else {
+        toast.error('Something went wrong, please try again later.', {
+          position: 'bottom-right',
+        })
+      }
+    })
+  }
 
   const imageSource =
     skin === 'bordered'
@@ -166,22 +206,27 @@ const ForgotPassword = () => {
             <form
               noValidate
               autoComplete='off'
-              onSubmit={(e) => e.preventDefault()}
+              onSubmit={handleSubmit(onSubmit)}
             >
               <TextField
                 autoFocus
                 type='email'
                 label='Email'
+                fullWidth
                 sx={{ display: 'flex', mb: 4 }}
+                {...register('email')}
+                error={!!errors.email}
+                helperText={errors.email?.message}
               />
               <Button
                 fullWidth
                 size='large'
                 type='submit'
                 variant='contained'
+                disabled={isSubmitting}
                 sx={{ mb: 5.25 }}
               >
-                Send reset link
+                {isSubmitting ? 'Sending...' : 'Send reset link'}
               </Button>
               <Typography
                 variant='body2'
