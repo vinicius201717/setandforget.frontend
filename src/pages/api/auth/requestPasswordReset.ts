@@ -15,8 +15,7 @@ export async function requestPasswordReset({
     const res = await api.post('/auth/request-reset', {
       email: data.email,
     })
-
-    return res.status === 200
+    return res.status === 201
   } catch (error) {
     console.error('Error requesting password reset:', error)
     return false

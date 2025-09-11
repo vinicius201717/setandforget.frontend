@@ -2,7 +2,6 @@ import { api } from 'src/lib/axios'
 import { notify } from 'src/components/toast_notification/toastUserCreate'
 
 type ResetPasswordType = {
-  userId: string
   token: string
   newPassword: string
 }
@@ -18,7 +17,6 @@ export async function resetPassword({
 }: ResetPasswordProps): Promise<void> {
   try {
     const res = await api.post('/auth/reset-password', {
-      userId: data.userId,
       token: data.token,
       newPassword: data.newPassword,
     })

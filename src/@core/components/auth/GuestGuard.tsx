@@ -1,33 +1,40 @@
-// ** React Imports
+// src/layouts/GuestGuard.tsx
+/* eslint-disable react-hooks/exhaustive-deps */
 import { ReactNode, ReactElement, useEffect } from 'react'
-
-// ** Next Import
 import { useRouter } from 'next/router'
-
-// ** Hooks Import
 import { useAuth } from 'src/hooks/useAuth'
+import { GUEST_ROUTES } from 'src/configs/routes'
+
+// Defina o tipo explícito para as rotas
+export type GuestRoute = (typeof GUEST_ROUTES)[number]
 
 interface GuestGuardProps {
   children: ReactNode
   fallback: ReactElement | null
 }
 
-const GuestGuard = (props: GuestGuardProps) => {
-  const { children, fallback } = props
+const GuestGuard = ({ children, fallback }: GuestGuardProps) => {
   const auth = useAuth()
   const router = useRouter()
 
   useEffect(() => {
-    if (!router.isReady) {
+    if (!router.isReady || auth.loading) {
       return
     }
 
-    if (window.localStorage.getItem('userData')) {
+    if (auth.user || window.localStorage.getItem('userData')) {
       router.replace('/')
     }
-  }, [router.route])
+  }, [auth.user, auth.loading, router.isReady, router.route])
 
-  if (auth.loading || (!auth.loading && auth.user !== null)) {
+  if (auth.loading) {
+    return fallback
+  }
+
+  if (
+    auth.user !== null &&
+    GUEST_ROUTES.includes(router.pathname as GuestRoute)
+  ) {
     return fallback
   }
 

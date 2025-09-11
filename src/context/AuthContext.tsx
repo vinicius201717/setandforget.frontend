@@ -24,6 +24,8 @@ import { login } from 'src/pages/api/auth/login'
 import toast from 'react-hot-toast'
 import { sendCode } from 'src/pages/api/auth/loginCode'
 import { chessChallengeCancel } from 'src/pages/api/chess-challenge/chessChallengeCancel'
+import { GUEST_ROUTES } from 'src/configs/routes'
+import { GuestRoute } from 'src/@core/components/auth/GuestGuard'
 
 // ** Defaults
 const defaultProvider: AuthValuesType = {
@@ -69,8 +71,11 @@ const AuthProvider = ({ children }: Props) => {
   // ** Hooks
   const router = useRouter()
 
+  // src/context/AuthContext.tsx
   const redirectLogin = () => {
-    router.replace('/login')
+    if (!GUEST_ROUTES.includes(router.pathname as GuestRoute)) {
+      router.replace('/login')
+    }
   }
 
   const redirectUrl = () => {
