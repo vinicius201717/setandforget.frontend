@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 // ** React Imports
 import { useState, ChangeEvent } from 'react'
 
@@ -26,7 +27,7 @@ import Icon from 'src/@core/components/icon'
 import CustomChip from 'src/@core/components/mui/chip'
 
 // ** Component Import
-import PricingPlans from 'src/views/pages/pricing/PricingPlans'
+// import PricingPlans from 'src/views/pages/pricing/PricingPlans'
 
 const CurrentPlanCard = () => {
   // ** State
@@ -361,7 +362,7 @@ const CurrentPlanCard = () => {
               Annually
             </InputLabel>
           </Box>
-          <PricingPlans plan={plan} />
+          {/* <PricingPlans plan={plan} /> */}
         </DialogContent>
       </Dialog>
     </>

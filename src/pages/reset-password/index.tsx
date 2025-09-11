@@ -1,82 +1,53 @@
-// pages/reset-password.tsx
-
-// ** React Imports
+// pages/reset-password/index.tsx
 import { ReactNode } from 'react'
 import { useRouter } from 'next/router'
-
-// ** MUI Components
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
 import Box from '@mui/material/Box'
 import TextField from '@mui/material/TextField'
 import Button from '@mui/material/Button'
 import Typography from '@mui/material/Typography'
 import { styled } from '@mui/material/styles'
-
-// ** Layout
-import BlankLayout from 'src/@core/layouts/BlankLayout'
-
-// ** Logo
 import GoodGameLogo from 'src/@core/components/logo'
-
-// ** Form + Validation
-import { useForm } from 'react-hook-form'
-import { z } from 'zod'
-import { zodResolver } from '@hookform/resolvers/zod'
-
-// ** API
 import { resetPassword } from '../api/auth/resetPassword'
-import themeConfig from 'src/configs/themeConfig'
 
-// =======================
-// Styled Components
-// =======================
-const CenterWrapper = styled(Box)(({ theme }) => ({
-  minHeight: '100vh',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  backgroundColor: theme.palette.background.paper,
-}))
-
+// === Styled Components ===
 const BoxWrapper = styled(Box)(({ theme }) => ({
   width: '100%',
   maxWidth: 400,
-  padding: theme.spacing(8),
-  borderRadius: theme.shape.borderRadius * 2,
-  boxShadow: theme.shadows[3],
-  backgroundColor: theme.palette.background.default,
-}))
-
-const LinkStyled = styled('a')(({ theme }) => ({
+  margin: '0 auto',
+  padding: theme.spacing(6),
   display: 'flex',
-  fontSize: '0.875rem',
+  flexDirection: 'column',
   alignItems: 'center',
-  textDecoration: 'none',
   justifyContent: 'center',
-  color: theme.palette.primary.main,
-  cursor: 'pointer',
+  minHeight: '100vh',
 }))
 
-// =======================
-// Validation schema
-// =======================
+const FormBox = styled('form')({
+  width: '100%',
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '1rem',
+})
+
+// === Zod Schema ===
 const schema = z
   .object({
-    password: z.string().min(6, 'Password must be at least 6 characters'),
+    newPassword: z.string().min(6, 'Password must be at least 6 characters'),
     confirmPassword: z.string(),
   })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: 'Passwords must match',
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: "Passwords don't match",
     path: ['confirmPassword'],
   })
 
 type ResetPasswordForm = z.infer<typeof schema>
 
-// =======================
-// Component
-// =======================
 const ResetPasswordPage = () => {
   const router = useRouter()
-  const { token } = router.query
+  const { token } = router.query as { token: string }
 
   const {
     register,
@@ -87,104 +58,55 @@ const ResetPasswordPage = () => {
   })
 
   const onSubmit = async (data: ResetPasswordForm) => {
-    if (!token) {
-      return
-    }
+    if (!token) return
 
     await resetPassword({
-      data: {
-        token: String(token),
-        newPassword: data.password,
-      },
+      data: { token, newPassword: data.newPassword },
       onRedirectToLogin: () => router.push('/login'),
     })
   }
 
   return (
-    <CenterWrapper>
-      <BoxWrapper>
-        <Box
-          sx={{
-            mb: 6,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
+    <BoxWrapper>
+      <GoodGameLogo />
+      <Typography variant='h5' sx={{ mb: 2 }}>
+        Reset Password 🔒
+      </Typography>
+      <Typography variant='body2' sx={{ mb: 4, textAlign: 'center' }}>
+        Enter your new password below
+      </Typography>
+
+      <FormBox onSubmit={handleSubmit(onSubmit)}>
+        <TextField
+          label='New Password'
+          type='password'
+          fullWidth
+          {...register('newPassword')}
+          error={!!errors.newPassword}
+          helperText={errors.newPassword?.message}
+        />
+        <TextField
+          label='Confirm Password'
+          type='password'
+          fullWidth
+          {...register('confirmPassword')}
+          error={!!errors.confirmPassword}
+          helperText={errors.confirmPassword?.message}
+        />
+        <Button
+          type='submit'
+          variant='contained'
+          fullWidth
+          disabled={isSubmitting}
         >
-          <GoodGameLogo />
-          <Typography
-            variant='h6'
-            sx={{
-              ml: 2,
-              lineHeight: 1,
-              fontWeight: 600,
-              textTransform: 'uppercase',
-              fontSize: '1.25rem !important',
-            }}
-          >
-            {themeConfig.templateName}
-          </Typography>
-        </Box>
-
-        <Typography variant='h5' sx={{ mb: 1.5, fontWeight: 600 }}>
-          Reset Your Password 🔑
-        </Typography>
-        <Typography variant='body2' sx={{ mb: 4 }}>
-          Enter your new password and confirm it below.
-        </Typography>
-
-        <form noValidate autoComplete='off' onSubmit={handleSubmit(onSubmit)}>
-          <TextField
-            fullWidth
-            type='password'
-            label='New Password'
-            sx={{ mb: 4 }}
-            {...register('password')}
-            error={!!errors.password}
-            helperText={errors.password?.message}
-          />
-          <TextField
-            fullWidth
-            type='password'
-            label='Confirm Password'
-            sx={{ mb: 4 }}
-            {...register('confirmPassword')}
-            error={!!errors.confirmPassword}
-            helperText={errors.confirmPassword?.message}
-          />
-          <Button
-            fullWidth
-            size='large'
-            type='submit'
-            variant='contained'
-            disabled={isSubmitting}
-            sx={{ mb: 3 }}
-          >
-            {isSubmitting ? 'Submitting...' : 'Reset Password'}
-          </Button>
-
-          <Typography
-            variant='body2'
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <LinkStyled onClick={() => router.push('/login')}>
-              Back to login
-            </LinkStyled>
-          </Typography>
-        </form>
-      </BoxWrapper>
-    </CenterWrapper>
+          {isSubmitting ? 'Updating...' : 'Update Password'}
+        </Button>
+      </FormBox>
+    </BoxWrapper>
   )
 }
 
+ResetPasswordPage.getLayout = (page: ReactNode) => page
 ResetPasswordPage.guestGuard = true
-ResetPasswordPage.authGuard = false
 
-ResetPasswordPage.getLayout = (page: ReactNode) => (
-  <BlankLayout>{page}</BlankLayout>
-)
 export default ResetPasswordPage

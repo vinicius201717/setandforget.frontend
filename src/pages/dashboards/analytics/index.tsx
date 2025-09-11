@@ -40,7 +40,7 @@ const AnalyticsDashboard = () => {
     })
 
   const { user } = useAuth()
-  const amount = (user?.Account.amount as number) / 100
+  const amount = user?.Account?.amount ? user.Account.amount / 100 : 0
 
   useEffect(() => {
     getDashboardTransactionsData().then((response) => {

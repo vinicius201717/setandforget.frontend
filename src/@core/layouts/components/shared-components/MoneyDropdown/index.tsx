@@ -52,9 +52,7 @@ const MoneyDropdown = (props: Props) => {
         sx={{ borderRadius: '20px' }}
       >
         <Typography variant='h6'>
-          {user?.Account.amount
-            ? `${formatMoney(user?.Account.amount / 100)}`
-            : '0'}
+          {user?.Account?.amount ? formatMoney(user.Account.amount / 100) : '0'}
         </Typography>
       </IconButton>
       <Menu
@@ -95,7 +93,7 @@ const MoneyDropdown = (props: Props) => {
               size='small'
               color='primary'
               label={
-                user?.Account.amount
+                user?.Account?.amount
                   ? formatMoney(user.Account.amount / 100)
                   : '0'
               }

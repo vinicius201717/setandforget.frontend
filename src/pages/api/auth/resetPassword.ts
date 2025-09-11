@@ -1,11 +1,7 @@
+import toast from 'react-hot-toast'
 import { api } from 'src/lib/axios'
-import { notify } from 'src/components/toast_notification/toastUserCreate'
 
-type ResetPasswordType = {
-  token: string
-  newPassword: string
-}
-
+type ResetPasswordType = { token: string; newPassword: string }
 type ResetPasswordProps = {
   data: ResetPasswordType
   onRedirectToLogin: () => void
@@ -20,15 +16,16 @@ export async function resetPassword({
       token: data.token,
       newPassword: data.newPassword,
     })
-
-    if (res.status === 200) {
-      notify(true) // sucesso
+    if (res.status === 201) {
+      toast.success('password updated successfully.', {
+        position: 'bottom-right',
+      })
       setTimeout(() => {
         onRedirectToLogin()
       }, 3000)
     }
   } catch (error) {
-    notify(false) // falha
+    toast.error('Error when changing password.', { position: 'bottom-right' })
     console.error('Error resetting password:', error)
   }
 }
