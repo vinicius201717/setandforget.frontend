@@ -11,6 +11,10 @@ import Box, { BoxProps } from '@mui/material/Box'
 import useMediaQuery from '@mui/material/useMediaQuery'
 import { styled, useTheme } from '@mui/material/styles'
 import Typography, { TypographyProps } from '@mui/material/Typography'
+import Radio from '@mui/material/Radio'
+import RadioGroup from '@mui/material/RadioGroup'
+import FormControlLabel from '@mui/material/FormControlLabel'
+import FormLabel from '@mui/material/FormLabel'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
@@ -29,7 +33,7 @@ import FooterIllustrationsV2 from 'src/views/pages/auth/FooterIllustrationsV2'
 import GoodGameLogo from 'src/@core/components/logo'
 
 // ** Form + Validation
-import { useForm } from 'react-hook-form'
+import { useForm, Controller } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { requestPasswordReset } from '../api/auth/requestPasswordReset'
@@ -87,9 +91,23 @@ const LinkStyled = styled(Link)(({ theme }) => ({
 // =======================
 // Validation schema
 // =======================
-const schema = z.object({
-  email: z.string().email('Enter a valid email address'),
-})
+const schema = z.discriminatedUnion('method', [
+  z.object({
+    method: z.literal('email'),
+    email: z.string().email('Enter a valid email address'),
+    phone: z.string().optional(),
+  }),
+  z.object({
+    method: z.literal('phone'),
+    phone: z
+      .string()
+      .regex(
+        /^\+\d{10,15}$/,
+        'Enter a valid phone number (e.g. +559999999999)',
+      ),
+    email: z.string().optional(),
+  }),
+])
 
 type ForgotPasswordForm = z.infer<typeof schema>
 
@@ -104,18 +122,23 @@ const ForgotPassword = () => {
   const {
     register,
     handleSubmit,
+    watch,
+    control,
     formState: { errors, isSubmitting },
   } = useForm<ForgotPasswordForm>({
     resolver: zodResolver(schema),
+    defaultValues: { method: 'email' },
   })
+
+  const selectedMethod = watch('method')
 
   // ** Handlers
   const onSubmit = async (data: ForgotPasswordForm) => {
     requestPasswordReset({
-      data: { email: data.email },
+      data,
     }).then((response) => {
       if (response) {
-        toast.success('Email sent successfully', {
+        toast.success('Reset link sent successfully!', {
           position: 'bottom-right',
         })
       } else {
@@ -199,8 +222,7 @@ const ForgotPassword = () => {
                 Forgot Password? 🔒
               </TypographyStyled>
               <Typography variant='body2'>
-                Enter your email and we&prime;ll send you instructions to reset
-                your password
+                Choose how you want to receive your reset instructions
               </Typography>
             </Box>
             <form
@@ -208,16 +230,56 @@ const ForgotPassword = () => {
               autoComplete='off'
               onSubmit={handleSubmit(onSubmit)}
             >
-              <TextField
-                autoFocus
-                type='email'
-                label='Email'
-                fullWidth
-                sx={{ display: 'flex', mb: 4 }}
-                {...register('email')}
-                error={!!errors.email}
-                helperText={errors.email?.message}
+              <FormLabel component='legend' sx={{ mb: 2, fontWeight: 600 }}>
+                Send reset link via:
+              </FormLabel>
+
+              <Controller
+                name='method'
+                control={control}
+                defaultValue='email'
+                render={({ field }) => (
+                  <RadioGroup row {...field} sx={{ mb: 4 }}>
+                    <FormControlLabel
+                      value='email'
+                      control={<Radio />}
+                      label='Email'
+                    />
+                    <FormControlLabel
+                      value='phone'
+                      control={<Radio />}
+                      label='Phone'
+                    />
+                  </RadioGroup>
+                )}
               />
+
+              {selectedMethod === 'email' && (
+                <TextField
+                  autoFocus
+                  type='email'
+                  label='Email'
+                  fullWidth
+                  sx={{ display: 'flex', mb: 4 }}
+                  {...register('email')}
+                  error={!!errors.email}
+                  helperText={errors.email?.message}
+                />
+              )}
+
+              {selectedMethod === 'phone' && (
+                <TextField
+                  autoFocus
+                  type='tel'
+                  label='Phone Number'
+                  fullWidth
+                  sx={{ display: 'flex', mb: 4 }}
+                  {...register('phone')}
+                  error={!!errors.phone}
+                  helperText={errors.phone?.message}
+                />
+              )}
+
               <Button
                 fullWidth
                 size='large'

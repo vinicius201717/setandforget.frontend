@@ -26,9 +26,6 @@ import Icon from 'src/@core/components/icon'
 // ** Custom Components Imports
 import CustomChip from 'src/@core/components/mui/chip'
 
-// ** Component Import
-// import PricingPlans from 'src/views/pages/pricing/PricingPlans'
-
 const CurrentPlanCard = () => {
   // ** State
   const [open, setOpen] = useState<boolean>(false)
@@ -38,17 +35,11 @@ const CurrentPlanCard = () => {
   const [openPricingDialog, setOpenPricingDialog] = useState<boolean>(false)
 
   const handleChange = (e: ChangeEvent<{ checked: boolean }>) => {
-    if (e.target.checked) {
-      setPlan('annually')
-    } else {
-      setPlan('monthly')
-    }
+    setPlan(e.target.checked ? 'annually' : 'monthly')
   }
 
   const handleClose = () => setOpen(false)
-
   const handleSecondDialogClose = () => setSecondDialogOpen(false)
-
   const handleConfirmation = (value: string) => {
     handleClose()
     setUserInput(value)
@@ -56,7 +47,8 @@ const CurrentPlanCard = () => {
   }
 
   return (
-    <>
+    <Box sx={{ position: 'relative' }}>
+      {/* Card original */}
       <Card>
         <CardHeader title='Current Plan' />
         <CardContent>
@@ -78,7 +70,7 @@ const CurrentPlanCard = () => {
                   We will send you a notification upon Subscription expiration
                 </Typography>
               </Box>
-              <div>
+              <Box>
                 <Box sx={{ mb: 1, display: 'flex', alignItems: 'center' }}>
                   <Typography sx={{ mr: 2, fontWeight: 600 }}>
                     $199 Per Month
@@ -93,8 +85,9 @@ const CurrentPlanCard = () => {
                 <Typography sx={{ color: 'text.secondary' }}>
                   Standard plan for small to medium businesses
                 </Typography>
-              </div>
+              </Box>
             </Grid>
+
             <Grid item xs={12} md={6}>
               <Alert
                 severity='warning'
@@ -109,7 +102,7 @@ const CurrentPlanCard = () => {
                 Your plan requires update
               </Alert>
 
-              <div>
+              <Box>
                 <Box
                   sx={{
                     display: 'flex',
@@ -137,8 +130,9 @@ const CurrentPlanCard = () => {
                 <Typography variant='caption'>
                   6 days remaining until your plan requires update
                 </Typography>
-              </div>
+              </Box>
             </Grid>
+
             <Grid item xs={12}>
               <Box sx={{ mt: 3, gap: 4, display: 'flex', flexWrap: 'wrap' }}>
                 <Button
@@ -160,6 +154,30 @@ const CurrentPlanCard = () => {
         </CardContent>
       </Card>
 
+      {/* Overlay sombreado com COMING SOON */}
+      <Box
+        sx={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          bgcolor: 'rgba(56, 58, 58, 0.7)',
+          zIndex: 10,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <Typography
+          variant='h3'
+          sx={{ color: 'white', fontWeight: 400, textAlign: 'center' }}
+        >
+          COMING SOON
+        </Typography>
+      </Box>
+
+      {/* Dialogs originais (cancelamento/upgrade) */}
       <Dialog fullWidth maxWidth='xs' open={open} onClose={handleClose}>
         <DialogContent
           sx={{
@@ -219,6 +237,7 @@ const CurrentPlanCard = () => {
           </Button>
         </DialogActions>
       </Dialog>
+
       <Dialog
         fullWidth
         maxWidth='xs'
@@ -289,6 +308,7 @@ const CurrentPlanCard = () => {
           </Button>
         </DialogActions>
       </Dialog>
+
       <Dialog
         fullWidth
         scroll='body'
@@ -365,7 +385,7 @@ const CurrentPlanCard = () => {
           {/* <PricingPlans plan={plan} /> */}
         </DialogContent>
       </Dialog>
-    </>
+    </Box>
   )
 }
 

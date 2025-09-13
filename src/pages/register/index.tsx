@@ -37,7 +37,7 @@ import { useSettings } from 'src/@core/hooks/useSettings'
 // ** Demo Imports
 import FooterIllustrationsV2 from 'src/views/pages/auth/FooterIllustrationsV2'
 import { useForm } from 'react-hook-form'
-import { z } from 'zod'
+import { z, z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 
 // ** Styled Components
@@ -59,14 +59,16 @@ const RegisterIllustrationWrapper = styled(Box)<BoxProps>(({ theme }) => ({
   },
 }))
 
+// CONTINUAR DAQUI FAZENDO COM QUE O SISTEMA ACEITE SALVAR O NUMERO DO USUARIO DE FORMA DINAMICA COM CODIGO DO PAIS E DDD
 const formDataSchema = z.object({
   name: z.string().min(3, { message: 'Name is required' }),
   email: z.string().email({ message: 'Invalid e-mail' }),
   phone: z
     .string()
-    .min(11, { message: 'Invalid number' })
-    .max(11, { message: 'Invalid number' })
-    .nullable(),
+    .nullable()
+    .regex(/^\+\d{1,3}\d{2,3}\d{8,}$/, {
+      message: 'Invalid phone number format. Example: +5562984250875',
+    }),
   password: z
     .string()
     .min(6, { message: 'Password must have at least 6 characters' }),
