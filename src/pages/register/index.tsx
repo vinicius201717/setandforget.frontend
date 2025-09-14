@@ -37,7 +37,7 @@ import { useSettings } from 'src/@core/hooks/useSettings'
 // ** Demo Imports
 import FooterIllustrationsV2 from 'src/views/pages/auth/FooterIllustrationsV2'
 import { useForm } from 'react-hook-form'
-import { z, z } from 'zod'
+import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 
 // ** Styled Components
@@ -59,16 +59,15 @@ const RegisterIllustrationWrapper = styled(Box)<BoxProps>(({ theme }) => ({
   },
 }))
 
-// CONTINUAR DAQUI FAZENDO COM QUE O SISTEMA ACEITE SALVAR O NUMERO DO USUARIO DE FORMA DINAMICA COM CODIGO DO PAIS E DDD
 const formDataSchema = z.object({
   name: z.string().min(3, { message: 'Name is required' }),
   email: z.string().email({ message: 'Invalid e-mail' }),
   phone: z
     .string()
-    .nullable()
     .regex(/^\+\d{1,3}\d{2,3}\d{8,}$/, {
-      message: 'Invalid phone number format. Example: +5562984250875',
-    }),
+      message: 'Invalid phone number format. Example: +0011222222222',
+    })
+    .nullable(),
   password: z
     .string()
     .min(6, { message: 'Password must have at least 6 characters' }),
@@ -314,33 +313,6 @@ const Register = () => {
                   justifyContent: 'center',
                 }}
               >
-                <IconButton
-                  href='/'
-                  component={Link}
-                  sx={{ color: '#497ce2' }}
-                  onClick={(e) => e.preventDefault()}
-                >
-                  <Icon icon='mdi:facebook' />
-                </IconButton>
-                <IconButton
-                  href='/'
-                  component={Link}
-                  sx={{ color: '#1da1f2' }}
-                  onClick={(e) => e.preventDefault()}
-                >
-                  <Icon icon='mdi:twitter' />
-                </IconButton>
-                <IconButton
-                  href='/'
-                  component={Link}
-                  onClick={(e) => e.preventDefault()}
-                  sx={{
-                    color: (theme) =>
-                      theme.palette.mode === 'light' ? '#272727' : 'grey.300',
-                  }}
-                >
-                  <Icon icon='mdi:github' />
-                </IconButton>
                 <IconButton
                   href='/'
                   component={Link}

@@ -110,6 +110,7 @@
     "@types/jest": "^27.4.1",
     "@types/jsonwebtoken": "8.5.9",
     "@types/lodash": "^4.14.202",
+    "@types/next": "^9.0.0",
     "@types/node": "18.16.3",
     "@types/nprogress": "0.2.0",
     "@types/payment": "2.1.4",
