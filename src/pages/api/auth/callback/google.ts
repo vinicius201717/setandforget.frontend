@@ -7,6 +7,7 @@ export default async function handler(
   res: NextApiResponse,
 ) {
   const { code } = req.query
+  console.log(code)
 
   try {
     // envia o code para o backend NestJS

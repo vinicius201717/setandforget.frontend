@@ -113,6 +113,11 @@ const Register = () => {
     resolver: zodResolver(formDataSchema),
   })
 
+  const handleGoogleSignUp = () => {
+    const googleUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${process.env.GOOGLE_CLIENT_ID}&redirect_uri=${encodeURIComponent('http://localhost:3001/auth/google/callback')}&response_type=code&scope=profile email`
+    window.location.href = googleUrl
+  }
+
   async function handleSignUp(data: formDataType): Promise<void> {
     onRegister({ data, onRedirectToLogin: redirectLogin })
   }
@@ -317,7 +322,7 @@ const Register = () => {
                   href='/'
                   component={Link}
                   sx={{ color: '#db4437' }}
-                  onClick={(e) => e.preventDefault()}
+                  onClick={() => handleGoogleSignUp()}
                 >
                   <Icon icon='mdi:google' />
                 </IconButton>

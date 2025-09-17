@@ -3,4 +3,5 @@ export const GUEST_ROUTES = [
   '/register',
   '/forgot-password',
   '/reset-password',
+  '/home',
 ] as const
