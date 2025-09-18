@@ -209,7 +209,10 @@ const LoginPage = () => {
                 justifyContent: 'center',
               }}
             >
-              <GoodGameLogo />
+              <Link href={'/home'}>
+                <GoodGameLogo />
+              </Link>
+
               <Typography
                 variant='h6'
                 sx={{
