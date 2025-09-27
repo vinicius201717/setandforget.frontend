@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/no-unescaped-entities */
 import React, { ReactNode, useEffect, useState } from 'react'
 import {
@@ -15,12 +16,22 @@ import MenuIcon from '@mui/icons-material/Menu'
 import GoodGameLogo from 'src/@core/components/logo'
 import Link from 'next/link'
 import Image from 'next/image'
+import { Feature } from 'src/context/types'
+import { imageListName, textList } from 'src/utils/text-homepage'
+import InfiniteTextCarousel from 'src/components/home/InfiniteCarousel'
+import Footer from 'src/components/home/footer'
+import Avatar3D from 'src/components/home/cssanimation'
 
 const HomePage = () => {
-  const [scrollY, setScrollY] = useState(0)
-  const [scrolled, setScrolled] = useState(false)
-
   const theme = useTheme()
+
+  const [scrollY, setScrollY] = useState<number>(0)
+  const [scrolled, setScrolled] = useState<boolean>(false)
+  const [images, setImages] = useState<string>(
+    `/images/pages/${theme.palette.mode}-home-dashboard-exemple.png`,
+  )
+  const [selectedImage, setSelectedImage] = useState(imageListName[0])
+  const [textImage, setTextImage] = useState<Feature>(textList[0])
 
   useEffect(() => {
     const handleScroll = () => {
@@ -43,7 +54,57 @@ const HomePage = () => {
   const boxScale = Math.max(0.8, 1 - scrollY / 1000)
   const opacity = Math.max(0.5, 1 - scrollY / 600)
 
-  const imageList = ['Control', 'Games', 'Deposit', 'Withdrawls', 'Friendship']
+  const imagesList = [
+    `/images/pages/${theme.palette.mode}-home-dashboard-exemple.png`,
+    `/images/pages/${theme.palette.mode}-home-game-exemple.png`,
+    `/images/pages/${theme.palette.mode}-home-deposit-exemple.png`,
+    `/images/pages/${theme.palette.mode}-home-withdrawls-exemple.png`,
+    `/images/pages/${theme.palette.mode}-home-friendship-exemple.png`,
+  ]
+
+  const handleChangeImage = (key: string) => {
+    setSelectedImage(key)
+    switch (key) {
+      case 'Control':
+        setImages(imagesList[0])
+        setTextImage(textList[0])
+
+        break
+      case 'Games':
+        setImages(imagesList[1])
+        setTextImage(textList[1])
+
+        break
+      case 'Deposit':
+        setImages(imagesList[2])
+        setTextImage(textList[2])
+
+        break
+      case 'Withdrawls':
+        setImages(imagesList[3])
+        setTextImage(textList[3])
+
+        break
+      case 'Friendship':
+        setImages(imagesList[4])
+        setTextImage(textList[4])
+
+        break
+      default:
+        break
+    }
+  }
+  const isDark = theme.palette.mode === 'dark'
+
+  const backgroundGradient = isDark
+    ? `linear-gradient(135deg, ${theme.palette.primary.dark}, ${theme.palette.secondary.main})`
+    : `linear-gradient(135deg, ${theme.palette.grey[100]}, ${theme.palette.grey[300]})`
+
+  const boxShadow = isDark
+    ? '0px -20px 59px 7px rgba(106, 90, 205, 0.45)'
+    : '0px -10px 40px 4px rgba(106, 90, 205, 0.15)'
+
+  const borderColor = isDark ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.1)'
 
   return (
     <Box>
@@ -87,7 +148,7 @@ const HomePage = () => {
                 }}
               >
                 <Typography variant='body1' sx={{ fontWeight: 600 }}>
-                  Criar conta
+                  create account
                 </Typography>
               </Box>
             </Box>
@@ -125,8 +186,8 @@ const HomePage = () => {
               transition: 'all 0.2s linear',
             }}
           >
-            Transforme raciocínio rápido em dinheiro real jogando contra outros
-            jogadores.
+            Turn quick thinking into real money by playing against other
+            players.
           </Typography>
           <br />
           <Box>
@@ -138,8 +199,7 @@ const HomePage = () => {
                 opacity,
               }}
             >
-              Junte-se à plataforma de iGaming e transforme inteligência em
-              lucro.
+              Join the iGaming platform and turn intelligence into profit.
             </Typography>
           </Box>
           <Box
@@ -177,19 +237,18 @@ const HomePage = () => {
           borderRadius: '20px 20px 0 0',
           padding: '15px',
           paddingBottom: '0',
-          background:
-            'linear-gradient(135deg, rgb(106, 90, 205), rgb(138, 43, 226))', // degradê roxo
+          background: backgroundGradient,
           boxShadow: '0px -20px 59px 7px rgba(106, 90, 205,0.75)',
-          backdropFilter: 'blur(10px)', // se quiser efeito glass
+          backdropFilter: 'blur(10px)',
           WebkitBackdropFilter: 'blur(10px)',
-          border: '1px solid rgba(255,255,255,0.2)', // opcional, para reforçar efeito luz
+          border: '1px solid rgba(255,255,255,0.2)',
         }}
       >
         <Box
           sx={{
             width: '50vw',
             height: '100%',
-            position: 'relative', // necessário para Image com layout fill
+            position: 'relative',
             borderRadius: '20px 20px 0 0',
             backdropFilter: 'blur(15px)',
             WebkitBackdropFilter: 'blur(15px)',
@@ -200,7 +259,7 @@ const HomePage = () => {
           }}
         >
           <Image
-            src='/images/pages/home-dashboard-exemple.png'
+            src={images}
             alt='dashboard exemple'
             fill
             style={{
@@ -211,38 +270,88 @@ const HomePage = () => {
       </Box>
       <Box
         sx={{
-          height: '200vh',
           position: 'relative',
           bgcolor: theme.palette.background.paper,
           zIndex: 888,
-          paddingTop: '20px',
+          paddingTop: '40px',
           borderTop: '1px solid rgba(114, 114, 114, 0.3)',
-          boxShadow: '1px -250px 33px 12px rgba(52, 78, 134, 0.27)',
+          boxShadow,
           display: 'flex',
-          justifyContent: 'center', // centraliza horizontal
-          alignItems: 'flex-start', // impede que o filho cresça na altura
+          justifyContent: 'center',
+          alignItems: 'flex-start',
         }}
       >
         <Box
           sx={{
-            display: 'inline-flex',
-            borderRadius: '30px',
-            border: '1px solid rgba(255, 255, 255, 0.3)',
-            padding: '8px',
-            gap: 2,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: 4,
+            width: '100%',
+            maxWidth: '900px',
           }}
         >
-          {imageList.map((image, key) => (
-            <Button
-              key={key}
-              variant={key === 0 ? 'outlined' : 'text'}
-              sx={{ borderRadius: '25px', height: '40px' }}
-            >
-              {image}
-            </Button>
-          ))}
+          <Box
+            sx={{
+              display: 'flex',
+              borderRadius: '30px',
+              border: `1px solid ${borderColor}`,
+              padding: '8px 16px',
+              gap: 2,
+              width: 'fit-content',
+              margin: '0 auto',
+              backgroundColor: theme.palette.background.default,
+            }}
+          >
+            {imageListName.map((image, key) => (
+              <Button
+                key={key}
+                variant={selectedImage === image ? 'outlined' : 'text'}
+                sx={{
+                  borderRadius: '25px',
+                  height: '40px',
+                  minWidth: '120px',
+                  flexShrink: 0,
+                  textTransform: 'capitalize',
+                }}
+                onClick={() => handleChangeImage(image)}
+              >
+                {image}
+              </Button>
+            ))}
+          </Box>
+
+          {/* Texto descritivo abaixo */}
+          <Box textAlign='center' px={2}>
+            <Typography variant='h6' gutterBottom>
+              {textImage.title}
+            </Typography>
+            <Typography variant='body1' color='text.secondary'>
+              {textImage.description}
+            </Typography>
+          </Box>
+          <Typography variant='h4' sx={{ marginTop: '100px' }}>
+            Coming Soon
+          </Typography>
+          <InfiniteTextCarousel />
         </Box>
       </Box>
+      <Box
+        sx={{
+          width: '100vw',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          padding: '100px',
+          position: 'relative',
+          zIndex: '999',
+          bgcolor: theme.palette.background.paper,
+        }}
+      >
+        <Avatar3D />
+        <Typography variant='h3'>How it works</Typography>
+      </Box>
+      <Footer />
     </Box>
   )
 }

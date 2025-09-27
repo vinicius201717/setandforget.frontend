@@ -211,3 +211,9 @@ export type OnlineUser = {
   createdAt: string
   updatedAt: string
 }
+
+export type Feature = {
+  key: 'Dashboard' | 'Deposit' | 'Withdrawals' | 'Friendship' | 'Games'
+  title: string
+  description: string
+}
