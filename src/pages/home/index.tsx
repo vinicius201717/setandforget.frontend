@@ -20,7 +20,7 @@ import { Feature } from 'src/context/types'
 import { imageListName, textList } from 'src/utils/text-homepage'
 import InfiniteTextCarousel from 'src/components/home/InfiniteCarousel'
 import Footer from 'src/components/home/footer'
-import Avatar3D from 'src/components/home/cssanimation'
+import ParallaxFBX from 'src/components/home/ParalaxImageComponent'
 
 const HomePage = () => {
   const theme = useTheme()
@@ -338,7 +338,6 @@ const HomePage = () => {
       </Box>
       <Box
         sx={{
-          width: '100vw',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
@@ -348,7 +347,12 @@ const HomePage = () => {
           bgcolor: theme.palette.background.paper,
         }}
       >
-        <Avatar3D />
+        <Image
+          src={'/images/icons/project-icons/question.png'}
+          alt='question'
+          width={100}
+          height={100}
+        ></Image>
         <Typography variant='h3'>How it works</Typography>
       </Box>
       <Footer />
