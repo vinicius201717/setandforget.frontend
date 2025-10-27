@@ -1,6 +1,7 @@
 export type createNewPostType = {
   id?: string
-  name: string
+  title: string
+  subtitle: string
   description?: string
   videoLink: string
   categoryId: string
@@ -15,9 +16,17 @@ export interface Category {
 export interface Lesson {
   id: string
   categoryId: string
-  name: string
+  title: string
+  subtitle: string
+  watched: boolean
   description: string
   videoLink: string
+}
+
+export interface CategoryWithLessonsResponse {
+  id: string
+  name: string
+  classes: Lesson[]
 }
 
 export interface CategoryWithLessons extends Category {

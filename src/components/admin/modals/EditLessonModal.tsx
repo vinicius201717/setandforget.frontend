@@ -18,7 +18,8 @@ interface EditLessonModalProps {
   open: boolean
   onClose: () => void
   editData: {
-    name: string
+    title: string
+    subtitle: string
     description: string
     videoLink: string
     categoryId: string
@@ -96,12 +97,21 @@ export default function EditLessonModal({
         </FormControl>
 
         <TextField
-          label='Lesson Name'
+          label='Lesson title'
           variant='outlined'
-          value={editData.name}
+          value={editData.title}
           onChange={(e) => setEditData({ ...editData, name: e.target.value })}
           fullWidth
-          InputLabelProps={{ shrink: !!editData.name }}
+          InputLabelProps={{ shrink: !!editData.title }}
+        />
+
+        <TextField
+          label='Lesson subtitle'
+          variant='outlined'
+          value={editData.subtitle}
+          onChange={(e) => setEditData({ ...editData, name: e.target.value })}
+          fullWidth
+          InputLabelProps={{ shrink: !!editData.subtitle }}
         />
 
         <TextField

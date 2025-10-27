@@ -39,14 +39,14 @@ const LessonList: React.FC<LessonListProps> = ({
         >
           <Box sx={{ flexGrow: 1 }}>
             <Typography variant='subtitle1' fontWeight={600}>
-              {lesson.name}
+              {lesson.title}
             </Typography>
             <Typography
               variant='body2'
               color='text.secondary'
               sx={{ mb: lesson.videoLink ? 1 : 0 }}
             >
-              {lesson.description}
+              {lesson.subtitle}
             </Typography>
             {lesson.videoLink && (
               <a

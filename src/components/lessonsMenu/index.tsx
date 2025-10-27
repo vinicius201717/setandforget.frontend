@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import {
   List,
   ListItemButton,
@@ -7,31 +8,43 @@ import {
   Box,
 } from '@mui/material'
 import { ExpandLess, ExpandMore } from '@mui/icons-material'
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useTheme } from '@mui/material/styles'
+import { CategoryWithLessonsResponse, Lesson } from 'src/types/apps/admin'
 
-export default function LessonsMenu() {
+interface LessonsMenuProps {
+  lessons: CategoryWithLessonsResponse | undefined
+  onSelectLesson: (lesson: Lesson) => void
+}
+
+export default function LessonsMenu({
+  lessons,
+  onSelectLesson,
+}: LessonsMenuProps) {
   const [openTopic, setOpenTopic] = useState<string | null>(null)
   const theme = useTheme()
 
-  const handleToggle = (topic: string) => {
-    setOpenTopic(openTopic === topic ? null : topic)
+  const handleToggle = (topicId: string) => {
+    setOpenTopic(openTopic === topicId ? null : topicId)
   }
 
-  const topics = [
-    {
-      title: 'Módulo 1 - Fundamentos',
-      lessons: ['Introdução', 'O que é Price Action', 'Estrutura de Mercado'],
-    },
-    {
-      title: 'Módulo 2 - Estratégias',
-      lessons: ['Breakouts', 'Pullbacks', 'Gestão de Risco'],
-    },
-    {
-      title: 'Módulo 3 - Psicologia',
-      lessons: ['Controle Emocional', 'Rotina de Trader'],
-    },
-  ]
+  const groupedLessons = useMemo(() => {
+    if (!lessons?.classes) return []
+
+    const groups: Record<string, Lesson[]> = {}
+
+    lessons.classes.forEach((lesson) => {
+      if (!groups[lesson.title]) {
+        groups[lesson.title] = []
+      }
+      groups[lesson.title].push(lesson)
+    })
+
+    return Object.entries(groups).map(([title, lessons]) => ({
+      title,
+      lessons,
+    }))
+  }, [lessons])
 
   return (
     <Box>
@@ -39,78 +52,84 @@ export default function LessonsMenu() {
         variant='h6'
         sx={{ mb: 2, px: 7, color: theme.palette.text.primary }}
       >
-        Lesson
+        Lessons
       </Typography>
 
-      <List component='nav' disablePadding>
-        {topics.map((topic) => (
-          <Box key={topic.title}>
+      <List
+        component='nav'
+        disablePadding
+        sx={{
+          width: '100%',
+          bgcolor: 'background.paper',
+          borderRadius: 2,
+          boxShadow: 2,
+          overflow: 'hidden',
+        }}
+      >
+        {groupedLessons.map((group) => (
+          <Box key={group.title}>
+            {/* --- Módulo principal (title) --- */}
             <ListItemButton
-              onClick={() => handleToggle(topic.title)}
+              onClick={() => handleToggle(group.title)}
               sx={{
                 bgcolor:
-                  openTopic === topic.title
-                    ? theme.palette.action.selected
-                    : theme.palette.action.hover,
-                borderRadius: 2,
-                mb: 1,
-                px: 3,
-                width: { xs: '95%', md: '90%' },
-                mx: 'auto',
-                transition: 'all 0.2s ease',
+                  openTopic === group.title
+                    ? 'primary.main'
+                    : 'background.default',
+                color:
+                  openTopic === group.title
+                    ? 'primary.contrastText'
+                    : 'text.primary',
                 '&:hover': {
-                  bgcolor: theme.palette.action.focus,
-                  transform: 'scale(1.02)',
+                  bgcolor:
+                    openTopic === group.title ? 'primary.dark' : 'action.hover',
                 },
+                transition: 'all 0.3s ease',
               }}
             >
               <ListItemText
-                primary={topic.title}
-                primaryTypographyProps={{
-                  sx: {
-                    color: theme.palette.text.primary,
-                    fontWeight: 600,
-                    fontSize: '1rem',
-                  },
-                }}
+                primary={
+                  <Typography
+                    variant='subtitle1'
+                    fontWeight={600}
+                    sx={{ letterSpacing: 0.3 }}
+                  >
+                    {group.title}
+                  </Typography>
+                }
               />
-              {openTopic === topic.title ? (
-                <ExpandLess sx={{ color: theme.palette.text.primary }} />
-              ) : (
-                <ExpandMore sx={{ color: theme.palette.text.primary }} />
-              )}
+              {openTopic === group.title ? <ExpandLess /> : <ExpandMore />}
             </ListItemButton>
 
+            {/* --- Subaulas (subtitle) --- */}
             <Collapse
-              in={openTopic === topic.title}
+              in={openTopic === group.title}
               timeout='auto'
               unmountOnExit
             >
               <List component='div' disablePadding>
-                {topic.lessons.map((lesson) => (
+                {group.lessons.map((lesson) => (
                   <ListItemButton
-                    key={lesson}
+                    key={lesson.id}
+                    onClick={() => onSelectLesson(lesson)}
                     sx={{
-                      pl: 6,
-                      width: { xs: '92%', md: '88%' },
-                      mx: 'auto',
-                      mb: 0.5,
-                      borderRadius: 2,
-                      transition: 'all 0.2s ease',
+                      pl: 4,
+                      py: 1.2,
+                      borderBottom: '1px dashed',
+                      borderColor: 'divider',
                       '&:hover': {
-                        bgcolor: theme.palette.action.hover,
-                        transform: 'scale(1.01)',
+                        bgcolor: 'action.hover',
+                        pl: 4.5,
                       },
+                      transition: 'all 0.2s ease',
                     }}
                   >
                     <ListItemText
-                      primary={lesson}
-                      primaryTypographyProps={{
-                        sx: {
-                          color: theme.palette.text.secondary,
-                          fontSize: '0.9rem',
-                        },
-                      }}
+                      primary={
+                        <Typography variant='body2' color='text.secondary'>
+                          {lesson.subtitle}
+                        </Typography>
+                      }
                     />
                   </ListItemButton>
                 ))}

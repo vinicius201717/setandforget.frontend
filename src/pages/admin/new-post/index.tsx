@@ -43,7 +43,8 @@ import deleteCategory from 'src/pages/api/admin/deleteCategory'
 
 // Define the Zod schema based on CreateVideoDto
 const createVideoSchema = z.object({
-  name: z.string().min(1, 'Name is required'),
+  title: z.string().min(1, 'Name is required'),
+  subtitle: z.string().min(1, 'Subtitle is required'),
   description: z.string().optional(),
   videoLink: z
     .string()
@@ -64,7 +65,8 @@ export default function AdminContentPage() {
   const [openEditDialog, setOpenEditDialog] = useState(false)
   const [lessonToEdit, setLessonToEdit] = useState<Lesson | null>(null)
   const [editData, setEditData] = useState({
-    name: '',
+    title: '',
+    subtitle: '',
     description: '',
     videoLink: '',
     categoryId: '',
@@ -81,7 +83,8 @@ export default function AdminContentPage() {
   } = useForm({
     resolver: zodResolver(createVideoSchema),
     defaultValues: {
-      name: '',
+      title: '',
+      subtitle: '',
       description: '',
       videoLink: '',
       categoryId: '',
@@ -108,7 +111,8 @@ export default function AdminContentPage() {
   const handleEditLesson = (lesson: Lesson) => {
     setLessonToEdit(lesson)
     setEditData({
-      name: lesson.name,
+      title: lesson.title,
+      subtitle: lesson.subtitle,
       description: lesson.description || '',
       videoLink: lesson.videoLink || '',
       categoryId: lesson.categoryId,
@@ -242,7 +246,9 @@ export default function AdminContentPage() {
             allLessons.push({
               id: lesson.id,
               categoryId: cat.id,
-              name: lesson.name,
+              title: lesson.title,
+              subtitle: lesson.subtitle,
+              watched: lesson.watched,
               description: lesson.description,
               videoLink: lesson.videoLink,
             })
@@ -320,15 +326,29 @@ export default function AdminContentPage() {
         </Button>
 
         <Controller
-          name='name'
+          name='title'
           control={control}
           render={({ field }) => (
             <TextField
-              label='Lesson Name'
+              label='Lesson title'
               fullWidth
               {...field}
-              error={!!errors.name}
-              helperText={errors.name?.message}
+              error={!!errors.title}
+              helperText={errors.title?.message}
+            />
+          )}
+        />
+
+        <Controller
+          name='subtitle'
+          control={control}
+          render={({ field }) => (
+            <TextField
+              label='Lesson subtitle'
+              fullWidth
+              {...field}
+              error={!!errors.subtitle}
+              helperText={errors.subtitle?.message}
             />
           )}
         />
