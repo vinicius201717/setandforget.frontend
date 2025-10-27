@@ -22,7 +22,6 @@ import NotificationDropdown from 'src/@core/layouts/components/shared-components
 import { useEffect, useState } from 'react'
 import { getShortcuts } from 'src/pages/api/shortcuts/getShortcuts'
 import { ResponseCreateType } from 'src/context/types'
-import MoneyDropdown from 'src/@core/layouts/components/shared-components/MoneyDropdown'
 
 interface Props {
   hidden: boolean
@@ -79,7 +78,6 @@ const AppBarContent = (props: Props) => {
         className='actions-right'
         sx={{ display: 'flex', alignItems: 'center' }}
       >
-        <MoneyDropdown settings={settings} />
         <LanguageDropdown settings={settings} saveSettings={saveSettings} />
         <ModeToggler settings={settings} saveSettings={saveSettings} />
         {auth.user && (

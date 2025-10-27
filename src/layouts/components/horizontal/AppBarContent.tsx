@@ -17,7 +17,6 @@ import ShortcutsDropdown from 'src/@core/layouts/components/shared-components/Sh
 import { useEffect, useState } from 'react'
 import { getShortcuts } from 'src/pages/api/shortcuts/getShortcuts'
 import { ResponseCreateType } from 'src/context/types'
-import MoneyDropdown from 'src/@core/layouts/components/shared-components/MoneyDropdown'
 
 interface Props {
   hidden: boolean
@@ -49,7 +48,6 @@ const AppBarContent = (props: Props) => {
   return (
     <Box sx={{ display: 'flex', alignItems: 'center' }}>
       {auth.user && <Autocomplete hidden={hidden} settings={settings} />}
-      <MoneyDropdown settings={settings} />
       <LanguageDropdown settings={settings} saveSettings={saveSettings} />
       <ModeToggler settings={settings} saveSettings={saveSettings} />
       {auth.user && (

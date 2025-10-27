@@ -3,22 +3,10 @@ import { ShortcutsType } from '.'
 
 const shortcuts: ShortcutsType[] = [
   {
-    title: 'Chess',
-    url: '/chess/',
-    subtitle: 'Chess Play',
-    icon: 'mdi:chess-knight',
-  },
-  {
     title: 'Profile',
     url: '/pages/user-profile/profile/',
     subtitle: 'Page Profile',
     icon: 'mdi:account',
-  },
-  {
-    url: '/dashboards/analytics/',
-    title: 'Dashboard',
-    icon: 'mdi:chart-pie',
-    subtitle: 'User Dashboard',
   },
   {
     title: 'Settings',
@@ -55,24 +43,6 @@ const shortcuts: ShortcutsType[] = [
     icon: 'mdi:wallet-membership',
     subtitle: 'Signature',
     url: '/pages/pricing/',
-  },
-  {
-    title: 'Deposit',
-    icon: 'mdi:currency-usd',
-    subtitle: 'Money',
-    url: '/pages/deposit/',
-  },
-  {
-    title: 'Withdraw',
-    icon: 'mdi:cash-minus',
-    subtitle: 'Money',
-    url: '/pages/withdraw/',
-  },
-  {
-    title: 'Transactions',
-    icon: 'mdi:bank-transfer',
-    subtitle: 'Deposits and Withdraw',
-    url: '/pages/transactions/',
   },
   {
     title: 'Notifications',

@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
   Button,
@@ -72,8 +74,6 @@ export const PaymentMethodCardComponent = () => {
   }
 
   const onSubmit = (data: PaymentMethodForm) => {
-    console.log(data)
-
     setLoading(true)
     setTimeout(() => {
       setLoading(false)

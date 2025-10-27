@@ -23,7 +23,6 @@ import { initAuth } from 'src/pages/api/auth/me'
 import { login } from 'src/pages/api/auth/login'
 import toast from 'react-hot-toast'
 import { sendCode } from 'src/pages/api/auth/loginCode'
-import { chessChallengeCancel } from 'src/pages/api/chess-challenge/chessChallengeCancel'
 import { GUEST_ROUTES } from 'src/configs/routes'
 import { GuestRoute } from 'src/@core/components/auth/GuestGuard'
 
@@ -138,18 +137,10 @@ const AuthProvider = ({ children }: Props) => {
   }
 
   const handleLogout = () => {
-    const challengeId = window.localStorage.getItem(
-      'chess-challenge-id',
-    ) as string
-    const roomId = window.localStorage.getItem('chess-room-id') as string
-    chessChallengeCancel(challengeId, roomId).then(() => {
-      window.localStorage.removeItem('chess-challenge-id')
-    })
     if (toastId) toast.dismiss(toastId)
     setUser(null)
     window.localStorage.removeItem('userData')
     window.localStorage.removeItem(authConfig.storageTokenKeyName)
-    window.localStorage.removeItem('chess-challenge-id')
     router.push('/login')
   }
 

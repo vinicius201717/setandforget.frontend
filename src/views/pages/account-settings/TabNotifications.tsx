@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-unused-vars */
 import { useEffect, useState } from 'react'
@@ -195,40 +196,6 @@ const TabNotifications = () => {
                 <TableCell>
                   <Controller
                     name='newDeviceLoggedInPhone'
-                    control={control}
-                    render={({ field }) => (
-                      <Checkbox {...field} checked={field.value} />
-                    )}
-                  />
-                </TableCell>
-              </TableRow>
-              <TableRow key={'depositOrWithdrawal'}>
-                <TableCell>
-                  <Typography sx={{ whiteSpace: 'nowrap' }}>
-                    Deposit or Withdrawal
-                  </Typography>
-                </TableCell>
-                <TableCell>
-                  <Controller
-                    name='depositOrWithdrawalEmail'
-                    control={control}
-                    render={({ field }) => (
-                      <Checkbox {...field} checked={field.value} />
-                    )}
-                  />
-                </TableCell>
-                <TableCell>
-                  <Controller
-                    name='depositOrWithdrawalWhatsApp'
-                    control={control}
-                    render={({ field }) => (
-                      <Checkbox {...field} checked={field.value} />
-                    )}
-                  />
-                </TableCell>
-                <TableCell>
-                  <Controller
-                    name='depositOrWithdrawalPhone'
                     control={control}
                     render={({ field }) => (
                       <Checkbox {...field} checked={field.value} />

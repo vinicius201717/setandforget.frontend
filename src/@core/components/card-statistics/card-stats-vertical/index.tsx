@@ -7,11 +7,10 @@ import CardContent from '@mui/material/CardContent'
 // ** Custom Components Imports
 import CustomAvatar from 'src/@core/components/mui/avatar'
 import { CardStatsVerticalProps } from 'src/@core/components/card-statistics/types'
-import { DashboardChessData } from 'src/types/apps/dashboardType'
 
 interface ExtendedCardStatsVerticalProps
   extends Partial<CardStatsVerticalProps> {
-  data?: DashboardChessData
+  data?: any
 }
 
 const CardStatsVertical = (props: ExtendedCardStatsVerticalProps) => {

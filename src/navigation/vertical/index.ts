@@ -8,26 +8,22 @@ const navigation = (): VerticalNavItemsType => {
     },
     {
       icon: 'mdi:chart-timeline-variant',
-      title: 'Analytics',
-      path: '/dashboards/analytics',
+      title: 'Classes',
+      path: '/dashboards/classes',
     },
     {
       title: 'Assessment',
       icon: 'mdi:chart-box-outline',
       path: '/assessment',
     },
+
     {
-      sectionTitle: 'Jogos',
+      sectionTitle: 'Administration',
     },
-    // {
-    //   title: 'Football',
-    //   icon: 'ph:soccer-ball-thin',
-    //   path: '/sports/football',
-    // },
     {
-      title: 'Chess',
-      icon: 'streamline:chess-knight',
-      path: '/chess',
+      title: 'New Post',
+      icon: 'mdi:note-edit-outline',
+      path: '/admin/new-post',
     },
   ]
 }

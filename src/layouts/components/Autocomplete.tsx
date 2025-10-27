@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 // ** React Imports
 import { useEffect, useCallback, useRef, useState, ChangeEvent } from 'react'
 
@@ -62,13 +63,13 @@ const defaultSuggestionsData: DefaultSuggestionsType[] = [
     suggestions: [
       {
         icon: 'mdi:chart-donut',
-        suggestion: 'Analytics',
+        suggestion: 'Classes',
         link: '/dashboards/crm',
       },
       {
         icon: 'mdi:poll',
-        suggestion: 'Analytics',
-        link: '/dashboards/analytics',
+        suggestion: 'Classes',
+        link: '/dashboards/classes',
       },
     ],
   },

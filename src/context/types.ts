@@ -213,7 +213,7 @@ export type OnlineUser = {
 }
 
 export type Feature = {
-  key: 'Dashboard' | 'Deposit' | 'Withdrawals' | 'Friendship' | 'Games'
+  key: 'Dashboard' | 'Friendship' | 'Games'
   title: string
   description: string
 }

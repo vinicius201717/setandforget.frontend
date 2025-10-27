@@ -4,28 +4,19 @@ import { HorizontalNavItemsType } from 'src/@core/layouts/types'
 const navigation = (): HorizontalNavItemsType => {
   return [
     {
-      icon: 'mdi:chart-timeline-variant',
-      title: 'Analytics',
-      path: '/dashboards/analytics',
+      title: 'Classes',
+      icon: 'mdi:chart-box-outline',
+      path: '/dashboards/classes',
     },
     {
       title: 'Assessment',
       icon: 'mdi:chart-box-outline',
       path: '/assessment',
     },
-    // {
-    //   title: 'Football',
-    //   path: '/sports/football',
-    // },
     {
-      title: 'Chess',
-      icon: 'streamline:chess-knight',
-      path: '/chess',
-    },
-    {
-      title: 'Assessment',
-      icon: 'mdi:chart-box-outline',
-      path: '/chess',
+      title: 'New Post',
+      icon: 'mdi:note-edit-outline',
+      path: '/admin/new-post',
     },
   ]
 }

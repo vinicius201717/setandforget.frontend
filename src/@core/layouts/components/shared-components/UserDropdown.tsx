@@ -11,7 +11,7 @@ import Badge from '@mui/material/Badge'
 import Avatar from '@mui/material/Avatar'
 import Divider from '@mui/material/Divider'
 import MenuItem from '@mui/material/MenuItem'
-import { styled, useTheme } from '@mui/material/styles'
+import { styled } from '@mui/material/styles'
 import Typography from '@mui/material/Typography'
 
 // ** Icon Imports
@@ -83,9 +83,6 @@ const UserDropdown = (props: Props) => {
     logout()
     handleDropdownClose()
   }
-
-  const theme = useTheme()
-
   return (
     <Fragment>
       <Badge
@@ -171,27 +168,6 @@ const UserDropdown = (props: Props) => {
           <Box sx={styles}>
             <Icon icon='mdi:cog-outline' />
             Settings
-          </Box>
-        </MenuItem>
-        <MenuItem
-          sx={{ p: 0 }}
-          onClick={() => handleDropdownClose('/pages/deposit')}
-        >
-          <Box sx={{ ...styles, color: 'primary.main' }}>
-            <Icon
-              icon='mdi:money'
-              style={{ color: theme.palette.primary.main }}
-            />
-            Deposit/withdraw
-          </Box>
-        </MenuItem>
-        <MenuItem
-          sx={{ p: 0 }}
-          onClick={() => handleDropdownClose('/pages/transactions')}
-        >
-          <Box sx={{ ...styles }}>
-            <Icon icon='mdi:swap-horizontal' />
-            Transaction
           </Box>
         </MenuItem>
         <MenuItem
