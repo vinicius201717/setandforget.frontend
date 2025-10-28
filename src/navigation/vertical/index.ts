@@ -6,10 +6,21 @@ const navigation = (): VerticalNavItemsType => {
     {
       sectionTitle: 'Dashboard',
     },
+
     {
-      icon: 'mdi:chart-timeline-variant',
-      title: 'Classes',
+      icon: 'mdi:home-outline',
+      title: 'Home',
       path: '/dashboards/classes',
+    },
+    {
+      icon: 'mdi:book-open-page-variant',
+      title: 'Learging',
+      path: '/pages/learning',
+    },
+    {
+      icon: 'mdi:check-box-multiple-outline',
+      title: 'Checklist',
+      path: '/pages/checklist',
     },
     {
       title: 'Assessment',

@@ -259,7 +259,6 @@ export default function AdminContentPage() {
       setLessons(allLessons)
     })
   }, [])
-
   return (
     <Box
       sx={{

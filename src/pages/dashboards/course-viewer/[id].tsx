@@ -1,23 +1,25 @@
+'use client'
+
 import { Box } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import LessonsMenu from 'src/components/lessonsMenu'
 import getClasses from 'src/pages/api/classes/getClasses'
 import { CategoryWithLessonsResponse, Lesson } from 'src/types/apps/admin'
+import { useRouter } from 'next/router'
 
 const CourseViewer = () => {
+  const router = useRouter()
+  const id = router.query.id as string
   const [lessons, setLessons] = useState<CategoryWithLessonsResponse>()
   const [selectedLesson, setSelectedLesson] = useState<Lesson | null>(null)
 
   useEffect(() => {
-    document.title = 'Course Viewer - Set and Forget'
-    getClasses('classes')
-      .then((res) => {
-        setLessons(res.data)
-      })
-      .catch((err) => {
-        console.error('Erro ao carregar aulas:', err)
-      })
-  }, [])
+    if (!id) return
+
+    getClasses(id)
+      .then((res) => setLessons(res.data))
+      .catch((err) => console.error(err))
+  }, [id, router.query])
 
   return (
     <Box
