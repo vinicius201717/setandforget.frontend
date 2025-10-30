@@ -9,8 +9,9 @@ const navigation = (): VerticalNavItemsType => {
 
     {
       icon: 'mdi:home-outline',
-      title: 'Home',
-      path: '/dashboards/classes',
+      title: 'Home DESENVOLVIMENTO',
+      path: '/pages/home',
+      disabled: true,
     },
     {
       icon: 'mdi:book-open-page-variant',
@@ -30,11 +31,13 @@ const navigation = (): VerticalNavItemsType => {
 
     {
       sectionTitle: 'Administration',
+      role: 'admin',
     },
     {
       title: 'New Post',
       icon: 'mdi:note-edit-outline',
       path: '/admin/new-post',
+      role: 'admin',
     },
   ]
 }

@@ -21,7 +21,7 @@ export type ACLObj = {
 const defineRulesFor = (role: string, subject: string) => {
   const { can, rules } = new AbilityBuilder(AppAbility)
 
-  if (role === 'client') {
+  if (role === 'client' || role === 'admin') {
     can('manage', 'all')
 
     // colocado no codigo pra evitar o erro de variavel sem uso

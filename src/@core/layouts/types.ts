@@ -52,6 +52,7 @@ export type NavGroup = {
   auth?: boolean
   action?: string
   subject?: string
+  role?: string | string[]
   badgeContent?: string
   children?: (NavGroup | NavLink)[]
   badgeColor?:
@@ -71,6 +72,7 @@ export type NavLink = {
   auth?: boolean
   action?: string
   subject?: string
+  role?: string | string[]
   disabled?: boolean
   badgeContent?: string
   externalLink?: boolean

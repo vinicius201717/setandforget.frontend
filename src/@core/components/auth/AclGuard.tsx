@@ -41,7 +41,7 @@ const AclGuard = (props: AclGuardProps) => {
 
   useEffect(() => {
     if (auth.user && !guestGuard && router.route === '/') {
-      const homeRoute = '/dashboards/classes'
+      const homeRoute = '/pages/learning'
       router.replace(homeRoute)
     }
   }, [auth.user, guestGuard, router])

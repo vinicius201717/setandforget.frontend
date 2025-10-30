@@ -6,23 +6,22 @@ import { Theme } from '@mui/material/styles'
 import useMediaQuery from '@mui/material/useMediaQuery'
 
 // ** Layout Imports
-// !Do not remove this Layout import
 import Layout from 'src/@core/layouts/Layout'
 
 // ** Navigation Imports
 import VerticalNavItems from 'src/navigation/vertical'
 import HorizontalNavItems from 'src/navigation/horizontal'
 
-// ** Component Import
-// Uncomment the below line (according to the layout type) when using server-side menu
-// import ServerSideVerticalNavItems from './components/vertical/ServerSideNavItems'
-// import ServerSideHorizontalNavItems from './components/horizontal/ServerSideNavItems'
-
+// ** Component Imports
 import VerticalAppBarContent from './components/vertical/AppBarContent'
 import HorizontalAppBarContent from './components/horizontal/AppBarContent'
 
-// ** Hook Import
+// ** Hook Imports
 import { useSettings } from 'src/@core/hooks/useSettings'
+import { useAuth } from 'src/hooks/useAuth'
+
+// ** Types Imports
+import { VerticalNavItemsType } from 'src/@core/layouts/types' // 👈 importante
 
 interface Props {
   children: ReactNode
@@ -30,23 +29,46 @@ interface Props {
 }
 
 const UserLayout = ({ children, contentHeightFixed }: Props) => {
-  // ** Hooks
   const { settings, saveSettings } = useSettings()
-
-  // ** Vars for server side navigation
-  // const { menuItems: verticalMenuItems } = ServerSideVerticalNavItems()
-  // const { menuItems: horizontalMenuItems } = ServerSideHorizontalNavItems()
-
-  /**
-   *  The below variable will hide the current layout menu at given screen size.
-   *  The menu will be accessible from the Hamburger icon only (Vertical Overlay Menu).
-   *  You can change the screen size from which you want to hide the current layout menu.
-   *  Please refer useMediaQuery() hook: https://mui.com/material-ui/react-use-media-query/,
-   *  to know more about what values can be passed to this hook.
-   *  ! Do not change this value unless you know what you are doing. It can break the template.
-   */
   const hidden = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'))
+  const { user } = useAuth()
 
+  const userRole: string | undefined = user?.role
+
+  // ✅ Carrega o menu
+  const allNavItems: VerticalNavItemsType = VerticalNavItems()
+
+  // ✅ Filtro recursivo compatível com VerticalNavItemsType
+  const filterByRole = (
+    items: VerticalNavItemsType,
+    role?: string,
+  ): VerticalNavItemsType => {
+    return items
+      .map((item) => {
+        // Se o item não tiver role, mantém
+        if (!('role' in item) || !role) return item
+
+        // Se tiver role, verifica permissão
+        const hasPermission = Array.isArray(item.role)
+          ? item.role.includes(role)
+          : item.role === role
+
+        if (!hasPermission) return null
+
+        // Se tiver children, filtra recursivamente
+        if ('children' in item && item.children) {
+          const filteredChildren = filterByRole(item.children, role)
+          return { ...item, children: filteredChildren }
+        }
+
+        return item
+      })
+      .filter((item): item is Exclude<typeof item, null> => Boolean(item))
+  }
+
+  const filteredNavItems = filterByRole(allNavItems, userRole)
+
+  // Corrige layout horizontal em telas pequenas
   if (hidden && settings.layout === 'horizontal') {
     settings.layout = 'vertical'
   }
@@ -59,10 +81,8 @@ const UserLayout = ({ children, contentHeightFixed }: Props) => {
       contentHeightFixed={contentHeightFixed}
       verticalLayoutProps={{
         navMenu: {
-          navItems: VerticalNavItems(),
-
-          // Uncomment the below line when using server-side menu in vertical layout and comment the above line
-          // navItems: verticalMenuItems
+          // ✅ Tipagem compatível
+          navItems: filteredNavItems,
         },
         appBar: {
           content: (props) => (
@@ -79,9 +99,6 @@ const UserLayout = ({ children, contentHeightFixed }: Props) => {
         horizontalLayoutProps: {
           navMenu: {
             navItems: HorizontalNavItems(),
-
-            // Uncomment the below line when using server-side menu in horizontal layout and comment the above line
-            // navItems: horizontalMenuItems
           },
           appBar: {
             content: () => (
