@@ -20,7 +20,6 @@ import { Feature } from 'src/context/types'
 import { imageListName, textList } from 'src/utils/text-homepage'
 import InfiniteTextCarousel from 'src/components/home/InfiniteCarousel'
 import Footer from 'src/components/home/footer'
-import ParallaxFBX from 'src/components/home/ParalaxImageComponent'
 
 const HomePage = () => {
   const theme = useTheme()

@@ -11,7 +11,6 @@ const navigation = (): VerticalNavItemsType => {
       icon: 'mdi:home-outline',
       title: 'Home DESENVOLVIMENTO',
       path: '/pages/home',
-      disabled: true,
     },
     {
       icon: 'mdi:book-open-page-variant',
