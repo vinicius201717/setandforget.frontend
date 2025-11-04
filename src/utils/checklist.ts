@@ -1,125 +1,115 @@
-export type Item = {
-  id: string
-  title: string
-  description?: string
-  weight: number // percentual da confluência
-  group: string
-}
+import { Item } from 'src/types/apps/operationType'
 
 export const CHECKLIST: Item[] = [
-  // Grupo: Weekly / Daily / 4H - Swingtrade
   {
-    id: 'w1',
-    title: 'At AOI / Rejeição (Semanal/Diário)',
-    weight: 10,
-    group: 'Swing (Weekly/Daily/4H)',
-  },
-  {
-    id: 'w2',
-    title: 'Toque / Rejeição da EMA (Weekly/Daily/4H)',
-    weight: 5,
-    group: 'Swing (Weekly/Daily/4H)',
-  },
-  {
-    id: 'w3',
-    title: 'Candle de rejeição (Weekly/Daily)',
-    weight: 10,
-    group: 'Swing (Weekly/Daily/4H)',
-  },
-  {
-    id: 'w4',
-    title: 'Rejeição em ponto de estrutura anterior (Weekly/Daily/4H)',
-    weight: 5,
-    group: 'Swing (Weekly/Daily/4H)',
-  },
-  {
-    id: 'w5',
-    title: 'Nível psicológico redondo (Weekly/Daily)',
-    weight: 5,
-    group: 'Swing (Weekly/Daily/4H)',
-  },
-  {
-    id: 'w6',
-    title: 'Padrões (Weekly/Daily/4H)',
-    weight: 10,
-    group: 'Swing (Weekly/Daily/4H)',
-  },
-
-  // Entry checklist 4H, 2H, 1H, 30M
-  {
-    id: 'e1',
-    title: 'Zona/Dourada 4H (Gold/Zone)',
-    weight: 5,
-    group: 'Entrada (4H/2H/1H/30M)',
-  },
-  {
-    id: 'e2',
-    title: 'SOS 30+1H (confluência de ordem superior)',
-    weight: 10,
-    group: 'Entrada (4H/2H/1H/30M)',
-  },
-  {
-    id: 'e3',
-    title: 'Padrões na entrada (ex.: pin/bar, inside bar, etc.)',
-    weight: 5,
-    group: 'Entrada (4H/2H/1H/30M)',
-  },
-  {
-    id: 'e4',
-    title: 'Compra/Venda obrigatória em HL/LH de H1 que combine com 4H',
-    weight: 5,
-    group: 'Entrada (4H/2H/1H/30M)',
-  },
-  {
-    id: 'e5',
-    title: 'Engolfamento em 1H (Engulfing 1H)',
-    weight: 10,
-    group: 'Entrada (4H/2H/1H/30M)',
-  },
-  {
-    id: 'e6',
-    title: 'RR mínimo 2.50 (Obrigatório)',
-    weight: 0,
+    id: 'aoi-touch',
+    title: 'Toque / Rejeição em AOI (Weekly/Daily)',
     description:
-      'Este item é obrigatório: se não houver RR ≥ 2.5, a entrada é rejeitada independentemente da soma.',
-    group: 'Entrada (4H/2H/1H/30M)',
+      'Preço reagindo em AOI no Weekly/Daily (ex.: martelo, engulfing)',
+    group: 'Análise',
+    weight: 15,
   },
+  {
+    id: 'psych-level',
+    title: 'Nível psicológico (Weekly/Daily)',
+    description:
+      'Níveis redondos (ex.: 1.20000). Confluência extra se coincidir com AOI',
+    group: 'Análise',
+    weight: 10,
+  },
+  {
+    id: 'ema-touch',
+    title: 'Toque / Rejeição na EMA 50',
+    description: 'EMA50 atuando como suporte/resistência dinâmica',
+    group: 'Análise',
+    weight: 10,
+  },
+  {
+    id: 'candle-rejection',
+    title: 'Rejeição por padrão de candle',
+    description: 'Pin bar, martelo, martelo invertido, engulfing',
+    group: 'Análise',
+    weight: 10,
+  },
+  {
+    id: 'prev-structure',
+    title: 'Rejeição na estrutura anterior',
+    description: 'Preço reagindo em topos/fundos anteriores',
+    group: 'Análise',
+    weight: 10,
+  },
+  {
+    id: 'patterns',
+    title: 'Padrões/gráficos',
+    description: 'Topo/Fundo duplo, OCO, rompimento e reteste',
+    group: 'Análise',
+    weight: 10,
+  },
+  {
+    id: 'sos',
+    title: 'SOS — Shift Of Structure',
+    description: 'Mudança de estrutura confirmando força',
+    group: 'Entrada',
+    weight: 15,
+  },
+  {
+    id: 'entry-patterns',
+    title: 'Padrões de entrada',
+    description: 'Topo/Fundo duplo, OCO, Pullback',
+    group: 'Entrada',
+    weight: 10,
+  },
+  {
+    id: 'hl-lh',
+    title: 'Entrada em HL/LH',
+    description: 'HL para compra, LH para venda',
+    group: 'Entrada',
+    weight: 10,
+  },
+  {
+    id: 'engulfing-4h',
+    title: 'Engulfing no 4H',
+    description: 'Engulfing demonstra domínio de compradores/vendedores',
+    group: 'Entrada',
+    weight: 5,
+  },
+]
 
-  // Cheklist 4H/Daily/Daytrade
-  {
-    id: 'd1',
-    title: 'Toque / Rejeição EMA (Daily/4H)',
-    weight: 5,
-    group: 'Daytrade (Daily/4H)',
-  },
-  {
-    id: 'd2',
-    title: 'Candle de rejeição no diário (Daily) / 4H',
-    weight: 10,
-    group: 'Daytrade (Daily/4H)',
-  },
-  {
-    id: 'd3',
-    title: 'Rejeição em estrutura anterior (Daily/4H)',
-    weight: 10,
-    group: 'Daytrade (Daily/4H)',
-  },
-  {
-    id: 'd4',
-    title: 'At AOI (Daily)',
-    weight: 10,
-    group: 'Daytrade (Daily/4H)',
-  },
-  {
-    id: 'd5',
-    title: 'Padrões Daily / 4H',
-    weight: 10,
-    group: 'Daytrade (Daily/4H)',
-  },
-  {
-    id: 'd6',
-    title: 'Nível psicológico redondo (Daily)',
-    weight: 5,
-    group: 'Daytrade (Daily/4H)',
-  },
+export const FOREX_PAIRS = [
+  'EUR/USD',
+  'GBP/USD',
+  'USD/JPY',
+  'USD/CHF',
+  'USD/CAD',
+  'AUD/USD',
+  'NZD/USD',
+  'EUR/GBP',
+  'EUR/JPY',
+  'EUR/CHF',
+  'EUR/AUD',
+  'EUR/NZD',
+  'EUR/CAD',
+  'GBP/JPY',
+  'GBP/CHF',
+  'GBP/AUD',
+  'GBP/NZD',
+  'GBP/CAD',
+  'AUD/JPY',
+  'AUD/NZD',
+  'AUD/CHF',
+  'AUD/CAD',
+  'NZD/JPY',
+  'NZD/CHF',
+  'NZD/CAD',
+  'CAD/JPY',
+  'CAD/CHF',
+  'CHF/JPY',
+]
+
+export const GRADES = [
+  { threshold: 90, label: 'A+' },
+  { threshold: 80, label: 'B+' },
+  { threshold: 70, label: 'C+' },
+  { threshold: 60, label: 'D+' },
+  { threshold: 50, label: 'F+' },
 ]

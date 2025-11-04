@@ -5,8 +5,6 @@ import { CreateOperationType } from 'src/types/apps/operationType'
 export async function createOperation(
   createOperationType: CreateOperationType,
 ) {
-  console.log(createOperationType)
-
   try {
     const storedToken = window.localStorage.getItem(
       authConfig.storageTokenKeyName,

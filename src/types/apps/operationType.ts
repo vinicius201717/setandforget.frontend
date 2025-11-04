@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 export interface OperationType {
   id: string
   userId: string
@@ -18,6 +19,7 @@ export interface CreateOperationType {
   rr?: number
   checklist?: string
   notes?: string
+  link?: string
 }
 
 export interface UpdateOperationType {
@@ -26,4 +28,24 @@ export interface UpdateOperationType {
   rr?: number
   checklist?: string
   notes?: string
+}
+
+export type Item = {
+  id: string
+  title: string
+  description?: string
+  group: string
+  weight: number
+}
+
+export interface AnalysisItem {
+  id?: string
+  pair: string
+  date: string
+  checkedItems: string[]
+}
+
+export interface AnalisesRegistradasCardProps {
+  analyses: AnalysisItem[]
+  loadAnalysis: (a: AnalysisItem) => void
 }
