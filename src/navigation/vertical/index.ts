@@ -23,6 +23,11 @@ const navigation = (): VerticalNavItemsType => {
       path: '/pages/checklist',
     },
     {
+      icon: 'mdi:rss-box',
+      title: 'Feed',
+      path: '/pages/feed',
+    },
+    {
       title: 'Assessment',
       icon: 'mdi:chart-box-outline',
       path: '/assessment',

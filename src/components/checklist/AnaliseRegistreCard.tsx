@@ -9,12 +9,16 @@ import {
   List,
   ListItemButton,
   ListItemText,
+  IconButton,
 } from '@mui/material'
 import { AnalisesRegistradasCardProps } from 'src/types/apps/operationType'
+
+import DeleteIcon from '@mui/icons-material/Delete'
 
 export default function AnalisesRegistradasCard({
   analyses,
   loadAnalysis,
+  onDelete,
 }: AnalisesRegistradasCardProps) {
   return (
     <Card
@@ -33,8 +37,20 @@ export default function AnalisesRegistradasCard({
         <List dense sx={{ maxHeight: 300, overflowY: 'auto' }}>
           {analyses.length > 0 ? (
             analyses.map((a, i) => (
-              <ListItemButton key={i} onClick={() => loadAnalysis(a)}>
-                <ListItemText primary={a.pair} secondary={a.date} />
+              <ListItemButton key={i}>
+                <ListItemText
+                  onClick={() => loadAnalysis(a)}
+                  primary={a.pair}
+                  secondary={a.date}
+                />
+
+                <IconButton
+                  edge='end'
+                  onClick={() => onDelete(a)}
+                  sx={{ ml: 1 }}
+                >
+                  <DeleteIcon color='error' />
+                </IconButton>
               </ListItemButton>
             ))
           ) : (

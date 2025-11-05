@@ -52,6 +52,7 @@ import AnalisesRegistradasCard from 'src/components/checklist/AnaliseRegistreCar
 import toast from 'react-hot-toast'
 import { AnalysisItem } from 'src/types/apps/operationType'
 import { getOperationsByUserDraft } from 'src/pages/api/operation/getOperationByUserDraft'
+import { deleteOperation } from 'src/pages/api/operation/deleteOperation'
 
 // Mock do professor
 const professorPairs = ['EUR/USD', 'USD/JPY', 'AUD/USD']
@@ -316,6 +317,22 @@ export default function ChecklistTradingPage() {
     })
   }
 
+  const handleDeleteAnalysis = async (analysis: AnalysisItem) => {
+    if (!analysis.id) {
+      setAnalyses((prev) => prev.filter((a) => a !== analysis))
+      return
+    }
+
+    const res = await deleteOperation(analysis.id)
+
+    if (res) {
+      setAnalyses((prev) => prev.filter((a) => a.id !== analysis.id))
+      toast.success('Análise removida!', { position: 'bottom-right' })
+    } else {
+      toast.error('Erro ao remover análise.', { position: 'bottom-right' })
+    }
+  }
+
   useEffect(() => {
     const fetchDrafts = async () => {
       const res = await getOperationsByUserDraft()
@@ -439,6 +456,7 @@ export default function ChecklistTradingPage() {
           <AnalisesRegistradasCard
             analyses={analyses}
             loadAnalysis={loadAnalysis}
+            onDelete={handleDeleteAnalysis}
           />
         </Grid>
       </Grid>

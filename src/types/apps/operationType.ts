@@ -48,4 +48,5 @@ export interface AnalysisItem {
 export interface AnalisesRegistradasCardProps {
   analyses: AnalysisItem[]
   loadAnalysis: (a: AnalysisItem) => void
+  onDelete: (analysis: AnalysisItem) => void
 }
