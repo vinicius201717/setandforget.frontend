@@ -13,7 +13,7 @@ export interface Post {
   metrics: { likes: number; reposts: number; replies: number; views?: number }
   userReactions: { liked: boolean; bookmarked: boolean; reposted: boolean }
   createdAt: string
-  tags?: string[]
+  tags: string[]
   pair?: string
 }
 

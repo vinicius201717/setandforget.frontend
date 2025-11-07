@@ -1,62 +1,98 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState } from 'react'
-import { Stack } from '@mui/material'
-import PostMediaModal from './PostMediaModal'
+/* eslint-disable react-hooks/exhaustive-deps */
+'use client'
+
+import React, { useRef, useEffect, useState } from 'react'
+import { Stack, Box, CircularProgress } from '@mui/material'
+
 import PostCard from './PostCard/PostCard'
+import PostMediaModal from './PostMediaModal'
+
+import { useFeed } from './hooks/useFeed'
+import { usePostActions } from './hooks/usePostAction'
+import ComposerButton from './Composer/ComposerButton'
+import ComposerSheet from './Composer/ComposerSheet'
 
 export default function FeedList() {
+  const { posts, setPosts, loading, hasMore, fetchMore } = useFeed()
+  const { like, repost } = usePostActions(posts, setPosts)
+
   const [selectedMedia, setSelectedMedia] = useState<{
     media: any[]
     index: number
   } | null>(null)
-  const [open, setOpen] = useState(false)
 
-  const mock = [
-    {
-      id: 'post_1001',
-      author: {
-        id: 'u12',
-        name: 'Marcos',
-        handle: '@marcosfx',
-        avatarUrl: '/avatar/1.png',
-        verified: true,
-      },
-      text: 'EUR/USD formando um padrão de reversão. Observo suporte em 1.082. #forex #EURUSD',
-      media: [
-        {
-          type: 'image',
-          url: '/images/pages/auth-v2-reset-password-illustration-bordered-dark.png',
-        },
-      ],
-      metrics: { likes: 124, reposts: 12, replies: 6, views: 2500 },
-      userReactions: { liked: false, bookmarked: false, reposted: false },
-      createdAt: '2025-11-05T01:10:00Z',
-      tags: ['forex', 'EURUSD'],
-      pair: 'EUR/USD',
-    },
-  ]
+  const [openMedia, setOpenMedia] = useState(false)
+  const [composerOpen, setComposerOpen] = useState(false)
+
+  const sentinelRef = useRef<HTMLDivElement | null>(null)
 
   const handleOpenMedia = (media: any[], index: number) => {
     setSelectedMedia({ media, index })
-    setOpen(true)
+    setOpenMedia(true)
   }
 
-  const handleClose = () => setOpen(false)
+  const handleCloseMedia = () => setOpenMedia(false)
+
+  // ✅ Infinite Scroll Observer
+  useEffect(() => {
+    if (!sentinelRef.current) return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !loading) {
+          fetchMore()
+        }
+      },
+      { rootMargin: '200px' },
+    )
+
+    observer.observe(sentinelRef.current)
+    return () => observer.disconnect()
+  }, [hasMore, loading])
 
   return (
     <>
       <Stack spacing={2}>
-        {mock.map((post) => (
-          <PostCard key={post.id} post={post} onMediaClick={handleOpenMedia} />
+        {posts.map((post) => (
+          <PostCard
+            key={post.id}
+            post={post}
+            onLike={like}
+            onReply={() => setComposerOpen(true)}
+            onRepost={repost}
+            onMediaClick={handleOpenMedia}
+          />
         ))}
       </Stack>
+
+      {/* Sentinela invisível */}
+      <Box ref={sentinelRef} sx={{ height: 10 }} />
+
+      {/* Loader */}
+      {loading && (
+        <Box sx={{ display: 'flex', justifyContent: 'center', py: 3 }}>
+          <CircularProgress size={28} />
+        </Box>
+      )}
+
+      <ComposerButton onClick={() => setComposerOpen(true)} />
+
+      <ComposerSheet
+        open={composerOpen}
+        onClose={() => setComposerOpen(false)}
+        onPostCreated={() => {
+          // recarregar o feed inicial
+          window.location.reload()
+        }}
+      />
 
       {selectedMedia && (
         <PostMediaModal
           media={selectedMedia.media}
-          open={open}
-          onClose={handleClose}
+          open={openMedia}
           initialIndex={selectedMedia.index}
+          onClose={handleCloseMedia}
         />
       )}
     </>
