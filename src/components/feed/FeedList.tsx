@@ -58,6 +58,7 @@ export default function FeedList() {
           <PostCard
             key={post.id}
             post={post}
+            setPosts={setPosts}
             onLike={like}
             onReply={() => setComposerOpen(true)}
             onRepost={repost}
@@ -81,9 +82,8 @@ export default function FeedList() {
       <ComposerSheet
         open={composerOpen}
         onClose={() => setComposerOpen(false)}
-        onPostCreated={() => {
-          // recarregar o feed inicial
-          window.location.reload()
+        onPostCreated={(newPost) => {
+          setPosts((prev) => [newPost, ...prev])
         }}
       />
 

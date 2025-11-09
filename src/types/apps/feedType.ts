@@ -19,6 +19,7 @@ export interface Post {
 
 export interface PostCardProps {
   post: Post
+  setPosts: React.Dispatch<React.SetStateAction<Post[]>>
   onLike?: (id: string) => void
   onReply?: (id: string) => void
   onRepost?: (id: string) => void

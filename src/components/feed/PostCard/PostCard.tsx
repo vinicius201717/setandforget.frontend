@@ -14,6 +14,7 @@ import PostFooter from './PostFooter'
 
 export default function PostCard({
   post,
+  setPosts,
   onLike,
   onReply,
   onRepost,
@@ -22,7 +23,7 @@ export default function PostCard({
   return (
     <Card sx={{ borderRadius: 2, boxShadow: 3, overflow: 'hidden' }}>
       {/* Header: avatar + nome + handle + menu */}
-      <PostHeader post={post} />
+      <PostHeader post={post} setPosts={setPosts} />
 
       {/* Conteúdo do texto */}
       <CardContent sx={{ pt: 1 }}>

@@ -31,11 +31,6 @@ export default function ComposerToolbar({
           onChange={handleMedia}
         />
       </IconButton>
-
-      {/* Emojis futuramente */}
-      <IconButton>
-        <EmojiEmotionsIcon />
-      </IconButton>
     </Box>
   )
 }

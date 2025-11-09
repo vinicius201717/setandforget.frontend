@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { api } from 'src/lib/axios'
 import authConfig from 'src/configs/auth'
 

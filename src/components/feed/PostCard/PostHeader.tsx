@@ -6,13 +6,17 @@ import { useState } from 'react'
 
 import PostOptionsMenu from './PostOptionsMenu'
 import { Post } from 'src/types/apps/feedType'
+import { useAuth } from 'src/hooks/useAuth'
 
 interface PostHeaderProps {
   post: Post
+  setPosts: React.Dispatch<React.SetStateAction<Post[]>>
 }
 
-export default function PostHeader({ post }: PostHeaderProps) {
+export default function PostHeader({ post, setPosts }: PostHeaderProps) {
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
+
+  const { user } = useAuth()
 
   const handleOpenMenu = (e: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(e.currentTarget)
@@ -44,10 +48,10 @@ export default function PostHeader({ post }: PostHeaderProps) {
       <PostOptionsMenu
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
+        setPosts={setPosts}
         onClose={handleCloseMenu}
+        isOwner={post.author.id === user?.id}
         postId={post.id}
-        onDelete={(id) => console.log('Delete', id)}
-        onEdit={(id) => console.log('Edit', id)}
       />
     </Box>
   )
