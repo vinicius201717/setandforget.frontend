@@ -7,7 +7,7 @@ export default async function replyPost(id: string, text: string) {
   )
 
   return await api.post(
-    `/feed/${id}/reply`,
+    `/posts/${id}/reply`,
     { text },
     {
       headers: {

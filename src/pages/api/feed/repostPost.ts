@@ -7,7 +7,7 @@ export default async function repostPost(id: string) {
   )
 
   return await api.post(
-    `/feed/${id}/repost`,
+    `/posts/${id}/repost`,
     {},
     {
       headers: {

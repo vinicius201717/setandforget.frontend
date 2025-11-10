@@ -15,7 +15,9 @@ import ComposerSheet from './Composer/ComposerSheet'
 
 export default function FeedList() {
   const { posts, setPosts, loading, hasMore, fetchMore } = useFeed()
-  const { like, repost } = usePostActions(posts, setPosts)
+
+  // ✅ agora pega like, repost e reply
+  const { like, repost, reply } = usePostActions(posts, setPosts)
 
   const [selectedMedia, setSelectedMedia] = useState<{
     media: any[]
@@ -24,6 +26,7 @@ export default function FeedList() {
 
   const [openMedia, setOpenMedia] = useState(false)
   const [composerOpen, setComposerOpen] = useState(false)
+  const [replyTo, setReplyTo] = useState<string | null>(null)
 
   const sentinelRef = useRef<HTMLDivElement | null>(null)
 
@@ -34,7 +37,7 @@ export default function FeedList() {
 
   const handleCloseMedia = () => setOpenMedia(false)
 
-  // ✅ Infinite Scroll Observer
+  // ✅ Infinite Scroll
   useEffect(() => {
     if (!sentinelRef.current) return
 
@@ -59,15 +62,18 @@ export default function FeedList() {
             key={post.id}
             post={post}
             setPosts={setPosts}
-            onLike={like}
-            onReply={() => setComposerOpen(true)}
-            onRepost={repost}
+            onLike={() => like(post.id)} // ✅ Like funcionando
+            onRepost={() => repost(post.id)} // ✅ Repost funcionando
+            onReply={() => {
+              setReplyTo(post.id) // ✅ guarda qual post será comentado
+              setComposerOpen(true)
+            }}
             onMediaClick={handleOpenMedia}
           />
         ))}
       </Stack>
 
-      {/* Sentinela invisível */}
+      {/* sentinela scroll infinito */}
       <Box ref={sentinelRef} sx={{ height: 10 }} />
 
       {/* Loader */}
@@ -77,13 +83,37 @@ export default function FeedList() {
         </Box>
       )}
 
-      <ComposerButton onClick={() => setComposerOpen(true)} />
+      {/* botão novo post */}
+      <ComposerButton
+        onClick={() => {
+          setReplyTo(null)
+          setComposerOpen(true)
+        }}
+      />
 
+      {/* compositor / reply */}
       <ComposerSheet
         open={composerOpen}
-        onClose={() => setComposerOpen(false)}
+        onClose={() => {
+          setComposerOpen(false)
+          setReplyTo(null)
+        }}
+        parentId={replyTo ?? undefined} // ✅ SE FOR REPLY, ENVIA O postId
         onPostCreated={(newPost) => {
-          setPosts((prev) => [newPost, ...prev])
+          // ✅ insere no feed corretamente
+          if (replyTo) {
+            // se era reply, insere logo abaixo do pai
+            setPosts((prev) => {
+              const idx = prev.findIndex((p) => p.id === replyTo)
+              if (idx === -1) return prev
+              const arr = [...prev]
+              arr.splice(idx + 1, 0, newPost)
+              return arr
+            })
+          } else {
+            // se é post normal, coloca no topo
+            setPosts((prev) => [newPost, ...prev])
+          }
         }}
       />
 

@@ -31,6 +31,7 @@ interface Props {
   onClose: () => void
   postId: string
   isOwner: boolean
+  onEdit?: (id: string) => void
 }
 
 export default function PostOptionsMenu({
@@ -40,6 +41,7 @@ export default function PostOptionsMenu({
   postId,
   isOwner,
   setPosts,
+  onEdit,
 }: Props) {
   const [confirmOpen, setConfirmOpen] = useState(false)
 
@@ -52,17 +54,15 @@ export default function PostOptionsMenu({
   const handleDelete = async () => {
     try {
       await deletePost(postId)
-      setPosts((prev: any) => prev.filter((p: any) => p.id !== postId))
+
+      setPosts((prev: Post[]) => prev.filter((p) => p.id !== postId))
+
       toast.success('Post deletado com sucesso', { position: 'bottom-right' })
     } catch (err) {
       toast.error('Erro ao deletar o post', { position: 'bottom-right' })
     } finally {
       setConfirmOpen(false)
     }
-  }
-
-  const handleEdit = (id: string) => {
-    console.log(id)
   }
 
   return (
@@ -74,11 +74,11 @@ export default function PostOptionsMenu({
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
         transformOrigin={{ horizontal: 'right', vertical: 'top' }}
       >
-        {/* Mostrar somente se for dono do post */}
-        {isOwner && (
+        {/* ✅ Mostrar somente se o post for do usuário */}
+        {isOwner && onEdit && (
           <MenuItem
             onClick={() => {
-              handleEdit(postId)
+              onEdit(postId)
               onClose()
             }}
           >
@@ -104,7 +104,7 @@ export default function PostOptionsMenu({
           </MenuItem>
         )}
 
-        {/* Sempre aparece */}
+        {/* ✅ Sempre aparece */}
         <MenuItem onClick={handleCopyLink}>
           <ListItemIcon>
             <LinkIcon fontSize='small' />
@@ -112,6 +112,7 @@ export default function PostOptionsMenu({
           <ListItemText primary='Copiar link' />
         </MenuItem>
 
+        {/* ✅ Sempre aparece */}
         <MenuItem
           onClick={() => {
             console.log('Report:', postId)
@@ -129,6 +130,7 @@ export default function PostOptionsMenu({
       {/* ✅ Modal de confirmação */}
       <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)}>
         <DialogTitle>Confirmar exclusão</DialogTitle>
+
         <DialogContent>
           <Typography>
             Tem certeza que deseja excluir este post? Esta ação não pode ser

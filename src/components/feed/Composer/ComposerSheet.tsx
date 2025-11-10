@@ -152,18 +152,17 @@ export default function ComposerSheet({
         finalMedia.push(...links)
       }
 
-      // 3) preparar tags
       const tagsArray =
         data.tags
           ?.toUpperCase()
-          .split(',')
-          .map((t) => t.trim())
+          .replace(/\s+/g, ' ')
+          .replace(/,/g, ' ')
+          .trim()
+          .split(' ')
           .filter(Boolean) ?? []
 
-      // 4) prepara par
       const pair = data.pair?.toUpperCase()
 
-      // 5) chamar endpoint do seu servidor (useCreatePost.submit)
       const created = await submit(
         data.text,
         finalMedia as any,
@@ -172,7 +171,6 @@ export default function ComposerSheet({
         pair || null,
       )
 
-      // dismiss loading toast e notificar sucesso/erro
       toast.dismiss(toastId)
 
       if (created) {

@@ -13,7 +13,7 @@ export default function PostFooter({ post }: PostFooterProps) {
     <Box sx={{ px: 2, pb: 2 }}>
       {/* Tags */}
       <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 1 }}>
-        {post.tags.map((tag, i) => (
+        {(post.tags ?? []).map((tag, i) => (
           <Chip
             key={i}
             size='small'
@@ -26,7 +26,7 @@ export default function PostFooter({ post }: PostFooterProps) {
 
       {/* Visualizações e par */}
       <Typography variant='caption' color='text.secondary'>
-        {post.metrics.views.toLocaleString()} visualizações
+        {post.metrics.views?.toLocaleString()} visualizações
         {post.pair && ` · ${post.pair}`}
       </Typography>
     </Box>

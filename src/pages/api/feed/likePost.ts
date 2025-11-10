@@ -7,7 +7,7 @@ export default async function likePost(id: string) {
   )
 
   return await api.post(
-    `/feed/${id}/like`,
+    `/posts/${id}/like`,
     {},
     {
       headers: {

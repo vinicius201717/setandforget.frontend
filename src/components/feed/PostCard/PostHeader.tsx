@@ -5,6 +5,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert'
 import { useState } from 'react'
 
 import PostOptionsMenu from './PostOptionsMenu'
+import ComposerEditSheet from '../Composer/ComposerEditSheet'
 import { Post } from 'src/types/apps/feedType'
 import { useAuth } from 'src/hooks/useAuth'
 
@@ -15,6 +16,8 @@ interface PostHeaderProps {
 
 export default function PostHeader({ post, setPosts }: PostHeaderProps) {
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
+  const [editOpen, setEditOpen] = useState(false)
+  const [editingPost, setEditingPost] = useState<Post | null>(null)
 
   const { user } = useAuth()
 
@@ -24,35 +27,56 @@ export default function PostHeader({ post, setPosts }: PostHeaderProps) {
 
   const handleCloseMenu = () => setAnchorEl(null)
 
-  return (
-    <Box sx={{ display: 'flex', alignItems: 'center', px: 2, pt: 2 }}>
-      <Avatar
-        src={post.author.avatarUrl}
-        sx={{ width: 40, height: 40, mr: 1.5 }}
-      />
+  const handleEditPost = (p: Post) => {
+    setEditingPost(p)
+    setEditOpen(true)
+  }
 
-      <Box sx={{ flex: 1 }}>
-        <Typography variant='subtitle1' sx={{ fontWeight: 600 }}>
-          {post.author.name}
-        </Typography>
-        <Typography variant='body2' color='text.secondary'>
-          {post.author.handle} • {new Date(post.createdAt).toLocaleString()}
-        </Typography>
+  return (
+    <>
+      <Box sx={{ display: 'flex', alignItems: 'center', px: 2, pt: 2 }}>
+        <Avatar
+          src={post.author.avatarUrl}
+          sx={{ width: 40, height: 40, mr: 1.5 }}
+        />
+
+        <Box sx={{ flex: 1 }}>
+          <Typography variant='subtitle1' sx={{ fontWeight: 600 }}>
+            {post.author.name}
+          </Typography>
+          <Typography variant='body2' color='text.secondary'>
+            {post.author.handle} • {new Date(post.createdAt).toLocaleString()}
+          </Typography>
+        </Box>
+
+        <IconButton size='small' onClick={handleOpenMenu}>
+          <MoreVertIcon />
+        </IconButton>
+
+        <PostOptionsMenu
+          anchorEl={anchorEl}
+          open={Boolean(anchorEl)}
+          setPosts={setPosts}
+          onClose={handleCloseMenu}
+          isOwner={post.author.id === user?.id}
+          postId={post.id}
+          onEdit={() => handleEditPost(post)}
+        />
       </Box>
 
-      <IconButton size='small' onClick={handleOpenMenu}>
-        <MoreVertIcon />
-      </IconButton>
-
-      {/* ✅ MENU */}
-      <PostOptionsMenu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        setPosts={setPosts}
-        onClose={handleCloseMenu}
-        isOwner={post.author.id === user?.id}
-        postId={post.id}
-      />
-    </Box>
+      {/* ✅ Modal de edição */}
+      {editingPost && (
+        <ComposerEditSheet
+          open={editOpen}
+          onClose={() => setEditOpen(false)}
+          post={editingPost}
+          onPostUpdated={(updated) => {
+            setPosts((prev) =>
+              prev.map((p) => (p.id === updated.id ? updated : p)),
+            )
+          }}
+        />
+      )}
+    </>
   )
 }
