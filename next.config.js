@@ -8,6 +8,16 @@ const path = require('path')
 module.exports = {
   images: {
     domains: ['media.api-sports.io'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'www.tradingview.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 's3.amazonaws.com',
+      },
+    ],
   },
   trailingSlash: true,
   reactStrictMode: false,

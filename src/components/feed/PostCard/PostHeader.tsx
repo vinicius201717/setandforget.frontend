@@ -11,7 +11,7 @@ import { useAuth } from 'src/hooks/useAuth'
 
 interface PostHeaderProps {
   post: Post
-  setPosts: React.Dispatch<React.SetStateAction<Post[]>>
+  setPosts?: React.Dispatch<React.SetStateAction<Post[]>>
 }
 
 export default function PostHeader({ post, setPosts }: PostHeaderProps) {
@@ -27,8 +27,8 @@ export default function PostHeader({ post, setPosts }: PostHeaderProps) {
 
   const handleCloseMenu = () => setAnchorEl(null)
 
-  const handleEditPost = (p: Post) => {
-    setEditingPost(p)
+  const handleEditPost = () => {
+    setEditingPost(post)
     setEditOpen(true)
   }
 
@@ -44,6 +44,7 @@ export default function PostHeader({ post, setPosts }: PostHeaderProps) {
           <Typography variant='subtitle1' sx={{ fontWeight: 600 }}>
             {post.author.name}
           </Typography>
+
           <Typography variant='body2' color='text.secondary'>
             {post.author.handle} • {new Date(post.createdAt).toLocaleString()}
           </Typography>
@@ -56,22 +57,26 @@ export default function PostHeader({ post, setPosts }: PostHeaderProps) {
         <PostOptionsMenu
           anchorEl={anchorEl}
           open={Boolean(anchorEl)}
-          setPosts={setPosts}
           onClose={handleCloseMenu}
           isOwner={post.author.id === user?.id}
           postId={post.id}
-          onEdit={() => handleEditPost(post)}
+          setPosts={setPosts}
+          onEdit={handleEditPost}
         />
       </Box>
 
-      {/* ✅ Modal de edição */}
+      {/* Modal de edição */}
       {editingPost && (
         <ComposerEditSheet
           open={editOpen}
-          onClose={() => setEditOpen(false)}
           post={editingPost}
+          onClose={() => {
+            setEditOpen(false)
+            setEditingPost(null) // ✅ limpa corretamente
+          }}
           onPostUpdated={(updated) => {
-            setPosts((prev) =>
+            // ✅ só atualiza se vier via setPosts
+            setPosts?.((prev) =>
               prev.map((p) => (p.id === updated.id ? updated : p)),
             )
           }}

@@ -1,13 +1,8 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
-// src/components/feed/PostCard/PostCard.tsx
-'use client'
-
-import React from 'react'
-import { Card, CardContent, Typography } from '@mui/material'
-
+import { Box, Card, CardContent, IconButton, Typography } from '@mui/material'
+import { useState } from 'react'
 import { PostCardProps } from 'src/types/apps/feedType'
-
 import PostHeader from './PostHeader'
+import { EyeIcon, EyeOffIcon } from 'lucide-react'
 import PostMedia from './PostMedia'
 import PostActions from './PostActions'
 import PostFooter from './PostFooter'
@@ -19,32 +14,54 @@ export default function PostCard({
   onReply,
   onRepost,
   onMediaClick,
+  compact,
 }: PostCardProps) {
+  const [hideMedia, setHideMedia] = useState(true)
+
   return (
-    <Card sx={{ borderRadius: 2, boxShadow: 3, overflow: 'hidden' }}>
-      {/* Header: avatar + nome + handle + menu */}
+    <Card
+      sx={{
+        borderRadius: 2,
+        boxShadow: 3,
+        overflow: 'hidden',
+        p: compact ? 1 : 0,
+      }}
+    >
       <PostHeader post={post} setPosts={setPosts} />
 
-      {/* Conteúdo do texto */}
-      <CardContent sx={{ pt: 1 }}>
+      {/* ✅ Botão para ocultar mídia (só no compact) */}
+      {compact && (post.media?.length ?? 0) > 0 && (
+        <Box sx={{ px: 2, pb: 1, display: 'flex', justifyContent: 'flex-end' }}>
+          <IconButton size='small' onClick={() => setHideMedia(!hideMedia)}>
+            {hideMedia ? <EyeIcon size={18} /> : <EyeOffIcon size={18} />}
+          </IconButton>
+        </Box>
+      )}
+
+      {/* ✅ Texto */}
+      <CardContent sx={{ pt: compact ? 0.5 : 1 }}>
         {post.text && (
-          <Typography variant='body1' sx={{ mb: 1.5 }}>
+          <Typography
+            variant='body1'
+            sx={{ mb: compact ? 1 : 1.5, fontSize: compact ? 14 : 16 }}
+          >
             {post.text}
           </Typography>
         )}
 
-        <PostMedia media={post.media ?? []} onMediaClick={onMediaClick} />
+        {/* ✅ Mídia escondida quando hideMedia = true */}
+        {!hideMedia && (
+          <PostMedia media={post.media ?? []} onMediaClick={onMediaClick} />
+        )}
       </CardContent>
 
-      {/* Botões de like/reply/repost */}
       <PostActions
         post={post}
         onLike={onLike!}
         onReply={onReply!}
         onRepost={onRepost!}
+        compact={compact}
       />
-
-      {/* Tags, views, par, etc. */}
       <PostFooter post={post} />
     </Card>
   )

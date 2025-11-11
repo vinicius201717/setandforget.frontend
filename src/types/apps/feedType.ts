@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-vars */
 export interface Post {
   id: string
+  parentId?: string | null
   author: {
     id: string
     name: string
@@ -19,9 +20,15 @@ export interface Post {
 
 export interface PostCardProps {
   post: Post
-  setPosts: React.Dispatch<React.SetStateAction<Post[]>>
+  setPosts?: React.Dispatch<React.SetStateAction<Post[]>>
   onLike?: (id: string) => void
   onReply?: (id: string) => void
   onRepost?: (id: string) => void
   onMediaClick?: (media: { type: string; url: string }[], index: number) => void
+  compact?: boolean
+}
+
+export interface Media {
+  type: 'image' | 'video' | 'link' | string
+  url: string
 }

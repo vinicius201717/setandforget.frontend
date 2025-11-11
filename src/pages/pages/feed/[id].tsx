@@ -1,63 +1,60 @@
-'use client'
-
-import { Box, Divider, Typography } from '@mui/material'
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-empty-function */
+import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
+import FallbackSpinner from 'src/@core/components/spinner'
 import PostCard from 'src/components/feed/PostCard/PostCard'
-import { useThread } from 'src/components/feed/hooks/useThread'
-import { useState } from 'react'
-import { usePostActions } from 'src/components/feed/hooks/usePostAction'
-import ComposerButton from 'src/components/feed/Composer/ComposerButton'
-import ComposerSheet from 'src/components/feed/Composer/ComposerSheet'
+import ReplyCard from 'src/components/feed/PostCard/ReplyCard'
+import ReplyComposer from 'src/components/feed/ReplyComposer'
+import getPost from 'src/pages/api/feed/getPost'
+import getReplies from 'src/pages/api/feed/getReplies'
+import { Post } from 'src/types/apps/feedType'
 
-export default function ThreadView({ id }: { id: string }) {
-  const { post, replies, loading, refresh } = useThread(id)
+export default function PostPage() {
+  const router = useRouter()
+  const { id } = router.query
 
-  const { like, repost } = usePostActions(
-    post ? [post, ...replies] : [],
-    () => undefined,
-  )
+  const [post, setPost] = useState<Post>()
+  const [replies, setReplies] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
 
-  const [composerOpen, setComposerOpen] = useState(false)
+  useEffect(() => {
+    if (!id) return
 
-  if (loading || !post) return <Typography>Carregando…</Typography>
+    async function load() {
+      const main = await getPost(id as string)
+      const rep = await getReplies(id as string)
+
+      setPost(main.data)
+      setReplies(rep.data)
+      setLoading(false)
+    }
+
+    load()
+  }, [id])
+
+  if (loading) return <div>Carregando...</div>
 
   return (
-    <Box sx={{ maxWidth: 700, mx: 'auto', py: 3 }}>
-      {/* Post principal */}
-      <PostCard
-        post={post}
-        onLike={like}
-        onReply={() => {
-          setComposerOpen(true)
-        }}
-        onRepost={repost}
-      />
+    <div style={{ padding: 20 }}>
+      {post ? (
+        <PostCard post={post} setPosts={() => {}} compact={true} />
+      ) : (
+        <FallbackSpinner />
+      )}
 
-      <Divider sx={{ my: 3 }} />
+      <h3 style={{ marginTop: 40 }}>{replies.length} respostas</h3>
 
-      <Typography variant='h6' sx={{ mb: 1 }}>
-        Respostas
-      </Typography>
-
-      {/* Replies */}
-      {replies.map((rep) => (
-        <PostCard
-          key={rep.id}
-          post={rep}
-          onLike={like}
-          onReply={() => setComposerOpen(true)}
-          onRepost={repost}
-        />
+      {replies.map((r) => (
+        <ReplyCard key={r.id} reply={r} />
       ))}
 
-      {/* Composer para responder */}
-      <ComposerButton onClick={() => setComposerOpen(true)} />
-
-      <ComposerSheet
-        open={composerOpen}
-        onClose={() => setComposerOpen(false)}
-        onPostCreated={refresh}
-        parentId={post.id}
+      <ReplyComposer
+        parentId={post?.id}
+        onReplyCreated={(newReply: any) =>
+          setReplies((prev) => [...prev, newReply])
+        }
       />
-    </Box>
+    </div>
   )
 }

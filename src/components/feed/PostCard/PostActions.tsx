@@ -13,6 +13,7 @@ interface PostActionsProps {
   onLike: (id: string) => void
   onReply: (id: string) => void
   onRepost: (id: string) => void
+  compact?: boolean
 }
 
 export default function PostActions({
@@ -20,6 +21,7 @@ export default function PostActions({
   onLike,
   onReply,
   onRepost,
+  compact,
 }: PostActionsProps) {
   return (
     <Box
@@ -41,12 +43,14 @@ export default function PostActions({
       </Box>
 
       {/* Comentário */}
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-        <IconButton size='small' onClick={() => onReply(post.id)}>
-          <ChatBubbleOutlineIcon fontSize='small' />
-        </IconButton>
-        <Typography variant='caption'>{post.metrics.replies}</Typography>
-      </Box>
+      {!compact && (
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+          <IconButton size='small' onClick={() => onReply(post.id)}>
+            <ChatBubbleOutlineIcon fontSize='small' />
+          </IconButton>
+          <Typography variant='caption'>{post.metrics.replies}</Typography>
+        </Box>
+      )}
 
       {/* Repost */}
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>

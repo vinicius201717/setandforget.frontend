@@ -27,7 +27,7 @@ import { Post } from 'src/types/apps/feedType'
 interface Props {
   anchorEl: HTMLElement | null
   open: boolean
-  setPosts: React.Dispatch<React.SetStateAction<Post[]>>
+  setPosts?: React.Dispatch<React.SetStateAction<Post[]>>
   onClose: () => void
   postId: string
   isOwner: boolean
@@ -55,7 +55,8 @@ export default function PostOptionsMenu({
     try {
       await deletePost(postId)
 
-      setPosts((prev: Post[]) => prev.filter((p) => p.id !== postId))
+      // ✅ Ajuste seguro: só atualiza lista se setPosts existir
+      setPosts?.((prev: Post[]) => prev.filter((p) => p.id !== postId))
 
       toast.success('Post deletado com sucesso', { position: 'bottom-right' })
     } catch (err) {
@@ -74,7 +75,6 @@ export default function PostOptionsMenu({
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
         transformOrigin={{ horizontal: 'right', vertical: 'top' }}
       >
-        {/* ✅ Mostrar somente se o post for do usuário */}
         {isOwner && onEdit && (
           <MenuItem
             onClick={() => {
@@ -104,7 +104,6 @@ export default function PostOptionsMenu({
           </MenuItem>
         )}
 
-        {/* ✅ Sempre aparece */}
         <MenuItem onClick={handleCopyLink}>
           <ListItemIcon>
             <LinkIcon fontSize='small' />
@@ -112,10 +111,8 @@ export default function PostOptionsMenu({
           <ListItemText primary='Copiar link' />
         </MenuItem>
 
-        {/* ✅ Sempre aparece */}
         <MenuItem
           onClick={() => {
-            console.log('Report:', postId)
             toast('Obrigado pelo feedback!', { position: 'bottom-right' })
             onClose()
           }}
@@ -127,7 +124,6 @@ export default function PostOptionsMenu({
         </MenuItem>
       </Menu>
 
-      {/* ✅ Modal de confirmação */}
       <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)}>
         <DialogTitle>Confirmar exclusão</DialogTitle>
 

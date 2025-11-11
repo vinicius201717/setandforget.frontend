@@ -3,11 +3,7 @@
 'use client'
 
 import { Box } from '@mui/material'
-
-interface Media {
-  type: 'image' | 'video' | 'link' | string
-  url: string
-}
+import { Media } from 'src/types/apps/feedType'
 
 interface PostMediaProps {
   media: Media[]
