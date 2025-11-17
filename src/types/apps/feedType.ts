@@ -1,4 +1,14 @@
 /* eslint-disable no-unused-vars */
+export interface PostReactons {
+  id: string
+  postId: string
+  userId: string
+  liked: boolean
+  reposted: boolean
+  createdAt: string
+  updatedAt: string
+}
+
 export interface Post {
   id: string
   parentId?: string | null
@@ -16,6 +26,7 @@ export interface Post {
   createdAt: string
   tags: string[]
   pair?: string
+  postReactions: PostReactons[]
 }
 
 export interface PostCardProps {

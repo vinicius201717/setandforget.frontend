@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { Box, Card, CardContent, IconButton, Typography } from '@mui/material'
 import { useState } from 'react'
 import { PostCardProps } from 'src/types/apps/feedType'
@@ -6,6 +7,7 @@ import { EyeIcon, EyeOffIcon } from 'lucide-react'
 import PostMedia from './PostMedia'
 import PostActions from './PostActions'
 import PostFooter from './PostFooter'
+import { useAuth } from 'src/hooks/useAuth'
 
 export default function PostCard({
   post,
@@ -16,7 +18,8 @@ export default function PostCard({
   onMediaClick,
   compact,
 }: PostCardProps) {
-  const [hideMedia, setHideMedia] = useState(true)
+  const [hideMedia, setHideMedia] = useState(false)
+  const { user } = useAuth()
 
   return (
     <Card
@@ -61,6 +64,7 @@ export default function PostCard({
         onReply={onReply!}
         onRepost={onRepost!}
         compact={compact}
+        currentUserId={user?.id || ''}
       />
       <PostFooter post={post} />
     </Card>

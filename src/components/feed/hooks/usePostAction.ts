@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+
 import likePost from 'src/pages/api/feed/likePost'
 import repostPost from 'src/pages/api/feed/repostPost'
 import replyPost from 'src/pages/api/feed/replyPost'
@@ -20,9 +21,14 @@ export function usePostActions(
     const post = posts.find((p) => p.id === id)
     if (!post) return
 
-    const alreadyLiked = post.userReactions?.liked === true
+    const reactions = Array.isArray(post.postReactions)
+      ? post.postReactions
+      : []
 
-    // ✅ Atualiza estado local
+    const current = reactions.find((r) => r.userId === post.author.id)
+
+    const alreadyLiked = current?.liked === true
+
     updateMetrics(id, {
       likes: post.metrics.likes + (alreadyLiked ? -1 : 1),
     })
@@ -32,16 +38,22 @@ export function usePostActions(
         p.id === id
           ? {
               ...p,
-              userReactions: {
-                ...(p.userReactions ?? {}),
-                liked: !alreadyLiked,
-              },
+              postReactions: [
+                {
+                  id: current?.id ?? 'temp-id',
+                  postId: p.id,
+                  userId: current?.userId ?? post.author.id,
+                  liked: !alreadyLiked,
+                  reposted: current?.reposted ?? false,
+                  createdAt: current?.createdAt ?? new Date().toISOString(),
+                  updatedAt: new Date().toISOString(),
+                },
+              ],
             }
           : p,
       ),
     )
 
-    // ✅ chama API
     await likePost(id)
   }
 
@@ -49,7 +61,13 @@ export function usePostActions(
     const post = posts.find((p) => p.id === id)
     if (!post) return
 
-    const alreadyReposted = post.userReactions?.reposted === true
+    const reactions = Array.isArray(post.postReactions)
+      ? post.postReactions
+      : []
+
+    const current = reactions.find((r) => r.userId === post.author.id)
+
+    const alreadyReposted = current?.reposted === true
 
     updateMetrics(id, {
       reposts: post.metrics.reposts + (alreadyReposted ? -1 : 1),
@@ -60,10 +78,17 @@ export function usePostActions(
         p.id === id
           ? {
               ...p,
-              userReactions: {
-                ...(p.userReactions ?? {}),
-                reposted: !alreadyReposted,
-              },
+              postReactions: [
+                {
+                  id: current?.id ?? 'temp-id',
+                  postId: p.id,
+                  userId: current?.userId ?? post.author.id,
+                  liked: current?.liked ?? false,
+                  reposted: !alreadyReposted,
+                  createdAt: current?.createdAt ?? new Date().toISOString(),
+                  updatedAt: new Date().toISOString(),
+                },
+              ],
             }
           : p,
       ),
