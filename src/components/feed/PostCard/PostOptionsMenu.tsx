@@ -46,7 +46,9 @@ export default function PostOptionsMenu({
   const [confirmOpen, setConfirmOpen] = useState(false)
 
   const handleCopyLink = () => {
-    navigator.clipboard.writeText(`${window.location.origin}/feed/${postId}`)
+    navigator.clipboard.writeText(
+      `${window.location.origin}/pages/feed/${postId}`,
+    )
     toast.success('Link copiado!', { position: 'bottom-right' })
     onClose()
   }

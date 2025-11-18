@@ -11,7 +11,7 @@ const ProfileTab: React.FC<ProfileTabProps> = ({ userData }) => {
   // teste
   return (
     <Grid container spacing={6}>
-      <Grid item lg={4} md={5} xs={12}>
+      <Grid item lg={12} md={12} xs={12}>
         <AboutOverivew user={userData} />
       </Grid>
     </Grid>

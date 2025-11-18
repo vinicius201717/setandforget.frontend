@@ -24,7 +24,7 @@ const navigation = (): VerticalNavItemsType => {
     },
     {
       icon: 'mdi:rss-box',
-      title: 'Feed',
+      title: 'Results',
       path: '/pages/feed',
     },
     {

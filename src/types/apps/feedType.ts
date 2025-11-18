@@ -9,6 +9,13 @@ export interface PostReactons {
   updatedAt: string
 }
 
+export interface PostMetrics {
+  likes: number
+  reposts: number
+  replies: number
+  views: number
+}
+
 export interface Post {
   id: string
   parentId?: string | null
@@ -21,7 +28,7 @@ export interface Post {
   }
   text?: string
   media?: { type: 'image' | 'video' | 'link' | string; url: string }[]
-  metrics: { likes: number; reposts: number; replies: number; views?: number }
+  metrics: PostMetrics
   userReactions: { liked: boolean; bookmarked: boolean; reposted: boolean }
   createdAt: string
   tags: string[]
@@ -42,4 +49,16 @@ export interface PostCardProps {
 export interface Media {
   type: 'image' | 'video' | 'link' | string
   url: string
+}
+
+export interface RepostedItem {
+  id: string
+  post: Post
+  reposted: boolean
+  liked: boolean
+}
+
+export interface GetPostsResponse {
+  posts: Post[]
+  reposted: RepostedItem[]
 }
