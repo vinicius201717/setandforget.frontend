@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable no-unused-vars */
@@ -11,32 +12,12 @@ import {
   Card,
   CardContent,
   Typography,
-  Checkbox,
-  FormControlLabel,
   Divider,
   LinearProgress,
   Button,
-  Chip,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Table,
-  TableBody,
-  TableRow,
-  TableCell,
-  Stack,
-  IconButton,
-  TextField,
-  InputAdornment,
-  List,
-  ListItemButton,
-  ListItemText,
 } from '@mui/material'
-import InfoIcon from '@mui/icons-material/Info'
-import SearchIcon from '@mui/icons-material/Search'
 import { useAuth } from 'src/hooks/useAuth'
-import { Controller, useForm } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { isNaN } from 'lodash'
@@ -50,15 +31,10 @@ import ChecklistGroup from 'src/components/checklist/ChecklistGroup'
 import ResumoRapidoCard from 'src/components/checklist/ResumeRapidCard'
 import AnalisesRegistradasCard from 'src/components/checklist/AnaliseRegistreCard'
 import toast from 'react-hot-toast'
-import { AnalysisItem } from 'src/types/apps/operationType'
+import { AnalysisItem, OperationType } from 'src/types/apps/operationType'
 import { getOperationsByUserDraft } from 'src/pages/api/operation/getOperationByUserDraft'
 import { deleteOperation } from 'src/pages/api/operation/deleteOperation'
-
-// Mock do professor
-const professorPairs = ['EUR/USD', 'USD/JPY', 'AUD/USD']
-
-// Mock análises registradas
-// Mock análises registradas
+import { getOperationsByTeacher } from 'src/pages/api/operation/getOperationByTeacher'
 
 const publishSchema = z.object({
   notes: z.string().optional(),
@@ -81,6 +57,11 @@ export default function ChecklistTradingPage() {
   const [pairSearch, setPairSearch] = useState('')
   const [analyses, setAnalyses] = useState<AnalysisItem[]>([])
   const [openPublishModal, setOpenPublishModal] = useState(false)
+  const [teacherPair, setTeacherPair] = useState<string[]>([])
+  const [isTeacherPair, setIsTeacherPair] = useState(false)
+  const [operationTeacherPair, setOperationTeacherPair] = useState<
+    OperationType[]
+  >([])
 
   const form = useForm<PublishFormData>({
     resolver: zodResolver(publishSchema),
@@ -124,38 +105,43 @@ export default function ChecklistTradingPage() {
 
   // filtro pares
   const filteredPairs = useMemo(() => {
-    if (pairSearch.toLowerCase() === 'professor') return professorPairs
     if (!pairSearch) return FOREX_PAIRS
     return FOREX_PAIRS.filter((p) =>
       p.toLowerCase().includes(pairSearch.toLowerCase()),
     )
   }, [pairSearch])
 
-  const handlePairSelect = (pair: string) => {
+  const handlePairSelect = (pair: string, teacherMode: boolean) => {
     setSelectedPair(pair)
-    setOpenPairModal(false)
+    setIsTeacherPair(!!teacherMode)
   }
 
-  const parseChecklistField = (raw?: string): Record<string, boolean> => {
+  const parseChecklistField = (raw: any): Record<string, boolean> => {
     if (!raw) return {}
-    try {
-      // Ex.: raw = '"{\"patterns\":true,...}"'  -> 1st JSON.parse -> '{"patterns":true,...}'
-      const once = JSON.parse(raw)
-      // pode já estar vindo só como '{}' (string) ou como objeto (se backend mudar)
-      if (typeof once === 'string') {
-        return JSON.parse(once)
+
+    if (typeof raw === 'object') return raw
+
+    if (typeof raw === 'string') {
+      try {
+        return JSON.parse(raw)
+      } catch {
+        console.warn('JSON inválido:', raw)
+        return {}
       }
-      if (typeof once === 'object' && once !== null) {
-        return once as Record<string, boolean>
-      }
-    } catch (e) {
-      console.warn('parseChecklistField failed for raw:', raw, e)
     }
+
     return {}
   }
 
   const loadAnalysis = (analysis: AnalysisItem) => {
+    // muda o par
     setSelectedPair(analysis.pair)
+
+    // verifica se esse par é um par de professor
+    const isTeacher = teacherPair.includes(analysis.pair)
+    setIsTeacherPair(isTeacher)
+
+    // monta o checklist salvo
     const newChecked: Record<string, boolean> = {}
     analysis.checkedItems.forEach((id) => (newChecked[id] = true))
     setChecklist(newChecked)
@@ -336,8 +322,16 @@ export default function ChecklistTradingPage() {
   useEffect(() => {
     const fetchDrafts = async () => {
       const res = await getOperationsByUserDraft()
+      const teacherData = await getOperationsByTeacher()
 
       if (!res) return
+      if (teacherData) {
+        const allOps = [...teacherData.drafts, ...teacherData.published]
+        setOperationTeacherPair(allOps)
+        const uniquePairs = Array.from(new Set(allOps.map((op) => op.pair)))
+
+        setTeacherPair(uniquePairs)
+      }
 
       const parsed = res.map((item: any): AnalysisItem => {
         const parsedChecklist = parseChecklistField(item.checklist)
@@ -357,6 +351,10 @@ export default function ChecklistTradingPage() {
     fetchDrafts()
   }, [])
 
+  useEffect(() => {
+    console.log(teacherPair)
+  }, [teacherPair])
+
   return (
     <Box
       sx={{
@@ -374,6 +372,7 @@ export default function ChecklistTradingPage() {
                 selectedPair={selectedPair}
                 operacaoPermitida={operacaoPermitida}
                 onOpenPairModal={() => setOpenPairModal(true)}
+                isTeacherPair={isTeacherPair}
               />
 
               <Divider sx={{ my: 2 }} />
@@ -388,6 +387,9 @@ export default function ChecklistTradingPage() {
                     items={items}
                     checklist={checklist}
                     toggle={toggle}
+                    selectedPair={selectedPair}
+                    operationTeacherPair={operationTeacherPair}
+                    isTeacherPair={isTeacherPair}
                   />
                 )
               })}
@@ -468,9 +470,10 @@ export default function ChecklistTradingPage() {
         selectedPair={selectedPair}
         pairSearch={pairSearch}
         setPairSearch={setPairSearch}
-        professorPairs={professorPairs}
+        teacherPair={teacherPair}
         filteredPairs={filteredPairs}
         handlePairSelect={handlePairSelect}
+        isTeacherMode={isTeacherPair}
       />
 
       <ResumoDialog

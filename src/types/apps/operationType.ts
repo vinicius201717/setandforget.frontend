@@ -6,11 +6,16 @@ export interface OperationType {
   isTeacher: boolean
   status: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED'
   rr?: number
-  checklist?: string
+  checklist?: Record<string, boolean>
   notes?: string
   createdAt: string
   updatedAt: string
   publishedAt?: string
+}
+
+export interface TeacherOperationsResponse {
+  drafts: OperationType[]
+  published: OperationType[]
 }
 
 export interface CreateOperationType {
