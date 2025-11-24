@@ -25,7 +25,7 @@ import { createOperation } from 'src/pages/api/operation/createOperation'
 import { CHECKLIST, FOREX_PAIRS, GRADES } from 'src/utils/checklist'
 import PairSelectDialog from 'src/components/checklist/modal/PairSelectDialog'
 import ResumoDialog from 'src/components/checklist/modal/ResumeDialog'
-import PublishDialog from 'src/components/checklist/modal/PublishDialog'
+import PublishDialog from 'src/components/checklist/modal/publishModal/PublishDialog'
 import HeaderSection from 'src/components/checklist/HeaderSelection'
 import ChecklistGroup from 'src/components/checklist/ChecklistGroup'
 import ResumoRapidoCard from 'src/components/checklist/ResumeRapidCard'
@@ -35,16 +35,27 @@ import { AnalysisItem, OperationType } from 'src/types/apps/operationType'
 import { getOperationsByUserDraft } from 'src/pages/api/operation/getOperationByUserDraft'
 import { deleteOperation } from 'src/pages/api/operation/deleteOperation'
 import { getOperationsByTeacher } from 'src/pages/api/operation/getOperationByTeacher'
+import { ImagesModal } from 'src/components/checklist/modal/publishModal/ImageLinksDialog'
 
+// Zod schema atualizado: totalRR como string (só números), imageBlocks opcional
 const publishSchema = z.object({
   notes: z.string().optional(),
-  link: z
+
+  type: z.enum(['buy', 'sell']),
+
+  totalRR: z
     .string()
-    .regex(
-      /^https:\/\/(www\.)?tradingview\.com\/x\/[A-Za-z0-9]+\/?$/,
-      'O link deve estar no formato https://www.tradingview.com/x/XXXXXX/',
-    ),
+    .regex(/^\d+(\.\d+)?$/, 'RR inválido — use apenas números'),
+
+  entryDate: z.string(),
+  entryTime: z.string(),
+
+  exitDate: z.string(),
+  exitTime: z.string(),
+
+  result: z.string().min(1, 'Informe o resultado da operação'),
 })
+
 type PublishFormData = z.infer<typeof publishSchema>
 
 export default function ChecklistTradingPage() {
@@ -62,10 +73,23 @@ export default function ChecklistTradingPage() {
   const [operationTeacherPair, setOperationTeacherPair] = useState<
     OperationType[]
   >([])
+  const [openImagesModal, setOpenImagesModal] = useState(false)
+
+  // imageBlocks mantidos no pai: array de { link, text }
+  const [links, setLinks] = useState<{ link: string; text: string }[]>([])
 
   const form = useForm<PublishFormData>({
     resolver: zodResolver(publishSchema),
-    defaultValues: { notes: '', link: '' },
+    defaultValues: {
+      notes: '',
+      type: 'buy',
+      totalRR: '2',
+      entryDate: new Date().toISOString().slice(0, 10),
+      entryTime: '09:00',
+      exitDate: new Date().toISOString().slice(0, 10),
+      exitTime: '12:00',
+      result: '',
+    },
   })
   const { handleSubmit, control, reset } = form
 
@@ -148,13 +172,36 @@ export default function ChecklistTradingPage() {
   }
 
   const onSubmitPublish = (data: PublishFormData) => {
+    // Links já estão no state pai; normalizamos (trim)
+    const normalizedLinks = links
+      .map((b) => ({ link: b.link?.trim() ?? '', text: b.text?.trim() ?? '' }))
+      .filter((b) => b.link || b.text) // remove blocos vazios
+
+    const flattenedLinks = normalizedLinks.flatMap((b) => [b.link, b.text])
+
+    // validação adicional: totalRR string -> number
+    const totalRrNumber = Number(data.totalRR)
+    if (Number.isNaN(totalRrNumber)) {
+      toast.error('RR inválido — use apenas números', {
+        position: 'bottom-right',
+      })
+      return
+    }
+
     createOperation({
       pair: selectedPair,
       checklist: JSON.stringify(checklist),
+      type: data.type,
+      totalRR: totalRrNumber,
+      entryDate: data.entryDate,
+      entryTime: data.entryTime,
+      exitDate: data.exitDate,
+      exitTime: data.exitTime,
+      result: data.result,
+      links: flattenedLinks,
       rr,
       status: 'PUBLISHED',
-      notes: data.notes,
-      link: data.link,
+      notes: data.notes || '',
     }).then((res: any) => {
       if (res) {
         toast.success('Operação publicada com sucesso!', {
@@ -172,13 +219,11 @@ export default function ChecklistTradingPage() {
           Object.keys(checklist).filter((id) => checklist[id]),
         )
 
-        // 🔹 Gera uma chave única (pair + itens)
         const makeKey = (pair: string, checked: string[]) =>
           `${pair}|${checked.join(',')}`
 
         const publishedKey = makeKey(selectedPair, publishedChecked)
 
-        // 🔹 Remove da lista de análises o item que tiver a mesma chave
         setAnalyses((prev) => {
           const prevNormalized = prev.map((a) => ({
             ...a,
@@ -194,6 +239,8 @@ export default function ChecklistTradingPage() {
 
     setOpenPublishModal(false)
     reset()
+    // limpar blocos de imagem após publicar
+    setLinks([{ link: '', text: '' }])
   }
 
   const onSubmitDraft = () => {
@@ -351,10 +398,6 @@ export default function ChecklistTradingPage() {
     fetchDrafts()
   }, [])
 
-  useEffect(() => {
-    console.log(teacherPair)
-  }, [teacherPair])
-
   return (
     <Box
       sx={{
@@ -492,6 +535,16 @@ export default function ChecklistTradingPage() {
         handleSubmit={handleSubmit}
         onSubmitPublish={onSubmitPublish}
         control={control}
+        links={links}
+        onOpenImages={() => setOpenImagesModal(true)}
+      />
+
+      {/* Images modal */}
+      <ImagesModal
+        open={openImagesModal}
+        onClose={() => setOpenImagesModal(false)}
+        links={links}
+        setLinks={setLinks}
       />
     </Box>
   )

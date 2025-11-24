@@ -32,7 +32,11 @@ const navigation = (): VerticalNavItemsType => {
       icon: 'mdi:chart-box-outline',
       path: '/assessment',
     },
-
+    {
+      title: 'Calendar',
+      icon: 'mdi:calendar-month-outline',
+      path: '/pages/calendar',
+    },
     {
       sectionTitle: 'Administration',
       role: 'admin',

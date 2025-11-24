@@ -32,6 +32,11 @@ const navigation = (): HorizontalNavItemsType => {
       title: 'New Post',
       icon: 'mdi:note-edit-outline',
       path: '/admin/new-post',
+    },
+    {
+      title: 'New Post',
+      icon: 'mdi:note-edit-outline',
+      path: '/admin/new-post',
       role: 'admin',
     },
   ]

@@ -93,7 +93,10 @@ export default function ChecklistGroup({
                             !teacherMarked &&
                             !isUserChecked
                           ) {
-                            toast.error('O professor não selecionou este item.')
+                            toast.error(
+                              'O professor não selecionou este item.',
+                              { position: 'bottom-right' },
+                            )
                           }
 
                           toggle(it.id)

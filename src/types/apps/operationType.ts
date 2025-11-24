@@ -24,7 +24,14 @@ export interface CreateOperationType {
   rr?: number
   checklist?: string
   notes?: string
-  link?: string
+  links?: string[]
+  totalRR?: number
+  type?: 'buy' | 'sell'
+  entryDate?: string
+  entryTime?: string
+  exitDate?: string
+  exitTime?: string
+  result?: string
 }
 
 export interface UpdateOperationType {
@@ -54,4 +61,12 @@ export interface AnalisesRegistradasCardProps {
   analyses: AnalysisItem[]
   loadAnalysis: (a: AnalysisItem) => void
   onDelete: (analysis: AnalysisItem) => void
+}
+
+export interface MediaEntry {
+  id: string
+  file?: File
+  preview?: string
+  link?: string
+  description?: string
 }
