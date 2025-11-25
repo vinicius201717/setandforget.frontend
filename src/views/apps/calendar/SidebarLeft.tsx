@@ -7,7 +7,10 @@ import FormControlLabel from '@mui/material/FormControlLabel'
 
 // ** Types
 import { ThemeColor } from 'src/@core/layouts/types'
-import { SidebarLeftType, CalendarFiltersType } from 'src/types/apps/calendarTypes'
+import {
+  SidebarLeftType,
+  CalendarFiltersType,
+} from 'src/types/apps/calendarTypes'
 
 const SidebarLeft = (props: SidebarLeftType) => {
   const {
@@ -21,7 +24,7 @@ const SidebarLeft = (props: SidebarLeftType) => {
     handleAllCalendars,
     handleCalendarsUpdate,
     handleLeftSidebarToggle,
-    handleAddEventSidebarToggle
+    handleAddEventSidebarToggle,
   } = props
 
   const colorsArr = calendarsColor ? Object.entries(calendarsColor) : []
@@ -35,8 +38,12 @@ const SidebarLeft = (props: SidebarLeftType) => {
             control={
               <Checkbox
                 color={value as ThemeColor}
-                checked={store.selectedCalendars.includes(key as CalendarFiltersType)}
-                onChange={() => dispatch(handleCalendarsUpdate(key as CalendarFiltersType))}
+                checked={store.selectedCalendars.includes(
+                  key as CalendarFiltersType,
+                )}
+                onChange={() =>
+                  dispatch(handleCalendarsUpdate(key as CalendarFiltersType))
+                }
               />
             }
           />
@@ -59,7 +66,7 @@ const SidebarLeft = (props: SidebarLeftType) => {
           disablePortal: true,
           disableAutoFocus: true,
           disableScrollLock: true,
-          keepMounted: true // Better open performance on mobile.
+          keepMounted: true, // Better open performance on mobile.
         }}
         sx={{
           zIndex: 3,
@@ -72,21 +79,28 @@ const SidebarLeft = (props: SidebarLeftType) => {
             borderTopRightRadius: 0,
             alignItems: 'flex-start',
             borderBottomRightRadius: 0,
-            p: theme => theme.spacing(5),
+            p: (theme) => theme.spacing(5),
             zIndex: mdAbove ? 2 : 'drawer',
-            position: mdAbove ? 'static' : 'absolute'
+            position: mdAbove ? 'static' : 'absolute',
           },
           '& .MuiBackdrop-root': {
             borderRadius: 1,
-            position: 'absolute'
-          }
+            position: 'absolute',
+          },
         }}
       >
-        <Button fullWidth variant='contained' onClick={handleSidebarToggleSidebar}>
+        <Button
+          fullWidth
+          variant='contained'
+          onClick={handleSidebarToggleSidebar}
+        >
           Add Event
         </Button>
 
-        <Typography variant='caption' sx={{ mt: 7, mb: 2, textTransform: 'uppercase' }}>
+        <Typography
+          variant='caption'
+          sx={{ mt: 7, mb: 2, textTransform: 'uppercase' }}
+        >
           Calendars
         </Typography>
         <FormControlLabel
@@ -95,7 +109,7 @@ const SidebarLeft = (props: SidebarLeftType) => {
             <Checkbox
               color='secondary'
               checked={store.selectedCalendars.length === colorsArr.length}
-              onChange={e => dispatch(handleAllCalendars(e.target.checked))}
+              onChange={(e) => dispatch(handleAllCalendars(e.target.checked))}
             />
           }
         />

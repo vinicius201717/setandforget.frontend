@@ -14,7 +14,10 @@ import { useSettings } from 'src/@core/hooks/useSettings'
 
 // ** Types
 import { RootState, AppDispatch } from 'src/store'
-import { CalendarColors, CalendarFiltersType } from 'src/types/apps/calendarTypes'
+import {
+  CalendarColors,
+  CalendarFiltersType,
+} from 'src/types/apps/calendarTypes'
 
 // ** FullCalendar & App Components Imports
 import Calendar from 'src/views/apps/calendar/Calendar'
@@ -30,16 +33,17 @@ import {
   updateEvent,
   handleSelectEvent,
   handleAllCalendars,
-  handleCalendarsUpdate
+  handleCalendarsUpdate,
 } from 'src/store/apps/calendar'
+import { getOperationsByUserPublished } from 'src/pages/api/operation/getOperationPublishedByUser'
 
 // ** CalendarColors
 const calendarsColor: CalendarColors = {
-  Personal: 'error',
-  Business: 'primary',
-  Family: 'warning',
-  Holiday: 'success',
-  ETC: 'info'
+  Operational: 'error',
+  Emotional: 'primary',
+  Take_profit: 'warning',
+  Stop_loss: 'success',
+  ETC: 'info',
 }
 
 const AppCalendar = () => {
@@ -63,16 +67,63 @@ const AppCalendar = () => {
     dispatch(fetchEvents(store.selectedCalendars as CalendarFiltersType[]))
   }, [dispatch, store.selectedCalendars])
 
+  useEffect(() => {
+    getOperationsByUserPublished().then((operations) => {
+      if (!operations) return
+
+      const allEvents: any[] = []
+
+      operations.forEach((op) => {
+        const entry = new Date(`${op.entryDate}T${op.entryTime || '00:00'}`)
+        const exit = new Date(`${op.exitDate}T${op.exitTime || '00:00'}`)
+
+        // Garantia de fallback
+        if (isNaN(entry.getTime()) || isNaN(exit.getTime())) return
+
+        // Quantos dias há entre entrada e saída?
+        const daysDiff =
+          Math.floor(
+            (exit.getTime() - entry.getTime()) / (1000 * 60 * 60 * 24),
+          ) + 1
+
+        for (let i = 0; i < daysDiff; i++) {
+          const dayStart = new Date(entry)
+          dayStart.setDate(entry.getDate() + i)
+
+          const dayEnd = new Date(dayStart)
+          dayEnd.setHours(23, 59, 59, 999)
+
+          allEvents.push({
+            id: `${op.id}-${i}`,
+            title: op.pair,
+            start: dayStart.toISOString(),
+            end: dayEnd.toISOString(),
+            allDay: false,
+            extendedProps: {
+              result: op.result ?? '',
+              calendar: 'Operational',
+            },
+          })
+        }
+      })
+
+      dispatch({ type: 'calendar/setEvents', payload: allEvents })
+    })
+  }, [])
+
   const handleLeftSidebarToggle = () => setLeftSidebarOpen(!leftSidebarOpen)
 
-  const handleAddEventSidebarToggle = () => setAddEventSidebarOpen(!addEventSidebarOpen)
+  const handleAddEventSidebarToggle = () =>
+    setAddEventSidebarOpen(!addEventSidebarOpen)
 
   return (
     <CalendarWrapper
       className='app-calendar'
       sx={{
         boxShadow: skin === 'bordered' ? 0 : 6,
-        ...(skin === 'bordered' && { border: theme => `1px solid ${theme.palette.divider}` })
+        ...(skin === 'bordered' && {
+          border: (theme) => `1px solid ${theme.palette.divider}`,
+        }),
       }}
     >
       <SidebarLeft
@@ -96,7 +147,9 @@ const AppCalendar = () => {
           borderRadius: 1,
           boxShadow: 'none',
           backgroundColor: 'background.paper',
-          ...(mdAbove ? { borderTopLeftRadius: 0, borderBottomLeftRadius: 0 } : {})
+          ...(mdAbove
+            ? { borderTopLeftRadius: 0, borderBottomLeftRadius: 0 }
+            : {}),
         }}
       >
         <Calendar

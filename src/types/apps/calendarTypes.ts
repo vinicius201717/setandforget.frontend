@@ -7,20 +7,20 @@ import { Dispatch } from 'redux'
 import { ThemeColor } from 'src/@core/layouts/types'
 
 export type CalendarFiltersType =
-  | 'Personal'
-  | 'Business'
-  | 'Family'
-  | 'Holiday'
+  | 'Operational'
+  | 'Emotional'
+  | 'Take_profit'
+  | 'Stop_loss'
   | 'ETC'
 
 export type EventDateType = Date | null | undefined
 
 export type CalendarColors = {
   ETC: ThemeColor
-  Family: ThemeColor
-  Holiday: ThemeColor
-  Personal: ThemeColor
-  Business: ThemeColor
+  Operational: ThemeColor
+  Emotional: ThemeColor
+  Take_profit: ThemeColor
+  Stop_loss: ThemeColor
 }
 
 export type EventType = {

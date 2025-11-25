@@ -1,4 +1,9 @@
 /* eslint-disable no-unused-vars */
+
+export interface ImageBlock {
+  link: string
+  text?: string
+}
 export interface OperationType {
   id: string
   userId: string
@@ -11,6 +16,14 @@ export interface OperationType {
   createdAt: string
   updatedAt: string
   publishedAt?: string
+  links?: ImageBlock[]
+  totalRR?: number
+  type?: 'buy' | 'sell'
+  entryDate?: string
+  entryTime?: string
+  exitDate?: string
+  exitTime?: string
+  result?: string
 }
 
 export interface TeacherOperationsResponse {
@@ -18,10 +31,6 @@ export interface TeacherOperationsResponse {
   published: OperationType[]
 }
 
-export interface ImageBlock {
-  link: string
-  text?: string
-}
 export interface CreateOperationType {
   pair: string
   status?: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED'

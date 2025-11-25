@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 // ** React Import
 import { useEffect, useRef } from 'react'
 
@@ -10,7 +12,7 @@ import bootstrap5Plugin from '@fullcalendar/bootstrap5'
 import interactionPlugin from '@fullcalendar/interaction'
 
 // ** Types
-import { CalendarType } from 'src/types/apps/calendarTypes'
+import { CalendarColors, CalendarType } from 'src/types/apps/calendarTypes'
 
 // ** Third Party Style Import
 import 'bootstrap-icons/font/bootstrap-icons.css'
@@ -25,8 +27,8 @@ const blankEvent = {
     calendar: '',
     guests: [],
     location: '',
-    description: ''
-  }
+    description: '',
+  },
 }
 
 const Calendar = (props: CalendarType) => {
@@ -41,7 +43,7 @@ const Calendar = (props: CalendarType) => {
     setCalendarApi,
     handleSelectEvent,
     handleLeftSidebarToggle,
-    handleAddEventSidebarToggle
+    handleAddEventSidebarToggle,
   } = props
 
   // ** Refs
@@ -58,16 +60,22 @@ const Calendar = (props: CalendarType) => {
     // ** calendarOptions(Props)
     const calendarOptions = {
       events: store.events.length ? store.events : [],
-      plugins: [interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin, bootstrap5Plugin],
+      plugins: [
+        interactionPlugin,
+        dayGridPlugin,
+        timeGridPlugin,
+        listPlugin,
+        bootstrap5Plugin,
+      ],
       initialView: 'dayGridMonth',
       headerToolbar: {
         start: 'sidebarToggle, prev, next, title',
-        end: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth'
+        end: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth',
       },
       views: {
         week: {
-          titleFormat: { year: 'numeric', month: 'long', day: 'numeric' }
-        }
+          titleFormat: { year: 'numeric', month: 'long', day: 'numeric' },
+        },
       },
 
       /*
@@ -102,11 +110,18 @@ const Calendar = (props: CalendarType) => {
 
       eventClassNames({ event: calendarEvent }: any) {
         // @ts-ignore
-        const colorName = calendarsColor[calendarEvent._def.extendedProps.calendar]
+        const calendarKey = calendarEvent._def.extendedProps.calendar
+
+        const colorName = Object.prototype.hasOwnProperty.call(
+          calendarsColor,
+          calendarKey,
+        )
+          ? calendarsColor[calendarKey as keyof CalendarColors]
+          : 'primary' // fallback
 
         return [
           // Background Color
-          `bg-${colorName}`
+          `bg-${colorName}`,
         ]
       },
 
@@ -126,8 +141,8 @@ const Calendar = (props: CalendarType) => {
           icon: 'bi bi-list',
           click() {
             handleLeftSidebarToggle()
-          }
-        }
+          },
+        },
       },
 
       dateClick(info: any) {
@@ -161,7 +176,7 @@ const Calendar = (props: CalendarType) => {
       ref: calendarRef,
 
       // Get direction from app state (store)
-      direction
+      direction,
     }
 
     // @ts-ignore
