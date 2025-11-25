@@ -64,7 +64,7 @@ export default function ChecklistTradingPage() {
   const [rr, setRr] = useState<number>(0)
   const [openResumo, setOpenResumo] = useState(false)
   const [openPairModal, setOpenPairModal] = useState(false)
-  const [selectedPair, setSelectedPair] = useState('EUR/USD')
+  const [selectedPair, setSelectedPair] = useState('')
   const [pairSearch, setPairSearch] = useState('')
   const [analyses, setAnalyses] = useState<AnalysisItem[]>([])
   const [openPublishModal, setOpenPublishModal] = useState(false)
@@ -138,6 +138,15 @@ export default function ChecklistTradingPage() {
   const handlePairSelect = (pair: string, teacherMode: boolean) => {
     setSelectedPair(pair)
     setIsTeacherPair(!!teacherMode)
+
+    const saved = analyses.find((a) => a.pair === pair)
+
+    if (saved) {
+      loadAnalysis(saved)
+    } else {
+      setChecklist({})
+      setRr(0)
+    }
   }
 
   const parseChecklistField = (raw: any): Record<string, boolean> => {
@@ -172,12 +181,12 @@ export default function ChecklistTradingPage() {
   }
 
   const onSubmitPublish = (data: PublishFormData) => {
-    // Links já estão no state pai; normalizamos (trim)
     const normalizedLinks = links
-      .map((b) => ({ link: b.link?.trim() ?? '', text: b.text?.trim() ?? '' }))
-      .filter((b) => b.link || b.text) // remove blocos vazios
-
-    const flattenedLinks = normalizedLinks.flatMap((b) => [b.link, b.text])
+      .map((b) => ({
+        link: b.link?.trim() ?? '',
+        text: b.text?.trim() ?? '',
+      }))
+      .filter((b) => b.link !== '' || b.text !== '')
 
     // validação adicional: totalRR string -> number
     const totalRrNumber = Number(data.totalRR)
@@ -198,7 +207,7 @@ export default function ChecklistTradingPage() {
       exitDate: data.exitDate,
       exitTime: data.exitTime,
       result: data.result,
-      links: flattenedLinks,
+      links: normalizedLinks,
       rr,
       status: 'PUBLISHED',
       notes: data.notes || '',
@@ -282,18 +291,22 @@ export default function ChecklistTradingPage() {
         const newKey = makeKey(newAnalysis.pair, newChecked)
 
         setAnalyses((prev) => {
-          const prevNormalized = prev.map((a) => ({
-            ...a,
-            _key: makeKey(a.pair, normalize(a.checkedItems)),
-          }))
+          // normalização das checkedItems
+          const normalize = (items: string[]) =>
+            items
+              .map((s) => String(s).trim())
+              .filter(Boolean)
+              .sort((a, b) => a.localeCompare(b))
 
-          // se backend retornou id do rascunho, use por id
+          const newChecked = normalize(newAnalysis.checkedItems)
+
+          // 1 — Atualizar por ID (melhor cenário)
           if (res.id) {
-            const idxById = prev.findIndex((a) => a.id === res.id)
-            if (idxById !== -1) {
+            const idx = prev.findIndex((a) => a.id === res.id)
+            if (idx !== -1) {
               const updated = [...prev]
-              updated[idxById] = {
-                ...(updated[idxById] as any),
+              updated[idx] = {
+                ...updated[idx],
                 date: new Date(
                   res.updatedAt ?? res.createdAt ?? Date.now(),
                 ).toLocaleDateString('pt-BR'),
@@ -302,37 +315,26 @@ export default function ChecklistTradingPage() {
               }
               return updated
             }
-            // não existia: inserir item vindo do backend (preferível)
-            return [
-              ...prev,
-              {
-                id: res.id,
-                pair: res.pair ?? newAnalysis.pair,
-                date: new Date(res.createdAt ?? Date.now()).toLocaleDateString(
-                  'pt-BR',
-                ),
-                checkedItems: newChecked,
-              },
-            ]
           }
 
-          // fallback: compara por conteúdo normalizado (key)
-          const existingIdx = prevNormalized.findIndex((p) => p._key === newKey)
-          if (existingIdx !== -1) {
+          // 2 — Atualizar por PAR (pair) caso id não exista
+          const idxByPair = prev.findIndex((a) => a.pair === newAnalysis.pair)
+          if (idxByPair !== -1) {
             const updated = [...prev]
-            updated[existingIdx] = {
-              ...updated[existingIdx],
+            updated[idxByPair] = {
+              ...updated[idxByPair],
               date: newAnalysis.date,
               checkedItems: newChecked,
+              id: res?.id ?? updated[idxByPair].id,
             }
             return updated
           }
 
-          // não existe: adiciona
+          // 3 — Criar novo item apenas se realmente não existe
           return [
             ...prev,
             {
-              id: res?.id, // pode ser undefined
+              id: res?.id,
               pair: newAnalysis.pair,
               date: newAnalysis.date,
               checkedItems: newChecked,

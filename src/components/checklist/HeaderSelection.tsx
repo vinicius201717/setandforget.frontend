@@ -84,7 +84,7 @@ export default function HeaderSection({
           transition: '0.25s',
         }}
       >
-        {selectedPair || 'Nenhum'}
+        {selectedPair || 'SELECIONE UM PAR'}
       </Box>
     </Box>
   )

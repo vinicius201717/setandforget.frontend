@@ -18,13 +18,17 @@ export interface TeacherOperationsResponse {
   published: OperationType[]
 }
 
+export interface ImageBlock {
+  link: string
+  text?: string
+}
 export interface CreateOperationType {
   pair: string
   status?: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED'
   rr?: number
   checklist?: string
   notes?: string
-  links?: string[]
+  links?: ImageBlock[]
   totalRR?: number
   type?: 'buy' | 'sell'
   entryDate?: string

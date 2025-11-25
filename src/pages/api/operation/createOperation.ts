@@ -14,7 +14,7 @@ export async function createOperation(
         headers: { Authorization: `Bearer ${storedToken}` },
       })
       if (response.status === 201 || response.status === 200)
-        return response.data
+        return 'response.data'
       return null
     }
   } catch (error) {
